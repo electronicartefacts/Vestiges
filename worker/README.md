@@ -9,6 +9,7 @@ Récepteur minimal du formulaire public. Le Worker reste en mode `closed` tant q
 - D1 créé avec juridiction européenne ;
 - schéma fermé et rejet des champs inconnus ;
 - origine, taille, durée minimale, honeypot, limitation et dédoublonnage ;
+- validation serveur Turnstile incluant succès, action attendue et correspondance exacte du domaine ;
 - synchronisation privée signée et protégée contre le rejeu ;
 - suppression du ciphertext dès l'accusé local ;
 - aucune journalisation applicative du corps.

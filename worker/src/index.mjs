@@ -1,7 +1,14 @@
 import { IntakeError, validateSubmission } from "./validation.mjs";
 import { bytesToBase64Url, encryptEnvelope, hmac, hmacTag, secureEqual, sha256 } from "./crypto.mjs";
 
-const JSON_HEADERS = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" };
+const JSON_HEADERS = {
+  "content-type": "application/json; charset=utf-8",
+  "cache-control": "no-store",
+  "content-security-policy": "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
+  "referrer-policy": "no-referrer",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY"
+};
 
 function response(body, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(body), { status, headers: { ...JSON_HEADERS, ...extraHeaders } });
@@ -27,6 +34,14 @@ function isoAfter(milliseconds) {
   return new Date(Date.now() + milliseconds).toISOString();
 }
 
+function requireSecrets(env, names) {
+  for (const name of names) {
+    if (typeof env[name] !== "string" || env[name].length < 24) {
+      throw new IntakeError("TEMPORARILY_UNAVAILABLE", 503);
+    }
+  }
+}
+
 async function requireClosedTestAccess(request, env) {
   if (env.INTAKE_MODE === "open") return;
   if (!env.TEST_TOKEN || !(await secureEqual(request.headers.get("x-vestiges-test-token") || "", env.TEST_TOKEN))) {
@@ -34,16 +49,28 @@ async function requireClosedTestAccess(request, env) {
   }
 }
 
-async function verifyTurnstile(token, request, env) {
+export async function verifyTurnstile(token, request, env, origin) {
   if (env.TURNSTILE_REQUIRED !== "true") return;
   if (!token || !env.TURNSTILE_SECRET) throw new IntakeError("CHALLENGE_FAILED", 403);
-  const verification = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ secret: env.TURNSTILE_SECRET, response: token, remoteip: request.headers.get("CF-Connecting-IP") || undefined })
-  });
-  const result = await verification.json();
-  if (!result.success) throw new IntakeError("CHALLENGE_FAILED", 403);
+  let verification;
+  let result;
+  try {
+    verification = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ secret: env.TURNSTILE_SECRET, response: token, remoteip: request.headers.get("CF-Connecting-IP") || undefined }),
+      signal: AbortSignal.timeout(5000)
+    });
+    result = await verification.json();
+  } catch {
+    throw new IntakeError("TEMPORARILY_UNAVAILABLE", 503);
+  }
+  let expectedHostname = "";
+  try { expectedHostname = new URL(origin).hostname; } catch { throw new IntakeError("CHALLENGE_FAILED", 403); }
+  const expectedAction = String(env.TURNSTILE_EXPECTED_ACTION || "vestiges_intake");
+  if (!verification.ok || !result.success || result.action !== expectedAction || result.hostname !== expectedHostname) {
+    throw new IntakeError("CHALLENGE_FAILED", 403);
+  }
 }
 
 async function enforceRateLimit(request, env) {
@@ -61,6 +88,7 @@ async function acceptSubmission(request, env) {
   const origin = request.headers.get("origin") || "";
   if (!allowedOrigins(env).has(origin)) throw new IntakeError("INVALID_REQUEST", 403);
   await requireClosedTestAccess(request, env);
+  requireSecrets(env, ["DEDUPE_SECRET", "RATE_LIMIT_SECRET", "ENCRYPTION_PUBLIC_KEY_SPKI"]);
 
   const contentType = request.headers.get("content-type") || "";
   const declaredLength = Number(request.headers.get("content-length") || 0);
@@ -71,7 +99,7 @@ async function acceptSubmission(request, env) {
 
   let parsed;
   try { parsed = JSON.parse(raw); } catch { throw new IntakeError(); }
-  await verifyTurnstile(parsed.turnstile_token, request, env);
+  await verifyTurnstile(parsed.turnstile_token, request, env, origin);
   const clean = validateSubmission(parsed);
   await enforceRateLimit(request, env);
 
@@ -85,16 +113,29 @@ async function acceptSubmission(request, env) {
   const submissionId = crypto.randomUUID();
   const receivedAt = new Date().toISOString();
   const expiresAt = isoAfter(Number(env.RETENTION_HOURS || 168) * 3600000);
-  await env.DB.prepare(`INSERT INTO submissions (
-    submission_id, received_at, form_type, schema_version, form_version, notice_version, key_version,
-    wrapped_key, iv, ciphertext, dedupe_tag, status, expires_at
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)`)
-    .bind(submissionId, receivedAt, clean.form_type, clean.schema_version, clean.form_version, clean.notice_version,
-      env.KEY_VERSION, encrypted.wrapped_key, encrypted.iv, encrypted.ciphertext, dedupeTag, expiresAt).run();
+  try {
+    await env.DB.prepare(`INSERT INTO submissions (
+      submission_id, received_at, form_type, schema_version, form_version, notice_version, key_version,
+      wrapped_key, iv, ciphertext, dedupe_tag, status, expires_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)`)
+      .bind(submissionId, receivedAt, clean.form_type, clean.schema_version, clean.form_version, clean.notice_version,
+        env.KEY_VERSION, encrypted.wrapped_key, encrypted.iv, encrypted.ciphertext, dedupeTag, expiresAt).run();
+  } catch (error) {
+    const concurrentDuplicate = await env.DB.prepare("SELECT submission_id FROM submissions WHERE dedupe_tag = ? AND expires_at > ?")
+      .bind(dedupeTag, new Date().toISOString()).first();
+    if (concurrentDuplicate) {
+      return response({ status: "ACCEPTED", submission_id: concurrentDuplicate.submission_id, contract_version: clean.schema_version }, 202, cors);
+    }
+    throw error;
+  }
   return response({ status: "ACCEPTED", submission_id: submissionId, contract_version: clean.schema_version }, 202, cors);
 }
 
 async function authenticateSync(request, body, env) {
+  requireSecrets(env, ["SYNC_HMAC_SECRET"]);
+  if (typeof env.SYNC_CLIENT_ID !== "string" || env.SYNC_CLIENT_ID.length < 8) {
+    throw new IntakeError("TEMPORARILY_UNAVAILABLE", 503);
+  }
   const client = request.headers.get("x-vestiges-client") || "";
   const timestamp = request.headers.get("x-vestiges-timestamp") || "";
   const nonce = request.headers.get("x-vestiges-nonce") || "";

@@ -14,7 +14,13 @@
   function initStableAnchor() {
     if (!window.location.hash || !("fonts" in document)) return;
     document.fonts.ready.then(() => {
-      const target = document.querySelector(window.location.hash);
+      let anchorId = "";
+      try {
+        anchorId = decodeURIComponent(window.location.hash.slice(1));
+      } catch (_error) {
+        return;
+      }
+      const target = anchorId ? document.getElementById(anchorId) : null;
       if (target) target.scrollIntoView({ block: "start", behavior: "auto" });
     });
   }
@@ -420,10 +426,19 @@
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok || result.status !== "ACCEPTED") throw new Error("SUBMISSION_REJECTED");
-        form.replaceChildren(Object.assign(document.createElement("div"), {
-          className: "form-step",
-          innerHTML: "<div class='step-heading'><span>Proposition transmise</span><h3>Merci pour votre regard.</h3><p>Votre proposition a été transmise pour examen. Aucun profil n’a été créé et rien ne sera publié.</p></div>"
-        }));
+        const confirmation = document.createElement("div");
+        confirmation.className = "form-step";
+        const heading = document.createElement("div");
+        heading.className = "step-heading";
+        const label = document.createElement("span");
+        label.textContent = "Proposition transmise";
+        const title = document.createElement("h3");
+        title.textContent = "Merci pour votre regard.";
+        const copy = document.createElement("p");
+        copy.textContent = "Votre proposition a été transmise pour examen. Aucun profil n’a été créé et rien ne sera publié.";
+        heading.append(label, title, copy);
+        confirmation.append(heading);
+        form.replaceChildren(confirmation);
       } catch (_error) {
         showError("La proposition n’a pas été transmise. Réessayez plus tard ou écrivez à contact@vestiges.world.");
         submitButton.disabled = false;
