@@ -163,6 +163,7 @@
     if (!form) return;
 
     const startedAt = new Date().toISOString();
+    const requestId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const steps = Array.from(form.querySelectorAll("[data-step]"));
     const progress = Array.from(form.querySelectorAll("[data-progress]"));
     const previousButton = form.querySelector("[data-previous]");
@@ -172,13 +173,43 @@
     const status = document.querySelector("[data-collection-status]");
     const message = form.querySelector("textarea[name='message']");
     const counter = form.querySelector("[data-character-count]");
+    const challengeContainer = form.querySelector("[data-turnstile-container]");
+    const challengeWidget = form.querySelector("[data-turnstile-widget]");
+    let turnstileToken = "";
+    let turnstileWidgetId = null;
     let currentStep = 1;
 
     const isOpen = Boolean(config.collectionEnabled && config.intakeEndpoint);
+    const requiresTurnstile = Boolean(isOpen && config.turnstileRequired && config.turnstileSiteKey);
     document.documentElement.dataset.collection = isOpen ? "open" : "closed";
     status.textContent = isOpen
       ? "Collecte ouverte — les informations sont transmises de manière sécurisée à Electronic Artefacts."
       : "Prototype public — parcours testable, transmission volontairement désactivée pendant la configuration de l’infrastructure.";
+
+    const loadTurnstile = () => {
+      if (!requiresTurnstile || !challengeContainer || !challengeWidget || turnstileWidgetId !== null) return;
+      challengeContainer.hidden = false;
+      const render = () => {
+        if (!window.turnstile || turnstileWidgetId !== null) return;
+        turnstileWidgetId = window.turnstile.render(challengeWidget, {
+          sitekey: config.turnstileSiteKey,
+          theme: "light",
+          language: "fr",
+          appearance: "interaction-only",
+          action: "vestiges_intake",
+          callback: (token) => { turnstileToken = token; showError(""); },
+          "expired-callback": () => { turnstileToken = ""; },
+          "error-callback": () => { turnstileToken = ""; }
+        });
+      };
+      if (window.turnstile) return render();
+      const script = document.createElement("script");
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.async = true;
+      script.defer = true;
+      script.addEventListener("load", render, { once: true });
+      document.head.append(script);
+    };
 
     const showError = (text) => {
       error.textContent = text;
@@ -222,7 +253,10 @@
       previousButton.hidden = currentStep === 1;
       nextButton.hidden = currentStep === steps.length;
       submitButton.hidden = currentStep !== steps.length;
-      if (currentStep === steps.length) buildReview();
+      if (currentStep === steps.length) {
+        buildReview();
+        loadTurnstile();
+      }
       showError("");
       steps[currentStep - 1].querySelector("h3")?.focus?.({ preventScroll: true });
     };
@@ -311,9 +345,11 @@
         notice_version: formData.get("notice_version"),
         locale: "fr-FR",
         started_at: startedAt,
+        request_id: requestId,
         website: formData.get("website") || "",
         data: common,
-        notice_acknowledged: formData.get("notice_acknowledged") === "on"
+        notice_acknowledged: formData.get("notice_acknowledged") === "on",
+        ...(requiresTurnstile ? { turnstile_token: turnstileToken } : {})
       };
     };
 
@@ -350,6 +386,10 @@
         showError("La transmission est volontairement désactivée pendant la configuration de l’infrastructure. Vous pouvez examiner le parcours, mais aucune information n’a été envoyée ni enregistrée.");
         return;
       }
+      if (requiresTurnstile && !turnstileToken) {
+        showError("La vérification anti-abus doit être terminée avant la transmission.");
+        return;
+      }
 
       submitButton.disabled = true;
       submitButton.textContent = "Transmission…";
@@ -369,6 +409,10 @@
         showError("La proposition n’a pas été transmise. Réessayez plus tard ou écrivez à contact@vestiges.world.");
         submitButton.disabled = false;
         submitButton.textContent = "Transmettre la proposition";
+        if (turnstileWidgetId !== null && window.turnstile) {
+          window.turnstile.reset(turnstileWidgetId);
+          turnstileToken = "";
+        }
       }
     });
 

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "vestiges-intake",
+  "main": "src/index.mjs",
+  "compatibility_date": "2026-07-14",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "intake.vestiges.world",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "INTAKE_MODE": "closed",
+    "TURNSTILE_REQUIRED": "true",
+    "ALLOWED_ORIGINS": "https://vestiges.world,https://www.vestiges.world,http://127.0.0.1:4173,http://localhost:4173",
+    "KEY_VERSION": "v1",
+    "RETENTION_HOURS": "168",
+    "LEASE_MINUTES": "15",
+    "RATE_LIMIT_COUNT": "5",
+    "RATE_LIMIT_MINUTES": "10"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "vestiges-intake-eu",
+      "database_id": "7aa1a263-23a9-4d43-999a-5e139ada81f5",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

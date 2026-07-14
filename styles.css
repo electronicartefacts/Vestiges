@@ -1322,6 +1322,25 @@ summary,
   font-weight: 600;
 }
 
+.challenge-container {
+  display: grid;
+  gap: .7rem;
+  margin-top: 1rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--line);
+}
+
+.challenge-container > p {
+  margin: 0;
+  font-size: .75rem;
+  font-weight: 620;
+}
+
+.challenge-container > span {
+  color: var(--muted);
+  font-size: .67rem;
+}
+
 .form-error {
   grid-column: 2;
   margin: 0 clamp(2rem, 5vw, 5rem) 1rem;

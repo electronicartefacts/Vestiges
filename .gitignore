@@ -6,3 +6,7 @@ secrets/
 submissions/
 private/
 .playwright-cli/
+.wrangler/
+worker/.dev.vars
+worker/.wrangler/
+worker/.keys/
