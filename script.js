@@ -49,35 +49,48 @@
   }
 
   function initKineticType() {
-    const title = document.querySelector("[data-kinetic]");
-    if (!title || reduceMotion) return;
+    const titles = Array.from(document.querySelectorAll("[data-kinetic]"));
+    if (!titles.length || reduceMotion) return;
+
+    titles.forEach((title) => initKineticTitle(title));
+  }
+
+  function initKineticTitle(title) {
 
     const text = title.textContent.trim();
+    if (!title.hasAttribute("aria-label")) title.setAttribute("aria-label", text);
     const segmenter = "Segmenter" in Intl
       ? new Intl.Segmenter("fr", { granularity: "grapheme" })
       : null;
-    const graphemes = segmenter
-      ? Array.from(segmenter.segment(text), (part) => part.segment)
-      : Array.from(text);
-
     title.textContent = "";
-    graphemes.forEach((glyph) => {
-      if (/\s/.test(glyph)) {
-        title.append(document.createTextNode(glyph));
+    text.split(/(\s+)/).forEach((token) => {
+      if (!token) return;
+      if (/^\s+$/.test(token)) {
+        title.append(document.createTextNode(token));
         return;
       }
-      const span = document.createElement("span");
-      span.className = "glyph";
-      span.textContent = glyph;
-      title.append(span);
+      const word = document.createElement("span");
+      word.className = "kinetic-word";
+      word.setAttribute("aria-hidden", "true");
+      const graphemes = segmenter
+        ? Array.from(segmenter.segment(token), (part) => part.segment)
+        : Array.from(token);
+      graphemes.forEach((glyph) => {
+        const span = document.createElement("span");
+        span.className = "glyph";
+        span.textContent = glyph;
+        word.append(span);
+      });
+      title.append(word);
     });
 
     const glyphs = Array.from(title.querySelectorAll(".glyph"));
     let frame = 0;
+    const baseWeight = title.classList.contains("kinetic-title") ? 310 : 330;
 
     const reset = () => {
       glyphs.forEach((glyph) => {
-        glyph.style.setProperty("--glyph-weight", "310");
+        glyph.style.setProperty("--glyph-weight", String(baseWeight));
         glyph.style.setProperty("--glyph-shift", "0");
       });
     };
@@ -90,15 +103,17 @@
           const centerX = rect.left + rect.width / 2;
           const centerY = rect.top + rect.height / 2;
           const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
-          const influence = Math.max(0, 1 - distance / 190);
+          const radius = title.classList.contains("kinetic-title") ? 190 : 135;
+          const influence = Math.max(0, 1 - distance / radius);
           const softened = influence * influence * (3 - 2 * influence);
-          glyph.style.setProperty("--glyph-weight", String(Math.round(310 + softened * 360)));
+          glyph.style.setProperty("--glyph-weight", String(Math.round(baseWeight + softened * 340)));
           glyph.style.setProperty("--glyph-shift", `${(-softened * 0.035).toFixed(3)}em`);
         });
       });
     });
 
     title.addEventListener("pointerleave", reset);
+    title.addEventListener("blur", reset, true);
   }
 
   function initGraph() {
@@ -184,7 +199,7 @@
     document.documentElement.dataset.collection = isOpen ? "open" : "closed";
     status.textContent = isOpen
       ? "Collecte ouverte — les informations sont transmises de manière sécurisée à Electronic Artefacts."
-      : "Prototype public — parcours testable, transmission volontairement désactivée pendant la configuration de l’infrastructure.";
+      : "Ouverture en préparation — la chaîne technique est déployée, mais aucune information saisie ici n’est transmise ni enregistrée.";
 
     const loadTurnstile = () => {
       if (!requiresTurnstile || !challengeContainer || !challengeWidget || turnstileWidgetId !== null) return;
@@ -258,7 +273,11 @@
         loadTurnstile();
       }
       showError("");
-      steps[currentStep - 1].querySelector("h3")?.focus?.({ preventScroll: true });
+      const heading = steps[currentStep - 1].querySelector("h3");
+      if (heading) {
+        heading.setAttribute("tabindex", "-1");
+        heading.focus({ preventScroll: true });
+      }
     };
 
     const validateStep = () => {
@@ -383,7 +402,7 @@
       if (!validateStep()) return;
 
       if (!isOpen) {
-        showError("La transmission est volontairement désactivée pendant la configuration de l’infrastructure. Vous pouvez examiner le parcours, mais aucune information n’a été envoyée ni enregistrée.");
+        showError("La transmission reste désactivée pendant la validation finale de la collecte. Vous pouvez examiner le parcours, mais aucune information n’a été envoyée ni enregistrée.");
         return;
       }
       if (requiresTurnstile && !turnstileToken) {

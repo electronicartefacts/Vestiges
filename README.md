@@ -6,12 +6,14 @@ Site statique léger de [Vestiges](https://vestiges.world), projet culturel port
 
 Vestiges est en recherche et préfiguration. Ce repository ne contient ni VASTE, ni back-office, ni commerce, ni donnée de participant. Il présente la démarche et un parcours de prise de contact.
 
-Le site remplit quatre fonctions publiques :
+Le site remplit six fonctions publiques :
 
-- expliquer Vestiges sans vocabulaire technique préalable ;
+- donner une ouverture éditoriale claire à Vestiges sans vocabulaire technique préalable ;
+- montrer l'anatomie candidate d'un dossier relationnel sans inventer de cas réel ;
 - ouvrir des parcours distincts pour les praticiens, la recherche et les organisations ;
 - donner au public un spécimen relationnel fictif, accompagné d'une lecture linéaire ;
-- rendre visibles le stade, les questions ouvertes, la méthode et les limites avant toute collecte.
+- présenter le premier terrain et la proposition faite aux praticiens fondateurs ;
+- distinguer le présent, le pilote à éprouver et les hypothèses de long terme.
 
 ## Architecture
 
@@ -19,7 +21,7 @@ Le site remplit quatre fonctions publiques :
 - polices locales sous SIL Open Font License ;
 - aucun framework, package ou service d'analytics ;
 - publication GitHub Pages ;
-- futur récepteur : Cloudflare Worker + D1 en juridiction UE ;
+- récepteur Cloudflare Worker + D1 en juridiction UE, déployé en mode fermé ;
 - synchronisation privée vers le QG local Electronic Artefacts.
 
 La landing ne constitue pas une instance de VASTE. Le graphe montré est une projection publique fictive : aucune donnée interne, aucun partenaire réel et aucune œuvre réelle n'y sont représentés.
@@ -30,7 +32,7 @@ Le formulaire est intégré à la landing mais fermé par défaut dans `site-con
 collectionEnabled: false
 ```
 
-Tant que cette valeur reste fausse ou que l'endpoint est vide, aucune donnée n'est envoyée ou enregistrée.
+Tant que cette valeur reste fausse ou que l'endpoint est indisponible, aucune donnée n'est envoyée ou enregistrée. Le passage à `true` exige une décision d'ouverture distincte et le Worker doit également être passé de `closed` à `open`.
 
 ## Développement local
 
