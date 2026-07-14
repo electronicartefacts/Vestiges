@@ -198,6 +198,8 @@
     const challengeWidget = form.querySelector("[data-turnstile-widget]");
     const testAccess = form.querySelector("[data-test-access]");
     const testAccessCode = form.querySelector("input[name='test_access_code']");
+    const noticeLabel = form.querySelector("[data-notice-label]");
+    const privacyPurpose = form.querySelector("[data-privacy-purpose]");
     let turnstileToken = "";
     let turnstileWidgetId = null;
     let currentStep = 1;
@@ -216,6 +218,10 @@
       testAccess.hidden = !isTestOwner;
       testAccessCode.disabled = !isTestOwner;
       testAccessCode.required = isTestOwner;
+    }
+    if (isTestOwner) {
+      if (noticeLabel) noticeLabel.textContent = "J’ai compris que les informations saisies servent uniquement à tester la collecte chiffrée et le classement local Vestiges. Aucun profil, abonnement, brouillon ou e-mail ne sera créé.";
+      if (privacyPurpose) privacyPurpose.textContent = "Ce test privé vérifie la réception chiffrée, la synchronisation locale, le classement CRM et la suppression. Les informations ne sont utilisées pour aucune prospection, publication ou newsletter.";
     }
 
     const loadTurnstile = () => {
