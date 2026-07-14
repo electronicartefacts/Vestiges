@@ -10,6 +10,9 @@
       "custom_domain": true
     }
   ],
+  "triggers": {
+    "crons": ["17 * * * *"]
+  },
   "vars": {
     "INTAKE_MODE": "closed",
     "TURNSTILE_REQUIRED": "true",

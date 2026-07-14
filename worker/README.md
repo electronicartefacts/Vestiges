@@ -43,4 +43,4 @@ Ne pas exécuter l'ouverture (`INTAKE_MODE=open`) avant fermeture écrite des ga
 
 ## Gate de purge
 
-Le handler planifié est implémenté, mais le déclencheur Cron n'est pas encore actif : l'API OAuth Wrangler a répondu `403` sur la ressource `schedules`. Tant que ce déclencheur n'est pas créé et observé, `INTAKE_MODE` doit rester `closed`. La synchronisation locale supprime déjà le ciphertext actif après chaque accusé réussi.
+Le handler planifié et le déclencheur Cron `17 * * * *` sont déployés. `INTAKE_MODE` reste `closed` jusqu'à observation d'une première exécution réelle et fermeture des autres gates du QG. La synchronisation locale supprime déjà le ciphertext actif après chaque accusé réussi.
