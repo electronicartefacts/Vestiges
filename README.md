@@ -52,4 +52,4 @@ Ne jamais ajouter à ce repository :
 
 ## Propriété et licences
 
-Identité Vestiges et contenu éditorial : Electronic Artefacts – Joey-Néot Marquet. Les licences des polices sont conservées à côté de leurs fichiers dans `assets/fonts/`.
+Identité Vestiges et contenu éditorial : Electronic Artefacts. Les licences des polices sont conservées à côté de leurs fichiers dans `assets/fonts/`.
