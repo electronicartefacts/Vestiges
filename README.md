@@ -1,16 +1,17 @@
 # Vestiges — site public de préfiguration
 
-Site statique léger de [Vestiges](https://vestiges.world), projet culturel porté par [Electronic Artefacts](https://github.com/electronicartefacts).
+Site statique léger de [Vestiges](https://vestiges.world), projet culturel porté par [Electronic Artefacts](https://www.electronicartefacts.com/).
 
 ## Stade public
 
 Vestiges est en recherche et préfiguration. Ce repository ne contient ni VASTE, ni back-office, ni commerce, ni donnée de participant. Il présente la démarche et un parcours de prise de contact.
 
-Le site remplit six fonctions publiques :
+Le site remplit sept fonctions publiques :
 
 - donner une ouverture éditoriale claire à Vestiges sans vocabulaire technique préalable ;
 - montrer l'anatomie candidate d'un dossier relationnel sans inventer de cas réel ;
 - ouvrir des parcours distincts pour les praticiens, la recherche et les organisations ;
+- expliciter pour chaque parcours la valeur candidate, l'effort ou l'apport attendu, les garde-fous et la suite du contact ;
 - donner au public un spécimen relationnel fictif, accompagné d'une lecture linéaire ;
 - présenter le premier terrain et la proposition faite aux praticiens fondateurs ;
 - distinguer le présent, le pilote à éprouver et les hypothèses de long terme.
