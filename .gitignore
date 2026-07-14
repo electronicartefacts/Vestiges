@@ -5,3 +5,4 @@
 secrets/
 submissions/
 private/
+.playwright-cli/

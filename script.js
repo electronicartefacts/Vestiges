@@ -9,6 +9,15 @@
   initKineticType();
   initGraph();
   initResearchForm();
+  initStableAnchor();
+
+  function initStableAnchor() {
+    if (!window.location.hash || !("fonts" in document)) return;
+    document.fonts.ready.then(() => {
+      const target = document.querySelector(window.location.hash);
+      if (target) target.scrollIntoView({ block: "start", behavior: "auto" });
+    });
+  }
 
   function initHeader() {
     const header = document.querySelector("[data-header]");
@@ -97,6 +106,7 @@
     if (!stage) return;
     const nodes = Array.from(stage.querySelectorAll("[data-node]"));
     const edges = Array.from(stage.querySelectorAll("[data-edge]"));
+    const ledgerRows = Array.from(document.querySelectorAll("[data-relation-node]"));
     const caption = stage.querySelector("[data-graph-caption] strong");
     const descriptions = {
       work: "Une œuvre et les contextes qui la rendent intelligible.",
@@ -120,6 +130,9 @@
         node.classList.toggle("is-active", node.dataset.node === id);
         node.classList.toggle("is-related", related.has(node.dataset.node));
       });
+      ledgerRows.forEach((row) => {
+        row.classList.toggle("is-active", id === "work" || row.dataset.relationNode === id);
+      });
       stage.classList.add("has-active");
       if (caption) caption.textContent = descriptions[id] || descriptions.work;
     };
@@ -128,6 +141,7 @@
       stage.classList.remove("has-active");
       nodes.forEach((node) => node.classList.remove("is-active", "is-related"));
       edges.forEach((edge) => edge.classList.remove("is-active", "is-muted"));
+      ledgerRows.forEach((row) => row.classList.remove("is-active"));
       if (caption) caption.textContent = descriptions.work;
     };
 
@@ -184,6 +198,15 @@
         });
       });
     };
+
+    document.querySelectorAll("[data-profile-target]").forEach((link) => {
+      link.addEventListener("click", () => {
+        const target = form.querySelector(`input[name="form_type"][value="${link.dataset.profileTarget}"]`);
+        if (!target) return;
+        target.checked = true;
+        syncBranches();
+      });
+    });
 
     const updateStep = () => {
       steps.forEach((step) => {
@@ -314,7 +337,7 @@
 
     if (message && counter) {
       message.addEventListener("input", () => {
-        counter.textContent = `${message.value.length.toLocaleString("fr-FR")} / 1 500`;
+        counter.textContent = `${message.value.length.toLocaleString("fr-FR")} / 800`;
       });
     }
 

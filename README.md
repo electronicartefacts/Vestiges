@@ -6,6 +6,13 @@ Site statique léger de [Vestiges](https://vestiges.world), projet culturel port
 
 Vestiges est en recherche et préfiguration. Ce repository ne contient ni VASTE, ni back-office, ni commerce, ni donnée de participant. Il présente la démarche et un parcours de prise de contact.
 
+Le site remplit quatre fonctions publiques :
+
+- expliquer Vestiges sans vocabulaire technique préalable ;
+- ouvrir des parcours distincts pour les praticiens, la recherche et les organisations ;
+- donner au public un spécimen relationnel fictif, accompagné d'une lecture linéaire ;
+- rendre visibles le stade, les questions ouvertes, la méthode et les limites avant toute collecte.
+
 ## Architecture
 
 - HTML, CSS et JavaScript natifs ;
@@ -14,6 +21,8 @@ Vestiges est en recherche et préfiguration. Ce repository ne contient ni VASTE,
 - publication GitHub Pages ;
 - futur récepteur : Cloudflare Worker + D1 en juridiction UE ;
 - synchronisation privée vers le QG local Electronic Artefacts.
+
+La landing ne constitue pas une instance de VASTE. Le graphe montré est une projection publique fictive : aucune donnée interne, aucun partenaire réel et aucune œuvre réelle n'y sont représentés.
 
 Le formulaire est intégré à la landing mais fermé par défaut dans `site-config.js` :
 
