@@ -22,18 +22,19 @@ Le site remplit sept fonctions publiques :
 - polices locales sous SIL Open Font License ;
 - aucun framework, package ou service d'analytics ;
 - publication GitHub Pages ;
-- récepteur Cloudflare Worker + D1 en juridiction UE, déployé en mode fermé ;
+- récepteur Cloudflare Worker + D1 en juridiction UE, déployé en mode test fondateur ;
 - synchronisation privée vers le QG local Electronic Artefacts.
 
 La landing ne constitue pas une instance de VASTE. Le graphe montré est une projection publique fictive : aucune donnée interne, aucun partenaire réel et aucune œuvre réelle n'y sont représentés.
 
-Le formulaire est intégré à la landing mais fermé par défaut dans `site-config.js` :
+Le formulaire est intégré à la landing. Son mode actuel est un test privé protégé par un code saisi manuellement :
 
 ```js
-collectionEnabled: false
+collectionEnabled: true
+collectionMode: "test-owner"
 ```
 
-Tant que cette valeur reste fausse ou que l'endpoint est indisponible, aucune donnée n'est envoyée ou enregistrée. Le passage à `true` exige une décision d'ouverture distincte et le Worker doit également être passé de `closed` à `open`.
+Ce mode n'est pas une ouverture publique : le Worker exige le secret temporaire du test, Turnstile et les versions exactes du formulaire et de la notice. Le secret n'est jamais présent dans Git, l'URL ou le stockage du navigateur. Le passage à `open` exige une décision distincte.
 
 ## Développement local
 

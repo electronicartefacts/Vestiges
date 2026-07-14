@@ -24,7 +24,7 @@ function corsHeaders(request, env) {
   return {
     "access-control-allow-origin": origin,
     "access-control-allow-methods": "POST, OPTIONS",
-    "access-control-allow-headers": "content-type",
+    "access-control-allow-headers": "content-type, x-vestiges-test-token",
     "access-control-max-age": "600",
     "vary": "Origin"
   };
@@ -42,11 +42,12 @@ function requireSecrets(env, names) {
   }
 }
 
-async function requireClosedTestAccess(request, env) {
-  if (env.INTAKE_MODE === "open") return;
-  if (!env.TEST_TOKEN || !(await secureEqual(request.headers.get("x-vestiges-test-token") || "", env.TEST_TOKEN))) {
+async function requireIntakeAccess(request, env) {
+  if (env.INTAKE_MODE === "open") return "PRODUCTION";
+  if (env.INTAKE_MODE !== "test" || !env.TEST_TOKEN || !(await secureEqual(request.headers.get("x-vestiges-test-token") || "", env.TEST_TOKEN))) {
     throw new IntakeError("TEMPORARILY_UNAVAILABLE", 503);
   }
+  return "TEST_OWNER";
 }
 
 export async function verifyTurnstile(token, request, env, origin) {
@@ -87,7 +88,7 @@ async function acceptSubmission(request, env) {
   const cors = corsHeaders(request, env);
   const origin = request.headers.get("origin") || "";
   if (!allowedOrigins(env).has(origin)) throw new IntakeError("INVALID_REQUEST", 403);
-  await requireClosedTestAccess(request, env);
+  const accessMode = await requireIntakeAccess(request, env);
   requireSecrets(env, ["DEDUPE_SECRET", "RATE_LIMIT_SECRET", "ENCRYPTION_PUBLIC_KEY_SPKI"]);
 
   const contentType = request.headers.get("content-type") || "";
@@ -101,13 +102,16 @@ async function acceptSubmission(request, env) {
   try { parsed = JSON.parse(raw); } catch { throw new IntakeError(); }
   await verifyTurnstile(parsed.turnstile_token, request, env, origin);
   const clean = validateSubmission(parsed);
+  if (accessMode === "TEST_OWNER" && (clean.form_version !== "landing.test-owner.v0.1" || clean.notice_version !== "privacy.test-owner.v0.1")) {
+    throw new IntakeError("INVALID_REQUEST", 403);
+  }
   await enforceRateLimit(request, env);
 
   const canonical = JSON.stringify(clean);
   const dedupeTag = await hmacTag(env.DEDUPE_SECRET, JSON.stringify({ ...clean, request_id: "" }));
   const duplicate = await env.DB.prepare("SELECT submission_id FROM submissions WHERE dedupe_tag = ? AND expires_at > ?")
     .bind(dedupeTag, new Date().toISOString()).first();
-  if (duplicate) return response({ status: "ACCEPTED", submission_id: duplicate.submission_id, contract_version: clean.schema_version }, 202, cors);
+  if (duplicate) return response({ status: "ACCEPTED", submission_id: duplicate.submission_id, contract_version: clean.schema_version, mode: accessMode }, 202, cors);
 
   const encrypted = await encryptEnvelope(clean, env.ENCRYPTION_PUBLIC_KEY_SPKI);
   const submissionId = crypto.randomUUID();
@@ -124,11 +128,11 @@ async function acceptSubmission(request, env) {
     const concurrentDuplicate = await env.DB.prepare("SELECT submission_id FROM submissions WHERE dedupe_tag = ? AND expires_at > ?")
       .bind(dedupeTag, new Date().toISOString()).first();
     if (concurrentDuplicate) {
-      return response({ status: "ACCEPTED", submission_id: concurrentDuplicate.submission_id, contract_version: clean.schema_version }, 202, cors);
+      return response({ status: "ACCEPTED", submission_id: concurrentDuplicate.submission_id, contract_version: clean.schema_version, mode: accessMode }, 202, cors);
     }
     throw error;
   }
-  return response({ status: "ACCEPTED", submission_id: submissionId, contract_version: clean.schema_version }, 202, cors);
+  return response({ status: "ACCEPTED", submission_id: submissionId, contract_version: clean.schema_version, mode: accessMode }, 202, cors);
 }
 
 async function authenticateSync(request, body, env) {
@@ -202,7 +206,8 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/v1/status") {
-      return response({ status: "OK", mode: env.INTAKE_MODE === "open" ? "open" : "closed", contract_version: "vestiges.intake.v1" });
+      const mode = env.INTAKE_MODE === "open" ? "open" : env.INTAKE_MODE === "test" ? "test" : "closed";
+      return response({ status: "OK", mode, contract_version: "vestiges.intake.v1" });
     }
     if (request.method === "OPTIONS" && url.pathname === "/v1/submissions") {
       const headers = corsHeaders(request, env);

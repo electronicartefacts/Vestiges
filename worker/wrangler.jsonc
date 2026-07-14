@@ -14,7 +14,7 @@
     "crons": ["17 * * * *"]
   },
   "vars": {
-    "INTAKE_MODE": "closed",
+    "INTAKE_MODE": "test",
     "TURNSTILE_REQUIRED": "true",
     "TURNSTILE_EXPECTED_ACTION": "vestiges_intake",
     "ALLOWED_ORIGINS": "https://vestiges.world,https://www.vestiges.world,http://127.0.0.1:4173,http://localhost:4173",

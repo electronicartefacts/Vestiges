@@ -196,16 +196,27 @@
     const counter = form.querySelector("[data-character-count]");
     const challengeContainer = form.querySelector("[data-turnstile-container]");
     const challengeWidget = form.querySelector("[data-turnstile-widget]");
+    const testAccess = form.querySelector("[data-test-access]");
+    const testAccessCode = form.querySelector("input[name='test_access_code']");
     let turnstileToken = "";
     let turnstileWidgetId = null;
     let currentStep = 1;
 
-    const isOpen = Boolean(config.collectionEnabled && config.intakeEndpoint);
-    const requiresTurnstile = Boolean(isOpen && config.turnstileRequired && config.turnstileSiteKey);
-    document.documentElement.dataset.collection = isOpen ? "open" : "closed";
-    status.textContent = isOpen
-      ? "Collecte ouverte — les informations sont transmises de manière sécurisée à Electronic Artefacts."
-      : "Ouverture en préparation — la chaîne technique est déployée, mais aucune information saisie ici n’est transmise ni enregistrée.";
+    const collectionMode = config.collectionMode === "test-owner" ? "test-owner" : config.collectionMode === "open" ? "open" : "closed";
+    const isEnabled = Boolean(config.collectionEnabled && config.intakeEndpoint && collectionMode !== "closed");
+    const isTestOwner = isEnabled && collectionMode === "test-owner";
+    const requiresTurnstile = Boolean(isEnabled && config.turnstileRequired && config.turnstileSiteKey);
+    document.documentElement.dataset.collection = isEnabled ? collectionMode : "closed";
+    status.textContent = isTestOwner
+      ? "Mode test privé — seule une personne disposant du code peut transmettre. Aucun e-mail n’est envoyé."
+      : isEnabled
+        ? "Collecte ouverte — les informations sont transmises de manière sécurisée à Electronic Artefacts."
+        : "Ouverture en préparation — la chaîne technique est déployée, mais aucune information saisie ici n’est transmise ni enregistrée.";
+    if (testAccess && testAccessCode) {
+      testAccess.hidden = !isTestOwner;
+      testAccessCode.disabled = !isTestOwner;
+      testAccessCode.required = isTestOwner;
+    }
 
     const loadTurnstile = () => {
       if (!requiresTurnstile || !challengeContainer || !challengeWidget || turnstileWidgetId !== null) return;
@@ -366,8 +377,8 @@
       return {
         schema_version: config.contractVersion || "vestiges.intake.v1",
         form_type: profile,
-        form_version: formData.get("form_version"),
-        notice_version: formData.get("notice_version"),
+        form_version: config.formVersion || formData.get("form_version"),
+        notice_version: config.noticeVersion || formData.get("notice_version"),
         locale: "fr-FR",
         started_at: startedAt,
         request_id: requestId,
@@ -407,8 +418,13 @@
       syncBranches();
       if (!validateStep()) return;
 
-      if (!isOpen) {
+      if (!isEnabled) {
         showError("La transmission reste désactivée pendant la validation finale de la collecte. Vous pouvez examiner le parcours, mais aucune information n’a été envoyée ni enregistrée.");
+        return;
+      }
+      if (isTestOwner && !testAccessCode?.value) {
+        showError("Saisissez le code du test privé avant la transmission.");
+        testAccessCode?.focus();
         return;
       }
       if (requiresTurnstile && !turnstileToken) {
@@ -421,7 +437,10 @@
       try {
         const response = await fetch(config.intakeEndpoint, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(isTestOwner ? { "X-Vestiges-Test-Token": testAccessCode.value } : {})
+          },
           body: JSON.stringify(buildPayload())
         });
         const result = await response.json().catch(() => ({}));
@@ -431,11 +450,13 @@
         const heading = document.createElement("div");
         heading.className = "step-heading";
         const label = document.createElement("span");
-        label.textContent = "Proposition transmise";
+        label.textContent = isTestOwner ? "Test transmis" : "Proposition transmise";
         const title = document.createElement("h3");
-        title.textContent = "Merci pour votre regard.";
+        title.textContent = isTestOwner ? "La chaîne de collecte peut maintenant être vérifiée." : "Merci pour votre regard.";
         const copy = document.createElement("p");
-        copy.textContent = "Votre proposition a été transmise pour examen. Aucun profil n’a été créé et rien ne sera publié.";
+        copy.textContent = isTestOwner
+          ? "Les informations ont été chiffrées et placées dans la file de synchronisation privée. Aucun profil, brouillon ou e-mail n’a été créé."
+          : "Votre proposition a été transmise pour examen. Aucun profil n’a été créé et rien ne sera publié.";
         heading.append(label, title, copy);
         confirmation.append(heading);
         form.replaceChildren(confirmation);

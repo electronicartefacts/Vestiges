@@ -110,3 +110,44 @@ test("accepte, chiffre et déduplique une soumission sans exposer son contenu", 
   assert.equal(DB.submissions.length, 1);
   assert.equal(DB.rateEvents.length, 2);
 });
+
+test("le mode test exige le secret et les versions réservées au test fondateur", async () => {
+  const { publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const environment = {
+    DB: fakeDatabase(),
+    INTAKE_MODE: "test",
+    TEST_TOKEN: "t".repeat(44),
+    ALLOWED_ORIGINS: "https://vestiges.world",
+    TURNSTILE_REQUIRED: "false",
+    DEDUPE_SECRET: "d".repeat(32),
+    RATE_LIMIT_SECRET: "r".repeat(32),
+    ENCRYPTION_PUBLIC_KEY_SPKI: publicKey.export({ type: "spki", format: "der" }).toString("base64"),
+    RATE_LIMIT_MINUTES: "10",
+    RATE_LIMIT_COUNT: "5",
+    RETENTION_HOURS: "168",
+    KEY_VERSION: "test-v1"
+  };
+  const payload = submission();
+  payload.form_version = "landing.test-owner.v0.1";
+  payload.notice_version = "privacy.test-owner.v0.1";
+  const request = (token) => new Request("https://intake.vestiges.world/v1/submissions", {
+    method: "POST",
+    headers: {
+      origin: "https://vestiges.world",
+      "content-type": "application/json",
+      "CF-Connecting-IP": "192.0.2.11",
+      ...(token ? { "x-vestiges-test-token": token } : {})
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const refused = await worker.fetch(request(""), environment);
+  assert.equal(refused.status, 503);
+  assert.equal(environment.DB.submissions.length, 0);
+
+  const accepted = await worker.fetch(request("t".repeat(44)), environment);
+  const body = await accepted.json();
+  assert.equal(accepted.status, 202);
+  assert.equal(body.mode, "TEST_OWNER");
+  assert.equal(environment.DB.submissions.length, 1);
+});

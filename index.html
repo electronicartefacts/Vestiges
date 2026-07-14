@@ -579,8 +579,13 @@
               <summary>Utilisation de vos informations</summary>
               <p>Electronic Artefacts utilisera les informations transmises pour examiner votre proposition, vous répondre et, si cela est pertinent, organiser un échange dans le cadre de la recherche Vestiges.</p>
               <p>Vous pourrez demander l’accès, la correction ou la suppression de vos informations à <a href="mailto:contact@vestiges.world">contact@vestiges.world</a>.</p>
-              <p>La chaîne technique est déployée en mode fermé. La collecte restera désactivée tant que les durées, la purge planifiée, la procédure de droits et les mentions définitives ne seront pas validées.</p>
+              <p data-privacy-mode>La collecte publique reste désactivée. Le mode test fondateur transmet réellement les informations vers une zone locale séparée afin de vérifier la chaîne, sans créer de profil et sans envoyer d’e-mail.</p>
             </details>
+            <label class="field" data-test-access hidden>
+              <span>Code du test privé <b aria-hidden="true">*</b></span>
+              <small>Ce code n’est ni enregistré dans le formulaire, ni conservé par le site.</small>
+              <input type="password" name="test_access_code" maxlength="256" autocomplete="off" data-test-required>
+            </label>
             <div class="challenge-container" data-turnstile-container hidden>
               <p>Vérification anti-abus</p>
               <div data-turnstile-widget></div>
