@@ -55,16 +55,16 @@
   }
 
   function initKineticType() {
-    const titles = Array.from(document.querySelectorAll("[data-kinetic]"));
+    const titles = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"));
     if (!titles.length || reduceMotion) return;
 
     titles.forEach((title) => initKineticTitle(title));
   }
 
   function initKineticTitle(title) {
-
     const text = title.textContent.trim();
     if (!title.hasAttribute("aria-label")) title.setAttribute("aria-label", text);
+    title.classList.add("kinetic-heading");
     const segmenter = "Segmenter" in Intl
       ? new Intl.Segmenter("fr", { granularity: "grapheme" })
       : null;
@@ -91,34 +91,84 @@
     });
 
     const glyphs = Array.from(title.querySelectorAll(".glyph"));
+    const styles = getComputedStyle(title);
+    const baseWeight = Number.parseFloat(styles.fontWeight) || 400;
+    const fontSize = Number.parseFloat(styles.fontSize) || 32;
+    const maxWeight = styles.fontFamily.includes("Newsreader") ? 800 : 900;
+    const peakWeight = Math.min(maxWeight, baseWeight + Math.max(250, Math.min(340, fontSize * 1.7)));
+    const radius = Math.max(92, Math.min(235, fontSize * 2.15));
+    title.style.setProperty("--kinetic-base-weight", String(baseWeight));
+    const currentWeights = glyphs.map(() => baseWeight);
+    let centers = [];
     let frame = 0;
-    const baseWeight = title.classList.contains("kinetic-title") ? 310 : 330;
+    let lastTime = 0;
+    let pointer = null;
 
-    const reset = () => {
-      glyphs.forEach((glyph) => {
-        glyph.style.setProperty("--glyph-weight", String(baseWeight));
-        glyph.style.setProperty("--glyph-shift", "0");
+    const measure = () => {
+      centers = glyphs.map((glyph) => {
+        const rect = glyph.getBoundingClientRect();
+        return {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        };
       });
     };
 
-    title.addEventListener("pointermove", (event) => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        glyphs.forEach((glyph) => {
-          const rect = glyph.getBoundingClientRect();
-          const centerX = rect.left + rect.width / 2;
-          const centerY = rect.top + rect.height / 2;
-          const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
-          const radius = title.classList.contains("kinetic-title") ? 190 : 135;
-          const influence = Math.max(0, 1 - distance / radius);
-          const softened = influence * influence * (3 - 2 * influence);
-          glyph.style.setProperty("--glyph-weight", String(Math.round(baseWeight + softened * 340)));
-          glyph.style.setProperty("--glyph-shift", `${(-softened * 0.035).toFixed(3)}em`);
-        });
+    const animate = (time) => {
+      frame = 0;
+      const elapsed = lastTime ? Math.min(34, time - lastTime) : 16.7;
+      lastTime = time;
+      const smoothing = 1 - Math.exp(-elapsed / (pointer ? 48 : 135));
+      let unsettled = false;
+
+      glyphs.forEach((glyph, index) => {
+        let targetWeight = baseWeight;
+        if (pointer && centers[index]) {
+          const distance = Math.hypot(pointer.x - centers[index].x, pointer.y - centers[index].y);
+          const influence = distance > radius * 2.6
+            ? 0
+            : Math.exp(-0.5 * (distance / radius) ** 2);
+          targetWeight += (peakWeight - baseWeight) * influence;
+        }
+
+        currentWeights[index] += (targetWeight - currentWeights[index]) * smoothing;
+        if (Math.abs(targetWeight - currentWeights[index]) > 0.35) unsettled = true;
+        glyph.style.setProperty("--glyph-weight", currentWeights[index].toFixed(1));
       });
-    });
+
+      if (pointer || unsettled) frame = requestAnimationFrame(animate);
+      else {
+        lastTime = 0;
+        title.classList.remove("is-kinetic-active");
+      }
+    };
+
+    const start = () => {
+      title.classList.add("is-kinetic-active");
+      if (!frame) frame = requestAnimationFrame(animate);
+    };
+
+    const updatePointer = (event) => {
+      pointer = { x: event.clientX, y: event.clientY };
+      start();
+    };
+
+    const reset = () => {
+      pointer = null;
+      start();
+    };
+
+    title.addEventListener("pointerenter", (event) => {
+      measure();
+      updatePointer(event);
+    }, { passive: true });
+    title.addEventListener("pointermove", updatePointer, { passive: true });
 
     title.addEventListener("pointerleave", reset);
+    title.addEventListener("pointerup", (event) => {
+      if (event.pointerType !== "mouse") reset();
+    }, { passive: true });
+    title.addEventListener("pointercancel", reset);
     title.addEventListener("blur", reset, true);
   }
 

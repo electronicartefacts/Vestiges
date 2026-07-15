@@ -246,8 +246,7 @@ summary,
 .kinetic-title .glyph {
   display: inline-block;
   font-variation-settings: "wght" var(--glyph-weight, 310), "opsz" 72;
-  transition: font-variation-settings 620ms var(--ease), transform 620ms var(--ease);
-  transform: translateY(var(--glyph-shift, 0));
+  transition: none;
 }
 
 .kinetic-word {
@@ -258,8 +257,17 @@ summary,
 .display .glyph {
   display: inline-block;
   font-variation-settings: "wght" var(--glyph-weight, 330), "opsz" 60;
-  transition: font-variation-settings 720ms var(--ease), transform 720ms var(--ease);
-  transform: translateY(var(--glyph-shift, 0));
+  transition: none;
+}
+
+.kinetic-heading:not(.kinetic-title):not(.display) .glyph {
+  display: inline-block;
+  font-variation-settings: "wght" var(--glyph-weight, var(--kinetic-base-weight, 400));
+  transition: none;
+}
+
+.kinetic-heading.is-kinetic-active .glyph {
+  will-change: font-variation-settings;
 }
 
 .hero-intro {
