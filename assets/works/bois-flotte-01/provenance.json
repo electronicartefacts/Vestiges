@@ -1,0 +1,25 @@
+{
+  "id": "vestiges-work-001",
+  "title": "Bois flotté 01",
+  "status": "prototype public",
+  "subject": {
+    "type": "natural found object",
+    "material": "driftwood",
+    "artist_attribution": null,
+    "origin": "not documented"
+  },
+  "digital_production": {
+    "producer": "Electronic Artefacts",
+    "technology": "FORGE",
+    "source_medium": "orbital video sequence",
+    "mesh_faces": 404304,
+    "texture_atlas_pixels": [8192, 8192],
+    "glb_sha256": "2762d5d4961fc6d52a11d74480dcad4359f45913c321463c4e476ad5bee1bb89"
+  },
+  "rights": {
+    "natural_subject": "no artist attributed",
+    "capture_and_digital_model": "Electronic Artefacts",
+    "public_domain_claim": false,
+    "reuse_status": "not specified"
+  }
+}

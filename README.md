@@ -5,20 +5,24 @@ Mini-site statique de [Vestiges](https://vestiges.world), projet culturel et éd
 ## Architecture publique
 
 - `/` — comprendre Vestiges, voir une première relation et choisir la suite ;
-- `/explorer/` — démonstration éditoriale puis relationnelle ;
-- `/explorer/specimen/` — modèle de dossier individuel fictif ;
+- `/explorer/` — découverte éditoriale et relationnelle de **Bois flotté 01** ;
+- `/explorer/specimen/` — dossier complet de cette première pièce technique ;
 - `/artistes/` — projection, effort, rôles, garanties et limites pour les artistes et ateliers ;
 - `/methode/` — co-construction, statuts, visibilité, correction et retrait ;
 - `/participer/` — orientation et préparation d’un échange réel par e-mail ;
 - `/a-propos/` — porteur, origine, stade actuel et horizons qualifiés.
 
-Le site correspond à l’état de maturité **sans dossier public réel**. Tous les objets éditoriaux sont créés en CSS et explicitement identifiés comme démonstrations. Aucun asset de recherche à droits inconnus n’est publié.
+Le site correspond à l’état de maturité **premier prototype public, sans dossier d’artiste validé**. Bois flotté 01 est un sujet naturel sans artiste attribué. La capture, la reconstruction et les médias numériques sont attribués à Electronic Artefacts et ne sont pas déclarés dans le domaine public.
 
 ## Choix d’expérience
 
 L’introduction typographique est déterministe, courte, immédiatement évitable, mémorisée localement et rejouable. La réduction de mouvement donne accès à un état stable. La séquence publique utilise `matière → geste → œuvre → mémoire → relation → Vestiges` afin d’éviter de limiter le projet à la sculpture ou au monument.
 
-Explorer commence par une lecture narrative, révèle une relation simple, puis ouvre une carte locale. Un registre linéaire porte les mêmes informations essentielles et constitue l’alternative accessible au graphe.
+Les titres éditoriaux utilisent un système typographique variable déterministe. Chaque mot conserve ses retours de ligne naturels ; une vague gaussienne de graisse suit le pointeur, réagit au toucher et accompagne la première apparition dans le viewport. Seul le `h1` conserve une respiration ambiante très légère. En réduction de mouvement, les titres restent entièrement statiques et ne sont pas découpés en glyphes.
+
+La direction visuelle associe noir, ivoire et un accent minéral rouge à des traces typographiques, axes et annotations. Le premier média réel est une sortie locale de FORGE : un GLB de 67 Mo, 404 304 faces et un atlas de texture 8192 × 8192 pixels. « 8K » qualifie explicitement cet atlas, pas la vidéo source.
+
+Explorer commence par une lecture narrative de Bois flotté 01, révèle la chaîne vidéo → FORGE → modèle 3D, puis ouvre une carte locale. Un registre linéaire porte les mêmes informations essentielles et constitue l’alternative accessible au graphe. Le modèle n’est téléchargé qu’après activation du bouton « Explorer en 3D » ; une image et le dossier HTML restent disponibles sans WebGL.
 
 ## Participation
 
@@ -30,7 +34,9 @@ Dans l’état actuel, le formulaire public prépare un e-mail dans la messageri
 
 - HTML, CSS et JavaScript natifs ;
 - polices Inter et Newsreader locales, sous SIL Open Font License ;
-- aucune dépendance client, aucun analytics, aucun modèle 3D ;
+- aucune dépendance distante, aucun analytics ;
+- Three.js est archivé localement sous licence MIT pour la vue 3D à la demande ;
+- modèle GLB FORGE et manifeste de provenance conservés dans `assets/works/bois-flotte-01/` ;
 - publication GitHub Pages ;
 - URLs en répertoires pour des pages indexables ;
 - contenu essentiel présent dans le HTML.
@@ -53,15 +59,15 @@ Cette commande vérifie la syntaxe JavaScript, les routes, les métadonnées, le
 
 ## Évolution d’Explorer
 
-1. Remplacer le spécimen par un premier dossier uniquement après autorisation et revue des sources et droits.
-2. Conserver l’étiquette de démonstration sur tout élément encore fictif.
+1. Faire relire le statut de réutilisation du fichier numérique avant de proposer son téléchargement.
+2. Conserver l’étiquette de prototype sur Bois flotté 01 et distinguer le sujet naturel de sa capture numérique.
 3. Ajouter un index de dossiers seulement quand plusieurs dossiers réels existent.
 4. N’ajouter recherche et filtres que lorsque le volume crée un besoin observable.
 5. Garder lecture éditoriale, registre linéaire et graphe local comme trois profondeurs complémentaires.
 
 ## Contenus encore provisoires
 
-- la preuve publique repose sur un spécimen abstrait ;
+- la preuve publique repose sur une première reconstruction technique, pas encore sur un dossier co-construit avec un artiste ;
 - le délai de réponse n’est pas promis ;
 - le premier terrain n’est pas présenté comme lancé ;
 - aucune citation ou partenaire n’est affiché ;
