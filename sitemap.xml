@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://vestiges.world/</loc>
-  </url>
+  <url><loc>https://vestiges.world/</loc></url>
+  <url><loc>https://vestiges.world/explorer/</loc></url>
+  <url><loc>https://vestiges.world/explorer/specimen/</loc></url>
+  <url><loc>https://vestiges.world/artistes/</loc></url>
+  <url><loc>https://vestiges.world/methode/</loc></url>
+  <url><loc>https://vestiges.world/participer/</loc></url>
+  <url><loc>https://vestiges.world/a-propos/</loc></url>
 </urlset>

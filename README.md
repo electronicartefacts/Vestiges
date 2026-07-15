@@ -1,56 +1,69 @@
-# Vestiges — site public de préfiguration
+# Vestiges — expérience publique
 
-Site statique léger de [Vestiges](https://vestiges.world), projet culturel porté par [Electronic Artefacts](https://www.electronicartefacts.com/).
+Mini-site statique de [Vestiges](https://vestiges.world), projet culturel et éditorial porté par [Electronic Artefacts](https://www.electronicartefacts.com/).
 
-## Stade public
+## Architecture publique
 
-Vestiges est en recherche et préfiguration. Ce repository ne contient ni VASTE, ni back-office, ni commerce, ni donnée de participant. Il présente la démarche et un parcours de prise de contact.
+- `/` — comprendre Vestiges, voir une première relation et choisir la suite ;
+- `/explorer/` — démonstration éditoriale puis relationnelle ;
+- `/explorer/specimen/` — modèle de dossier individuel fictif ;
+- `/artistes/` — projection, effort, rôles, garanties et limites pour les artistes et ateliers ;
+- `/methode/` — co-construction, statuts, visibilité, correction et retrait ;
+- `/participer/` — orientation et préparation d’un échange réel par e-mail ;
+- `/a-propos/` — porteur, origine, stade actuel et horizons qualifiés.
 
-Le site remplit sept fonctions publiques :
+Le site correspond à l’état de maturité **sans dossier public réel**. Tous les objets éditoriaux sont créés en CSS et explicitement identifiés comme démonstrations. Aucun asset de recherche à droits inconnus n’est publié.
 
-- donner une ouverture éditoriale claire à Vestiges sans vocabulaire technique préalable ;
-- montrer l'anatomie candidate d'un dossier relationnel sans inventer de cas réel ;
-- ouvrir des parcours distincts pour les praticiens, la recherche et les organisations ;
-- expliciter pour chaque parcours la valeur candidate, l'effort ou l'apport attendu, les garde-fous et la suite du contact ;
-- donner au public un spécimen relationnel fictif, accompagné d'une lecture linéaire ;
-- présenter le premier terrain et la proposition faite aux praticiens fondateurs ;
-- distinguer le présent, le pilote à éprouver et les hypothèses de long terme.
+## Choix d’expérience
 
-## Architecture
+L’introduction typographique est déterministe, courte, immédiatement évitable, mémorisée localement et rejouable. La réduction de mouvement donne accès à un état stable. La séquence publique utilise `matière → geste → œuvre → mémoire → relation → Vestiges` afin d’éviter de limiter le projet à la sculpture ou au monument.
+
+Explorer commence par une lecture narrative, révèle une relation simple, puis ouvre une carte locale. Un registre linéaire porte les mêmes informations essentielles et constitue l’alternative accessible au graphe.
+
+## Participation
+
+Le Worker Cloudflare et sa base chiffrée restent dans `worker/`, mais leur mode public n’est pas encore ouvert. Le site ne doit jamais exposer le code du test propriétaire.
+
+Dans l’état actuel, le formulaire public prépare un e-mail dans la messagerie de la personne. Il indique explicitement qu’aucune information n’est reçue avant l’envoi manuel. Quand les gates juridiques, opérationnelles et anti-abus seront fermées, cette surface pourra être reliée au Worker sans changer l’ordre cognitif du formulaire.
+
+## Technique
 
 - HTML, CSS et JavaScript natifs ;
-- polices locales sous SIL Open Font License ;
-- aucun framework, package ou service d'analytics ;
+- polices Inter et Newsreader locales, sous SIL Open Font License ;
+- aucune dépendance client, aucun analytics, aucun modèle 3D ;
 - publication GitHub Pages ;
-- récepteur Cloudflare Worker + D1 en juridiction UE, déployé en mode test fondateur ;
-- synchronisation privée vers le QG local Electronic Artefacts.
+- URLs en répertoires pour des pages indexables ;
+- contenu essentiel présent dans le HTML.
 
-La landing ne constitue pas une instance de VASTE. Le graphe montré est une projection publique fictive : aucune donnée interne, aucun partenaire réel et aucune œuvre réelle n'y sont représentés.
+Lancer localement depuis ce dossier :
 
-Le formulaire est intégré à la landing. Son mode actuel est un test privé protégé par un code saisi manuellement :
-
-```js
-collectionEnabled: true
-collectionMode: "test-owner"
+```text
+python3 -m http.server 4173
 ```
 
-Ce mode n'est pas une ouverture publique : le Worker exige le secret temporaire du test, Turnstile et les versions exactes du formulaire et de la notice. Le secret n'est jamais présent dans Git, l'URL ou le stockage du navigateur. Le passage à `open` exige une décision distincte.
+Puis ouvrir `http://127.0.0.1:4173/`.
 
-## Développement local
+## Validation
 
-Ouvrir `index.html` suffit pour une première lecture. Un serveur statique local est recommandé pour les tests navigateur complets.
+```text
+npm run validate
+```
 
-## Sécurité de publication
+Cette commande vérifie la syntaxe JavaScript, les routes, les métadonnées, les liens et ressources internes, les contrats principaux du site, puis les tests existants du Worker.
 
-Ne jamais ajouter à ce repository :
+## Évolution d’Explorer
 
-- secret Cloudflare ou token GitHub ;
-- clé privée de déchiffrement ;
-- export de formulaire ;
-- document du QG local Vestiges ;
-- asset Pinterest ou référence visuelle sans droits ;
-- soumission réelle ou journal contenant son contenu.
+1. Remplacer le spécimen par un premier dossier uniquement après autorisation et revue des sources et droits.
+2. Conserver l’étiquette de démonstration sur tout élément encore fictif.
+3. Ajouter un index de dossiers seulement quand plusieurs dossiers réels existent.
+4. N’ajouter recherche et filtres que lorsque le volume crée un besoin observable.
+5. Garder lecture éditoriale, registre linéaire et graphe local comme trois profondeurs complémentaires.
 
-## Propriété et licences
+## Contenus encore provisoires
 
-Identité Vestiges et contenu éditorial : Electronic Artefacts. Les licences des polices sont conservées à côté de leurs fichiers dans `assets/fonts/`.
+- la preuve publique repose sur un spécimen abstrait ;
+- le délai de réponse n’est pas promis ;
+- le premier terrain n’est pas présenté comme lancé ;
+- aucune citation ou partenaire n’est affiché ;
+- la collecte chiffrée publique reste fermée ;
+- les mentions juridiques complètes devront être validées avant son ouverture.
