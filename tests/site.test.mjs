@@ -15,9 +15,9 @@ test("les pages publiques chargent une version cohérente des ressources", async
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.js\?v=20260716c/);
-    assert.match(html, /styles\.css\?v=20260716c/);
-    assert.match(html, /script\.js\?v=20260716c/);
+    assert.match(html, /theme-init\.js\?v=20260716d/);
+    assert.match(html, /styles\.css\?v=20260716d/);
+    assert.match(html, /script\.js\?v=20260716d/);
   }
 });
 
@@ -98,13 +98,13 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
   assert.match(artistes, /Votre pratique déborde de l’image/);
-  assert.match(artistes, /v=20260716c&amp;parcours=artistes#conversation/);
+  assert.match(artistes, /v=20260716d&amp;parcours=artistes#conversation/);
   assert.match(transmission, /Transmettre sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
-  assert.match(transmission, /v=20260716c&amp;parcours=transmission#conversation/);
+  assert.match(transmission, /v=20260716d&amp;parcours=transmission#conversation/);
   assert.match(organisations, /Commencer par un terrain/);
   assert.match(organisations, /Quatre décisions avant toute production/);
-  assert.match(organisations, /v=20260716c&amp;parcours=institutions#conversation/);
+  assert.match(organisations, /v=20260716d&amp;parcours=institutions#conversation/);
 });
 
 test("le menu compact conserve l’action principale et le focus clavier", async () => {
