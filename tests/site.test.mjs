@@ -15,17 +15,17 @@ test("les pages publiques chargent une version cohérente des ressources", async
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.20260716e\.js/);
-    assert.match(html, /styles\.20260716e\.css/);
-    assert.match(html, /script\.20260716e\.js/);
+    assert.match(html, /theme-init\.20260716f\.js/);
+    assert.match(html, /styles\.20260716f\.css/);
+    assert.match(html, /script\.20260716f\.js/);
   }
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
-    ["theme-init.js", "theme-init.20260716e.js"],
-    ["styles.css", "styles.20260716e.css"],
-    ["script.js", "script.20260716e.js"]
+    ["theme-init.js", "theme-init.20260716f.js"],
+    ["styles.css", "styles.20260716f.css"],
+    ["script.js", "script.20260716f.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
 });
@@ -50,10 +50,37 @@ test("les pages publiques exposent des métadonnées de partage propres", async 
 test("l’introduction est courte, évitable, déterministe et mémorisée", async () => {
   const [html, script] = await Promise.all([read("index.html"), read("script.js")]);
   assert.match(html, /data-intro-skip/);
+  assert.match(html, /data-brand-intro role="dialog" aria-modal="true"/);
   assert.match(html, /matière[\s\S]*geste[\s\S]*œuvre[\s\S]*mémoire[\s\S]*relation[\s\S]*Vestiges/);
   assert.doesNotMatch(script, /Math\.random/);
   assert.match(script, /localStorage\.setItem/);
   assert.match(script, /prefers-reduced-motion/);
+  assert.match(script, /element\.inert = value/);
+  assert.match(script, /focusAfterIntro/);
+  assert.match(script, /event\.key !== "Tab"/);
+});
+
+test("la participation conserve une issue explicite sans JavaScript", async () => {
+  const [html, theme, styles] = await Promise.all([
+    read("participer/index.html"), read("theme-init.js"), read("styles.css")
+  ]);
+  assert.match(html, /<html lang="fr" class="no-js">/);
+  assert.match(html, /<noscript>[\s\S]*contact@vestiges\.world[\s\S]*<\/noscript>/);
+  assert.match(theme, /classList\.remove\("no-js"\)/);
+  assert.match(styles, /\.no-js \.contact-form \{ display: none; \}/);
+});
+
+test("les navigations de pied de page sont toutes nommées", async () => {
+  const pages = [
+    "index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
+    "organisations/index.html", "comment-ca-marche/index.html", "methode/index.html",
+    "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
+    "explorer/index.html", "explorer/specimen/index.html"
+  ];
+  for (const page of pages) {
+    const html = await read(page);
+    assert.doesNotMatch(html, /<nav class="footer-nav">/);
+  }
 });
 
 test("tous les titres utilisent une vague de graisse déterministe et réversible", async () => {
@@ -93,8 +120,8 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(theme, /localStorage\.setItem/);
   assert.match(theme, /prefers-color-scheme: dark/);
   assert.match(theme, /aria-label/);
-  assert.match(home, /theme-init\.20260716e\.js/);
-  assert.match(explorer, /theme-init\.20260716e\.js/);
+  assert.match(home, /theme-init\.20260716f\.js/);
+  assert.match(explorer, /theme-init\.20260716f\.js/);
 });
 
 test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {
@@ -124,13 +151,13 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
   assert.match(artistes, /Votre pratique déborde de l’image/);
-  assert.match(artistes, /v=20260716e&amp;parcours=artistes#conversation/);
+  assert.match(artistes, /v=20260716f&amp;parcours=artistes#conversation/);
   assert.match(transmission, /Transmettre sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
-  assert.match(transmission, /v=20260716e&amp;parcours=transmission#conversation/);
+  assert.match(transmission, /v=20260716f&amp;parcours=transmission#conversation/);
   assert.match(organisations, /Commencer par un terrain/);
   assert.match(organisations, /Quatre décisions avant toute production/);
-  assert.match(organisations, /v=20260716e&amp;parcours=institutions#conversation/);
+  assert.match(organisations, /v=20260716f&amp;parcours=institutions#conversation/);
 });
 
 test("le menu compact conserve l’action principale et le focus clavier", async () => {
