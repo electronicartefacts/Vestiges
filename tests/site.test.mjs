@@ -8,24 +8,24 @@ const read = (path) => readFile(resolve(root, path), "utf8");
 
 test("les pages publiques chargent une version cohérente des ressources", async () => {
   const pages = [
-    "index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
+    "index.html", "programme-fondateur/index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
     "organisations/index.html", "comment-ca-marche/index.html", "methode/index.html",
     "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
     "explorer/index.html", "explorer/specimen/index.html"
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.20260716g\.js/);
-    assert.match(html, /styles\.20260716g\.css/);
-    assert.match(html, /script\.20260716g\.js/);
+    assert.match(html, /theme-init\.20260716h\.js/);
+    assert.match(html, /styles\.20260716h\.css/);
+    assert.match(html, /script\.20260716h\.js/);
   }
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
-    ["theme-init.js", "theme-init.20260716g.js"],
-    ["styles.css", "styles.20260716g.css"],
-    ["script.js", "script.20260716g.js"],
+    ["theme-init.js", "theme-init.20260716h.js"],
+    ["styles.css", "styles.20260716h.css"],
+    ["script.js", "script.20260716h.js"],
     ["forge-viewer.js", "forge-viewer.20260716g.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
@@ -33,7 +33,7 @@ test("les ressources versionnées correspondent aux sources validées", async ()
 
 test("les pages publiques exposent des métadonnées de partage propres", async () => {
   const pages = [
-    "index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
+    "index.html", "programme-fondateur/index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
     "organisations/index.html", "comment-ca-marche/index.html", "methode/index.html",
     "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
     "explorer/index.html", "explorer/specimen/index.html"
@@ -73,7 +73,7 @@ test("la participation conserve une issue explicite sans JavaScript", async () =
 
 test("les navigations de pied de page sont toutes nommées", async () => {
   const pages = [
-    "index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
+    "index.html", "programme-fondateur/index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
     "organisations/index.html", "comment-ca-marche/index.html", "methode/index.html",
     "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
     "explorer/index.html", "explorer/specimen/index.html"
@@ -81,6 +81,19 @@ test("les navigations de pied de page sont toutes nommées", async () => {
   for (const page of pages) {
     const html = await read(page);
     assert.doesNotMatch(html, /<nav class="footer-nav">/);
+  }
+});
+
+test("le footer attribue Vestiges à electronicArtefacts avec un lien explicite", async () => {
+  const pages = [
+    "index.html", "programme-fondateur/index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
+    "organisations/index.html", "comment-ca-marche/index.html", "methode/index.html",
+    "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
+    "explorer/index.html", "explorer/specimen/index.html"
+  ];
+  for (const page of pages) {
+    const html = await read(page);
+    assert.match(html, /<span>Vestiges by <a href="https:\/\/www\.electronicartefacts\.com">electronicArtefacts<\/a><\/span>/);
   }
 });
 
@@ -121,8 +134,8 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(theme, /localStorage\.setItem/);
   assert.match(theme, /prefers-color-scheme: dark/);
   assert.match(theme, /aria-label/);
-  assert.match(home, /theme-init\.20260716g\.js/);
-  assert.match(explorer, /theme-init\.20260716g\.js/);
+  assert.match(home, /theme-init\.20260716h\.js/);
+  assert.match(explorer, /theme-init\.20260716h\.js/);
 });
 
 test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {
@@ -152,13 +165,13 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
   assert.match(artistes, /Votre pratique déborde de l’image/);
-  assert.match(artistes, /v=20260716g&amp;parcours=artistes#conversation/);
+  assert.match(artistes, /v=20260716h&amp;parcours=artistes#conversation/);
   assert.match(transmission, /Transmettre sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
-  assert.match(transmission, /v=20260716g&amp;parcours=transmission#conversation/);
+  assert.match(transmission, /v=20260716h&amp;parcours=transmission#conversation/);
   assert.match(organisations, /Commencer par un terrain/);
   assert.match(organisations, /Quatre décisions avant toute production/);
-  assert.match(organisations, /v=20260716g&amp;parcours=institutions#conversation/);
+  assert.match(organisations, /v=20260716h&amp;parcours=institutions#conversation/);
 });
 
 test("le menu compact conserve l’action principale et le focus clavier", async () => {
@@ -222,7 +235,7 @@ test("le modèle FORGE est local, transparent et chargé à la demande", async (
 test("la participation prépare un contact direct sans prétendre transmettre", async () => {
   const [html, script] = await Promise.all([read("participer/index.html"), read("script.js")]);
   assert.match(html, /action="mailto:contact@vestiges\.world"/);
-  assert.match(html, /Aucune donnée n’est transmise au site/);
+  assert.match(html, /Aucune (?:donnée|réponse) n’est transmise au site/);
   assert.match(script, /Vestiges n’a rien reçu tant que vous ne l’avez pas envoyé/);
   assert.match(html, /data-route-choice="Artistes et ateliers"/);
   assert.match(html, /data-route-choice="Recherche et transmission"/);
@@ -231,6 +244,33 @@ test("la participation prépare un contact direct sans prétendre transmettre", 
   assert.match(script, /institutions: "Institutions et territoires"/);
   assert.match(script, /route\.checked = true/);
   assert.match(script, /scrollIntoView/);
+  assert.match(html, /Situation, une difficulté ou un exemple récent/i);
+  assert.match(html, /data-form-review/);
+  assert.match(script, /originLabel/);
+  assert.match(script, /invitationId/);
+  assert.match(script, /Résultat recherché/);
+});
+
+test("le programme fondateur rend la proposition et ses limites décidables", async () => {
+  const [program, home, artistes, about] = await Promise.all([
+    read("programme-fondateur/index.html"), read("index.html"), read("artistes/index.html"), read("a-propos/index.html")
+  ]);
+  assert.match(program, /30 à 45 minutes/);
+  assert.match(program, /production initiale non facturés/i);
+  assert.match(program, /Aucun frais futur ni gratuité à vie/);
+  assert.match(program, /Ni capital, ni emploi, ni mandat/);
+  assert.match(home, /Programme fondateur/);
+  assert.match(artistes, /Premiers praticiens/);
+  assert.match(about, /Joey-Néot Marquet/);
+});
+
+test("la navigation privilégie le programme réel au dossier témoin", async () => {
+  const pages = ["index.html", "artistes/index.html", "participer/index.html", "methode/index.html"];
+  for (const page of pages) {
+    const html = await read(page);
+    assert.match(html, /<nav class="main-nav"[\s\S]*href="\/programme-fondateur\/">Programme fondateur<\/a>/);
+    assert.doesNotMatch(html, /<nav class="main-nav"[\s\S]*>Voir un dossier<\/a>/);
+  }
 });
 
 test("les états masqués du formulaire restent réellement invisibles", async () => {
