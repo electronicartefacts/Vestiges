@@ -63,7 +63,7 @@ test("le header compose le monogramme avec estiges et conserve seulement le logo
   assert.match(home, /aria-label="Vestiges, accueil"[\s\S]*brand-word" aria-hidden="true">estiges/);
   assert.match(explorer, /aria-label="Vestiges, accueil"[\s\S]*brand-word" aria-hidden="true">estiges/);
   assert.match(styles, /\.site-header \.brand-word \{ margin-left: -\.05rem; \}/);
-  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*\.site-header \.brand-word \{ display: none; \}/);
+  assert.match(styles, /@media \(max-width: 960px\)[\s\S]*\.site-header \.brand-word \{ display: none; \}/);
 });
 
 test("l’accueil explique le produit avant la technologie et oriente par rôle", async () => {
@@ -126,4 +126,14 @@ test("la participation prépare un contact direct sans prétendre transmettre", 
   assert.match(html, /action="mailto:contact@vestiges\.world"/);
   assert.match(html, /Aucune donnée n’est transmise au site/);
   assert.match(script, /Vestiges n’a rien reçu tant que vous ne l’avez pas envoyé/);
+  assert.match(html, /data-route-choice="Artistes et ateliers"/);
+  assert.match(html, /data-route-choice="Recherche et transmission"/);
+  assert.match(html, /data-route-choice="Organisations et territoires"/);
+  assert.match(script, /route\.checked = true/);
+  assert.match(script, /scrollIntoView/);
+});
+
+test("les états masqués du formulaire restent réellement invisibles", async () => {
+  const styles = await read("styles.css");
+  assert.match(styles, /\[hidden\] \{ display: none !important; \}/);
 });

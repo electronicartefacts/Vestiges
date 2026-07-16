@@ -417,6 +417,7 @@
   function initContactForm() {
     const form = document.querySelector("[data-contact-form]");
     if (!form) return;
+    const routeLinks = Array.from(document.querySelectorAll("[data-route-choice]"));
     const steps = Array.from(form.querySelectorAll("[data-form-step]"));
     const progress = Array.from(form.querySelectorAll("[data-form-progress] span"));
     const previous = form.querySelector("[data-form-previous]");
@@ -464,6 +465,19 @@
     form.addEventListener("input", (event) => {
       event.target.removeAttribute("aria-invalid");
       clearError();
+    });
+    routeLinks.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        const value = link.dataset.routeChoice;
+        const route = Array.from(form.elements.route || []).find((input) => input.value === value);
+        if (route) {
+          route.checked = true;
+          route.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+        document.querySelector("#conversation")?.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth" });
+        window.setTimeout(() => form.querySelector("#intention")?.focus({ preventScroll: true }), reduceMotion.matches ? 0 : 420);
+      });
     });
     form.addEventListener("submit", (event) => {
       event.preventDefault();

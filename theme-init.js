@@ -18,9 +18,19 @@
   };
 
   const effectiveTheme = () => document.documentElement.dataset.theme || (systemDark.matches ? "dark" : "light");
+  const updateChrome = (theme) => {
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+    meta.content = theme === "dark" ? "#000000" : "#ffffff";
+  };
   const applyPreference = (value) => {
     if (value) document.documentElement.dataset.theme = value;
     else delete document.documentElement.dataset.theme;
+    updateChrome(effectiveTheme());
   };
 
   applyPreference(readPreference());
@@ -57,7 +67,10 @@
 
     actions.insertBefore(button, actions.querySelector("[data-menu-toggle]"));
     systemDark.addEventListener("change", () => {
-      if (!readPreference()) updateButton(button);
+      if (!readPreference()) {
+        updateChrome(effectiveTheme());
+        updateButton(button);
+      }
     });
   };
 
