@@ -83,8 +83,23 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
   assert.match(artistes, /Votre pratique déborde de l’image/);
+  assert.match(artistes, /parcours=artistes#conversation/);
   assert.match(transmission, /Transmettre sans effacer les nuances/);
+  assert.match(transmission, /Partir d’un usage réel/);
+  assert.match(transmission, /parcours=transmission#conversation/);
   assert.match(organisations, /Commencer par un terrain/);
+  assert.match(organisations, /Quatre décisions avant toute production/);
+  assert.match(organisations, /parcours=institutions#conversation/);
+});
+
+test("le menu compact conserve l’action principale et le focus clavier", async () => {
+  const [script, styles] = await Promise.all([read("script.js"), read("styles.css")]);
+  assert.match(script, /mobile-nav-cta/);
+  assert.match(script, /navigation\.setAttribute\("aria-label", "Navigation principale"\)/);
+  assert.match(script, /close\(\{ returnFocus: true \}\)/);
+  assert.match(script, /button\.textContent = open \? "Fermer" : "Menu"/);
+  assert.match(styles, /\.main-nav \.mobile-nav-cta/);
+  assert.match(styles, /font-variation-settings: "wght" 720/);
 });
 
 test("Explorer annonce le futur corpus au lieu d’ouvrir un artefact", async () => {
@@ -128,7 +143,9 @@ test("la participation prépare un contact direct sans prétendre transmettre", 
   assert.match(script, /Vestiges n’a rien reçu tant que vous ne l’avez pas envoyé/);
   assert.match(html, /data-route-choice="Artistes et ateliers"/);
   assert.match(html, /data-route-choice="Recherche et transmission"/);
-  assert.match(html, /data-route-choice="Organisations et territoires"/);
+  assert.match(html, /data-route-choice="Institutions et territoires"/);
+  assert.match(script, /parcours/);
+  assert.match(script, /institutions: "Institutions et territoires"/);
   assert.match(script, /route\.checked = true/);
   assert.match(script, /scrollIntoView/);
 });

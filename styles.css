@@ -186,6 +186,7 @@ p:last-child { margin-bottom: 0; }
 .site-header .brand-word { margin-left: -.05rem; }
 
 .main-nav { display: flex; align-items: center; gap: clamp(1rem, 2.5vw, 2.5rem); }
+.main-nav .mobile-nav-cta { display: none; }
 .main-nav a, .footer-nav a {
   color: var(--muted);
   font-size: .82rem;
@@ -659,6 +660,23 @@ p:last-child { margin-bottom: 0; }
   .main-nav.is-open { display: flex; }
   .main-nav a { min-height: 3rem; display: flex; align-items: center; border-bottom: 1px solid var(--soft-line); font-size: 1rem; }
   .main-nav a:last-child { border-bottom: 0; }
+  .main-nav .mobile-nav-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: .75rem;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    color: var(--ink);
+    font-weight: 560;
+    font-variation-settings: "wght" 560;
+    transition: box-shadow .22s ease, font-weight .22s ease, font-variation-settings .22s ease;
+  }
+  .main-nav .mobile-nav-cta:hover,
+  .main-nav .mobile-nav-cta:focus-visible {
+    box-shadow: inset 0 0 0 1px currentColor;
+    font-weight: 720;
+    font-variation-settings: "wght" 720;
+  }
   .home-hero, .page-hero { grid-template-columns: 1fr; }
   .home-hero { min-height: auto; }
   .page-hero { min-height: auto; }

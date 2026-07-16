@@ -17,20 +17,39 @@
     const button = document.querySelector("[data-menu-toggle]");
     const navigation = document.querySelector("[data-main-nav]");
     if (!button || !navigation) return;
+    if (!navigation.hasAttribute("aria-label")) navigation.setAttribute("aria-label", "Navigation principale");
 
-    const close = () => {
+    const primaryAction = document.querySelector(".header-actions a[href='/participer/']");
+    if (primaryAction && !navigation.querySelector(".mobile-nav-cta")) {
+      const mobileAction = primaryAction.cloneNode(true);
+      mobileAction.className = "mobile-nav-cta";
+      navigation.append(mobileAction);
+    }
+
+    const close = ({ returnFocus = false } = {}) => {
       button.setAttribute("aria-expanded", "false");
+      button.textContent = "Menu";
       navigation.classList.remove("is-open");
+      if (returnFocus) button.focus();
     };
 
     button.addEventListener("click", () => {
       const open = button.getAttribute("aria-expanded") !== "true";
       button.setAttribute("aria-expanded", String(open));
+      button.textContent = open ? "Fermer" : "Menu";
       navigation.classList.toggle("is-open", open);
     });
-    navigation.addEventListener("click", close);
+    navigation.addEventListener("click", () => close());
+    document.addEventListener("pointerdown", (event) => {
+      if (button.getAttribute("aria-expanded") !== "true") return;
+      if (navigation.contains(event.target) || button.contains(event.target)) return;
+      close();
+    });
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") close();
+      if (event.key === "Escape" && button.getAttribute("aria-expanded") === "true") close({ returnFocus: true });
+    });
+    window.matchMedia("(min-width: 961px)").addEventListener("change", (event) => {
+      if (event.matches) close();
     });
   }
 
@@ -425,6 +444,18 @@
     const submit = form.querySelector("[data-form-submit]");
     const error = form.querySelector("[data-form-error]");
     let current = 0;
+
+    const routeBySlug = {
+      artistes: "Artistes et ateliers",
+      transmission: "Recherche et transmission",
+      institutions: "Institutions et territoires",
+      organisations: "Institutions et territoires"
+    };
+    const requestedRoute = routeBySlug[new URLSearchParams(window.location.search).get("parcours")];
+    if (requestedRoute) {
+      const route = Array.from(form.elements.route || []).find((input) => input.value === requestedRoute);
+      if (route) route.checked = true;
+    }
 
     const showError = (message) => {
       if (!error) return;
