@@ -167,6 +167,9 @@ p:last-child { margin-bottom: 0; }
   transition: background .25s, color .25s, transform .25s var(--ease);
 }
 .button:hover, .text-button:hover { transform: translateY(-2px); }
+.role-card { color: inherit; text-decoration: none; transition: transform .3s var(--ease), background .3s, color .3s; }
+.role-card:hover { transform: translateY(-6px); background: var(--ink); color: var(--inverse); }
+.section-dark .role-card:hover { background: var(--paper); color: var(--ink); }
 .button-dark { background: var(--ink); color: var(--inverse); }
 .button-light { border-color: var(--inverse); color: var(--inverse); }
 .button-light:hover { background: var(--inverse); color: var(--ink); }

@@ -4,13 +4,18 @@ Mini-site statique de [Vestiges](https://vestiges.world), projet culturel et éd
 
 ## Architecture publique
 
-- `/` — comprendre Vestiges, voir une première relation et choisir la suite ;
-- `/explorer/` — découverte éditoriale et relationnelle de **Bois flotté 01** ;
-- `/explorer/specimen/` — dossier complet de cette première pièce technique ;
+- `/` — comprendre Vestiges, son résultat et choisir une intention ;
+- `/pour-qui/` — s’orienter entre création, transmission et terrain culturel ;
 - `/artistes/` — projection, effort, rôles, garanties et limites pour les artistes et ateliers ;
+- `/transmission/` — recherche, médiation, enseignement et contribution critique ;
+- `/organisations/` — cadrage d’un terrain pour institutions, collections et territoires ;
+- `/comment-ca-marche/` — résultat du dossier et processus de co-construction ;
 - `/methode/` — co-construction, statuts, visibilité, correction et retrait ;
 - `/participer/` — orientation et préparation d’un échange réel par e-mail ;
-- `/a-propos/` — porteur, origine, stade actuel et horizons qualifiés.
+- `/a-propos/` — porteur, origine, stade actuel et horizons qualifiés ;
+- `/laboratoire/` — preuve technique FORGE avec **Bois flotté 01** ;
+- `/explorer/` — emplacement réservé au futur corpus réel ;
+- `/explorer/specimen/` — URL historique du dossier technique détaillé.
 
 Le site correspond à l’état de maturité **premier prototype public, sans dossier d’artiste validé**. Bois flotté 01 est un sujet naturel sans artiste attribué. La capture, la reconstruction et les médias numériques sont attribués à Electronic Artefacts et ne sont pas déclarés dans le domaine public.
 
@@ -20,9 +25,9 @@ L’introduction typographique est déterministe, courte, immédiatement évitab
 
 Les titres éditoriaux utilisent un système typographique variable déterministe. Chaque mot conserve ses retours de ligne naturels ; une vague gaussienne de graisse suit le pointeur, réagit au toucher et accompagne la première apparition dans le viewport. Seul le `h1` conserve une respiration ambiante très légère. En réduction de mouvement, les titres restent entièrement statiques et ne sont pas découpés en glyphes.
 
-La direction visuelle associe noir, ivoire et un accent minéral rouge à des traces typographiques, axes et annotations. Le premier média réel est une sortie locale de FORGE : un GLB de 67 Mo, 404 304 faces et un atlas de texture 8192 × 8192 pixels. « 8K » qualifie explicitement cet atlas, pas la vidéo source.
+La direction visuelle associe noir, ivoire et un accent minéral rouge à des traces typographiques, axes et annotations. La preuve de laboratoire est une sortie locale de FORGE : un GLB de 67 Mo, 404 304 faces et un atlas de texture 8192 × 8192 pixels. « 8K » qualifie explicitement cet atlas, pas la vidéo source.
 
-Explorer commence par une lecture narrative de Bois flotté 01, révèle la chaîne vidéo → FORGE → modèle 3D, puis ouvre une carte locale. Un registre linéaire porte les mêmes informations essentielles et constitue l’alternative accessible au graphe. À l’approche de la visionneuse, le GLB se charge sur un canvas transparent ; le chargement reste manuel quand l’économie de données ou une connexion 2G est détectée. Le dossier HTML demeure disponible sans WebGL.
+Le laboratoire révèle la chaîne vidéo → FORGE → modèle 3D après la compréhension du produit. À l’approche de la visionneuse, le GLB se charge sur un canvas transparent ; le chargement reste manuel quand l’économie de données ou une connexion 2G est détectée. Le dossier HTML détaillé demeure disponible sans WebGL.
 
 ## Participation
 

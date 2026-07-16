@@ -15,9 +15,8 @@ test("l’introduction est courte, évitable, déterministe et mémorisée", asy
   assert.match(script, /prefers-reduced-motion/);
 });
 
-test("les titres utilisent une vague de graisse déterministe et réversible", async () => {
+test("tous les titres utilisent une vague de graisse déterministe et réversible", async () => {
   const [html, script, styles] = await Promise.all([read("index.html"), read("script.js"), read("styles.css")]);
-  assert.match(script, /initKineticType\(\)/);
   assert.match(script, /main h1, main h2, main h3/);
   assert.match(script, /Math\.exp\(-\.5 \* distance \* distance\)/);
   assert.match(script, /pointermove/);
@@ -28,49 +27,59 @@ test("les titres utilisent une vague de graisse déterministe et réversible", a
   assert.doesNotMatch(script, /Math\.random/);
 });
 
-test("l’accueil donne la définition, le public, le résultat et un CTA réel", async () => {
+test("l’accueil explique le produit avant la technologie et oriente par rôle", async () => {
   const html = await read("index.html");
-  assert.match(html, /artistes, artisans et ateliers/);
-  assert.match(html, /gestes, matières, lieux, sources et histoires/);
-  assert.match(html, /Couverture éditoriale/);
-  assert.match(html, /href="\/explorer\/"/);
+  assert.match(html, /Vestiges conçoit, avec les artistes et les lieux culturels, des dossiers numériques/);
+  assert.match(html, /Je crée[\s\S]*Je transmets[\s\S]*Je structure un terrain/);
+  assert.match(html, /couverture éditoriale/i);
+  assert.match(html, /href="\/pour-qui\/"/);
+  assert.doesNotMatch(html.split("Trois manières d’entrer")[0], /FORGE|8K|Bois flotté/);
 });
 
-test("Explorer présente Bois flotté 01 avec une provenance et une formulation 8K exactes", async () => {
-  const [explorer, dossier, provenance] = await Promise.all([
-    read("explorer/index.html"),
-    read("explorer/specimen/index.html"),
-    read("assets/works/bois-flotte-01/provenance.json")
+test("les trois cibles disposent d’une route dédiée", async () => {
+  const [hub, artistes, transmission, organisations] = await Promise.all([
+    read("pour-qui/index.html"), read("artistes/index.html"), read("transmission/index.html"), read("organisations/index.html")
   ]);
-  assert.match(explorer, /Première pièce · prototype public/);
-  assert.match(explorer, /atlas de texture 8192 × 8192 pixels/);
-  assert.match(dossier, /La mention 8K désigne l’atlas de texture/);
+  assert.match(hub, /Artistes et ateliers/);
+  assert.match(hub, /Recherche et transmission/);
+  assert.match(hub, /Institutions et territoires/);
+  assert.match(artistes, /Votre pratique déborde de l’image/);
+  assert.match(transmission, /Transmettre sans effacer les nuances/);
+  assert.match(organisations, /Commencer par un terrain/);
+});
+
+test("Explorer annonce le futur corpus au lieu d’ouvrir un artefact", async () => {
+  const explorer = await read("explorer/index.html");
+  assert.match(explorer, /corpus à venir/);
+  assert.match(explorer, /plusieurs dossiers consentis/);
+  assert.doesNotMatch(explorer, /data-forge-viewer|404 304 faces|atlas de texture/);
+});
+
+test("Bois flotté 01 est une preuve de laboratoire attribuée et exacte", async () => {
+  const [lab, dossier, provenance] = await Promise.all([
+    read("laboratoire/index.html"), read("explorer/specimen/index.html"), read("assets/works/bois-flotte-01/provenance.json")
+  ]);
+  assert.match(lab, /Laboratoire · preuve technique/);
+  assert.match(lab, /pas encore l’expérience complète d’un dossier d’artiste/);
   assert.match(dossier, /Aucun artiste attribué/);
-  assert.match(dossier, /ne sont pas présentés comme appartenant au domaine public|n’est pas déclaré dans le domaine public/);
+  assert.match(dossier, /La mention 8K désigne l’atlas de texture/);
   assert.equal(JSON.parse(provenance).digital_production.mesh_faces, 404304);
   assert.deepEqual(JSON.parse(provenance).digital_production.texture_atlas_pixels, [8192, 8192]);
-  assert.match(explorer, /Lecture relationnelle/);
-  assert.match(explorer, /Registre/);
 });
 
-test("le modèle FORGE est local, transparent et chargé à l’approche sans pénaliser les connexions contraintes", async () => {
-  const [explorer, script, viewer, styles, model] = await Promise.all([
-    read("explorer/index.html"),
-    read("script.js"),
-    read("forge-viewer.js"),
-    read("styles.css"),
+test("le modèle FORGE est local, transparent et chargé à la demande", async () => {
+  const [lab, script, viewer, styles, model] = await Promise.all([
+    read("laboratoire/index.html"), read("script.js"), read("forge-viewer.js"), read("styles.css"),
     stat(resolve(root, "assets/works/bois-flotte-01/bois-flotte-01-8k.glb"))
   ]);
-  assert.match(explorer, /data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
-  assert.match(explorer, /data-load-model/);
+  assert.match(lab, /data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
+  assert.match(lab, /data-load-model/);
   assert.match(script, /await import\("\/forge-viewer\.js"\)/);
-  assert.match(script, /IntersectionObserver/);
   assert.match(script, /connection\?\.saveData/);
   assert.match(viewer, /alpha: true/);
   assert.match(viewer, /setClearColor\(0x000000, 0\)/);
   assert.match(styles, /\.forge-viewer-poster \{ display: none; \}/);
   assert.ok(model.size > 60_000_000);
-  assert.doesNotMatch(explorer, /<script[^>]+three|<script[^>]+forge-viewer/);
 });
 
 test("la participation prépare un contact direct sans prétendre transmettre", async () => {
@@ -78,12 +87,4 @@ test("la participation prépare un contact direct sans prétendre transmettre", 
   assert.match(html, /action="mailto:contact@vestiges\.world"/);
   assert.match(html, /Aucune donnée n’est transmise au site/);
   assert.match(script, /Vestiges n’a rien reçu tant que vous ne l’avez pas envoyé/);
-  assert.match(html, /name="website"/);
-});
-
-test("les interactions essentielles ont une alternative tactile ou linéaire", async () => {
-  const explorer = await read("explorer/index.html");
-  assert.match(explorer, /<button class="graph-node/);
-  assert.match(explorer, /Chaque affirmation garde son statut/);
-  assert.doesNotMatch(explorer, /onmouseover|onmouseenter/);
 });

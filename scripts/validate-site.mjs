@@ -2,7 +2,7 @@ import { access, readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
-const routes = ["/", "/explorer/", "/explorer/specimen/", "/artistes/", "/methode/", "/participer/", "/a-propos/"];
+const routes = ["/", "/pour-qui/", "/artistes/", "/transmission/", "/organisations/", "/comment-ca-marche/", "/methode/", "/participer/", "/a-propos/", "/laboratoire/", "/explorer/", "/explorer/specimen/"];
 const routeFile = (route) => join(root, route === "/" ? "index.html" : `${route.slice(1)}index.html`);
 
 for (const route of routes) {
