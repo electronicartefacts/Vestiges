@@ -19,7 +19,7 @@
     if (!button || !navigation) return;
     if (!navigation.hasAttribute("aria-label")) navigation.setAttribute("aria-label", "Navigation principale");
 
-    const primaryAction = document.querySelector(".header-actions a[href='/participer/']");
+    const primaryAction = document.querySelector(".header-actions a[href^='/participer/']");
     if (primaryAction && !navigation.querySelector(".mobile-nav-cta")) {
       const mobileAction = primaryAction.cloneNode(true);
       mobileAction.className = "mobile-nav-cta";
