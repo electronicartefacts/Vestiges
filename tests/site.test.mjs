@@ -15,10 +15,19 @@ test("les pages publiques chargent une version cohérente des ressources", async
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.js\?v=20260716e/);
-    assert.match(html, /styles\.css\?v=20260716e/);
-    assert.match(html, /script\.js\?v=20260716e/);
+    assert.match(html, /theme-init\.20260716e\.js/);
+    assert.match(html, /styles\.20260716e\.css/);
+    assert.match(html, /script\.20260716e\.js/);
   }
+});
+
+test("les ressources versionnées correspondent aux sources validées", async () => {
+  const pairs = [
+    ["theme-init.js", "theme-init.20260716e.js"],
+    ["styles.css", "styles.20260716e.css"],
+    ["script.js", "script.20260716e.js"]
+  ];
+  for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
 });
 
 test("les pages publiques exposent des métadonnées de partage propres", async () => {
@@ -84,8 +93,8 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(theme, /localStorage\.setItem/);
   assert.match(theme, /prefers-color-scheme: dark/);
   assert.match(theme, /aria-label/);
-  assert.match(home, /theme-init\.js/);
-  assert.match(explorer, /theme-init\.js/);
+  assert.match(home, /theme-init\.20260716e\.js/);
+  assert.match(explorer, /theme-init\.20260716e\.js/);
 });
 
 test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {

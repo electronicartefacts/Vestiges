@@ -29,7 +29,7 @@ for (const route of routes) {
   }
 }
 
-for (const asset of ["styles.css", "script.js", "theme-init.js", "robots.txt", "sitemap.xml", "assets/logo/vestiges-monogram.svg", "assets/logo/vestiges-favicon.png", "assets/logo/vestiges-monogram-og.png"]) {
+for (const asset of ["styles.css", "styles.20260716e.css", "script.js", "script.20260716e.js", "theme-init.js", "theme-init.20260716e.js", "robots.txt", "sitemap.xml", "assets/logo/vestiges-monogram.svg", "assets/logo/vestiges-favicon.png", "assets/logo/vestiges-monogram-og.png"]) {
   await access(join(root, asset));
 }
 
