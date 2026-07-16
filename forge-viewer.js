@@ -18,11 +18,11 @@ export function mountForgeViewer(root) {
   }
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x090b12);
   const camera = new THREE.PerspectiveCamera(34, 1, 0.01, 100);
   camera.position.set(3.15, 2.1, 4.4);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+  renderer.setClearColor(0x000000, 0);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;

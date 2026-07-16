@@ -53,15 +53,22 @@ test("Explorer présente Bois flotté 01 avec une provenance et une formulation 
   assert.match(explorer, /Registre/);
 });
 
-test("le modèle FORGE est local, intègre et chargé uniquement à la demande", async () => {
-  const [explorer, script, model] = await Promise.all([
+test("le modèle FORGE est local, transparent et chargé à l’approche sans pénaliser les connexions contraintes", async () => {
+  const [explorer, script, viewer, styles, model] = await Promise.all([
     read("explorer/index.html"),
     read("script.js"),
+    read("forge-viewer.js"),
+    read("styles.css"),
     stat(resolve(root, "assets/works/bois-flotte-01/bois-flotte-01-8k.glb"))
   ]);
   assert.match(explorer, /data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
   assert.match(explorer, /data-load-model/);
   assert.match(script, /await import\("\/forge-viewer\.js"\)/);
+  assert.match(script, /IntersectionObserver/);
+  assert.match(script, /connection\?\.saveData/);
+  assert.match(viewer, /alpha: true/);
+  assert.match(viewer, /setClearColor\(0x000000, 0\)/);
+  assert.match(styles, /\.forge-viewer-poster \{ display: none; \}/);
   assert.ok(model.size > 60_000_000);
   assert.doesNotMatch(explorer, /<script[^>]+three|<script[^>]+forge-viewer/);
 });

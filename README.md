@@ -22,7 +22,7 @@ Les titres éditoriaux utilisent un système typographique variable déterminist
 
 La direction visuelle associe noir, ivoire et un accent minéral rouge à des traces typographiques, axes et annotations. Le premier média réel est une sortie locale de FORGE : un GLB de 67 Mo, 404 304 faces et un atlas de texture 8192 × 8192 pixels. « 8K » qualifie explicitement cet atlas, pas la vidéo source.
 
-Explorer commence par une lecture narrative de Bois flotté 01, révèle la chaîne vidéo → FORGE → modèle 3D, puis ouvre une carte locale. Un registre linéaire porte les mêmes informations essentielles et constitue l’alternative accessible au graphe. Le modèle n’est téléchargé qu’après activation du bouton « Explorer en 3D » ; une image et le dossier HTML restent disponibles sans WebGL.
+Explorer commence par une lecture narrative de Bois flotté 01, révèle la chaîne vidéo → FORGE → modèle 3D, puis ouvre une carte locale. Un registre linéaire porte les mêmes informations essentielles et constitue l’alternative accessible au graphe. À l’approche de la visionneuse, le GLB se charge sur un canvas transparent ; le chargement reste manuel quand l’économie de données ou une connexion 2G est détectée. Le dossier HTML demeure disponible sans WebGL.
 
 ## Participation
 

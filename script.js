@@ -379,7 +379,11 @@
     viewers.forEach((viewer) => {
       const button = viewer.querySelector("[data-load-model]");
       if (!button) return;
-      button.addEventListener("click", async () => {
+      let loading = false;
+      const load = async () => {
+        if (loading || viewer.dataset.viewerMounted === "true") return;
+        loading = true;
+        viewer.classList.add("is-model-loading");
         button.disabled = true;
         button.textContent = "Préparation de la vue 3D…";
         try {
@@ -387,12 +391,26 @@
           mountForgeViewer(viewer);
           button.hidden = true;
         } catch (_error) {
+          loading = false;
+          viewer.classList.remove("is-model-loading");
           button.disabled = false;
           button.textContent = "Réessayer d’ouvrir l’objet 3D";
           const status = viewer.querySelector("[data-viewer-status]");
           if (status) status.textContent = "La vue 3D n’a pas pu démarrer. Le dossier reste disponible.";
         }
-      });
+      };
+      button.addEventListener("click", load);
+
+      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const constrained = connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || "");
+      if (!constrained && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(([entry]) => {
+          if (!entry.isIntersecting) return;
+          observer.disconnect();
+          load();
+        }, { rootMargin: "240px 0px", threshold: 0.01 });
+        observer.observe(viewer);
+      }
     });
   }
 
