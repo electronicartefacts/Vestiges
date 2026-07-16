@@ -96,6 +96,8 @@ html {
   background: var(--paper);
 }
 
+[id] { scroll-margin-top: calc(var(--header) + 1rem); }
+
 body {
   margin: 0;
   background: var(--paper);
@@ -697,6 +699,10 @@ p:last-child { margin-bottom: 0; }
 
 @media (max-width: 680px) {
   :root { --header: 4.2rem; }
+  .site-header .brand { min-width: 2.75rem; min-height: 2.75rem; }
+  .hero-actions .text-link,
+  .footer-nav a,
+  .footer-bottom a { display: flex; min-height: 2.75rem; align-items: center; }
   .section, .page-hero { padding-inline: 1rem; }
   .display { font-size: clamp(3rem, 15vw, 5rem); }
   .page-title { font-size: clamp(3.6rem, 16vw, 6.2rem); }

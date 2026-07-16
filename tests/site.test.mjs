@@ -15,9 +15,26 @@ test("les pages publiques chargent une version cohérente des ressources", async
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.js\?v=20260716d/);
-    assert.match(html, /styles\.css\?v=20260716d/);
-    assert.match(html, /script\.js\?v=20260716d/);
+    assert.match(html, /theme-init\.js\?v=20260716e/);
+    assert.match(html, /styles\.css\?v=20260716e/);
+    assert.match(html, /script\.js\?v=20260716e/);
+  }
+});
+
+test("les pages publiques exposent des métadonnées de partage propres", async () => {
+  const pages = [
+    "index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
+    "organisations/index.html", "comment-ca-marche/index.html", "methode/index.html",
+    "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
+    "explorer/index.html", "explorer/specimen/index.html"
+  ];
+  for (const page of pages) {
+    const html = await read(page);
+    assert.match(html, /<meta property="og:title"/);
+    assert.match(html, /<meta property="og:description"/);
+    assert.match(html, /<meta property="og:url" content="https:\/\/vestiges\.world\//);
+    assert.match(html, /<meta name="twitter:card"/);
+    assert.doesNotMatch(html, /(?:canonical|og:url)[^>]*\?v=/);
   }
 });
 
@@ -98,13 +115,13 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
   assert.match(artistes, /Votre pratique déborde de l’image/);
-  assert.match(artistes, /v=20260716d&amp;parcours=artistes#conversation/);
+  assert.match(artistes, /v=20260716e&amp;parcours=artistes#conversation/);
   assert.match(transmission, /Transmettre sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
-  assert.match(transmission, /v=20260716d&amp;parcours=transmission#conversation/);
+  assert.match(transmission, /v=20260716e&amp;parcours=transmission#conversation/);
   assert.match(organisations, /Commencer par un terrain/);
   assert.match(organisations, /Quatre décisions avant toute production/);
-  assert.match(organisations, /v=20260716d&amp;parcours=institutions#conversation/);
+  assert.match(organisations, /v=20260716e&amp;parcours=institutions#conversation/);
 });
 
 test("le menu compact conserve l’action principale et le focus clavier", async () => {
@@ -115,6 +132,9 @@ test("le menu compact conserve l’action principale et le focus clavier", async
   assert.match(script, /button\.textContent = open \? "Fermer" : "Menu"/);
   assert.match(styles, /\.main-nav \.mobile-nav-cta/);
   assert.match(styles, /font-variation-settings: "wght" 720/);
+  assert.match(styles, /\.site-header \.brand \{ min-width: 2\.75rem; min-height: 2\.75rem; \}/);
+  assert.match(styles, /\.footer-nav a,[\s\S]*min-height: 2\.75rem/);
+  assert.match(styles, /\[id\] \{ scroll-margin-top: calc\(var\(--header\) \+ 1rem\); \}/);
 });
 
 test("Explorer annonce le futur corpus au lieu d’ouvrir un artefact", async () => {
