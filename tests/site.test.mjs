@@ -30,12 +30,30 @@ test("tous les titres utilisent une vague de graisse déterministe et réversibl
 test("les boutons d’action sont uniquement en contour et se renforcent sans translation", async () => {
   const styles = await read("styles.css");
   assert.match(styles, /\.button-dark \{ background: transparent; color: var\(--ink\); \}/);
-  assert.match(styles, /\.button-light \{ border-color: var\(--inverse\); color: var\(--inverse\); \}/);
+  assert.match(styles, /\.button-light \{ border-color: currentColor; color: inherit; \}/);
   assert.match(styles, /box-shadow: inset 0 0 0 1px currentColor/);
   assert.match(styles, /font-variation-settings: "wght" 720/);
   assert.doesNotMatch(styles, /\.button:hover[^}]*transform/s);
   assert.doesNotMatch(styles, /\.button-light:hover[^}]*background/s);
   assert.doesNotMatch(styles, /\.forge-viewer \.button:hover[^}]*background/s);
+});
+
+test("le contraste suit l’appareil et peut être basculé manuellement", async () => {
+  const [home, explorer, styles, theme] = await Promise.all([
+    read("index.html"), read("explorer/index.html"), read("styles.css"), read("theme-init.js")
+  ]);
+  assert.match(styles, /@media \(prefers-color-scheme: dark\)/);
+  assert.match(styles, /html\[data-theme="light"\]/);
+  assert.match(styles, /html\[data-theme="dark"\]/);
+  assert.match(styles, /--paper: #fff/);
+  assert.match(styles, /--paper: #000/);
+  assert.match(styles, /\.theme-toggle/);
+  assert.match(theme, /vestiges:theme:v1/);
+  assert.match(theme, /localStorage\.setItem/);
+  assert.match(theme, /prefers-color-scheme: dark/);
+  assert.match(theme, /aria-label/);
+  assert.match(home, /theme-init\.js/);
+  assert.match(explorer, /theme-init\.js/);
 });
 
 test("l’accueil explique le produit avant la technologie et oriente par rôle", async () => {

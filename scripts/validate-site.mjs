@@ -29,7 +29,7 @@ for (const route of routes) {
   }
 }
 
-for (const asset of ["styles.css", "script.js", "robots.txt", "sitemap.xml", "assets/logo/vestiges-monogram.svg", "assets/logo/vestiges-favicon.png", "assets/logo/vestiges-monogram-og.png"]) {
+for (const asset of ["styles.css", "script.js", "theme-init.js", "robots.txt", "sitemap.xml", "assets/logo/vestiges-monogram.svg", "assets/logo/vestiges-favicon.png", "assets/logo/vestiges-monogram-og.png"]) {
   await access(join(root, asset));
 }
 

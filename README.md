@@ -25,6 +25,8 @@ L’introduction typographique est déterministe, courte, immédiatement évitab
 
 Les titres éditoriaux utilisent un système typographique variable déterministe. Chaque mot conserve ses retours de ligne naturels ; une vague gaussienne de graisse suit le pointeur, réagit au toucher et accompagne la première apparition dans le viewport. Seul le `h1` conserve une respiration ambiante très légère. En réduction de mouvement, les titres restent entièrement statiques et ne sont pas découpés en glyphes.
 
+Le contraste suit `prefers-color-scheme` : fond blanc et texte noir en mode clair, fond noir et texte blanc en mode sombre. Un contrôle circulaire présent dans chaque en-tête permet de basculer manuellement ; ce choix est mémorisé localement et prend priorité sur le réglage de l’appareil.
+
 La direction visuelle associe noir, ivoire et un accent minéral rouge à des traces typographiques, axes et annotations. La preuve de laboratoire est une sortie locale de FORGE : un GLB de 67 Mo, 404 304 faces et un atlas de texture 8192 × 8192 pixels. « 8K » qualifie explicitement cet atlas, pas la vidéo source.
 
 Le laboratoire révèle la chaîne vidéo → FORGE → modèle 3D après la compréhension du produit. À l’approche de la visionneuse, le GLB se charge sur un canvas transparent ; le chargement reste manuel quand l’économie de données ou une connexion 2G est détectée. Le dossier HTML détaillé demeure disponible sans WebGL.
