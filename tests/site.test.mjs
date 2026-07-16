@@ -6,6 +6,21 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const read = (path) => readFile(resolve(root, path), "utf8");
 
+test("les pages publiques chargent une version cohérente des ressources", async () => {
+  const pages = [
+    "index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
+    "organisations/index.html", "comment-ca-marche/index.html", "methode/index.html",
+    "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
+    "explorer/index.html", "explorer/specimen/index.html"
+  ];
+  for (const page of pages) {
+    const html = await read(page);
+    assert.match(html, /theme-init\.js\?v=20260716c/);
+    assert.match(html, /styles\.css\?v=20260716c/);
+    assert.match(html, /script\.js\?v=20260716c/);
+  }
+});
+
 test("l’introduction est courte, évitable, déterministe et mémorisée", async () => {
   const [html, script] = await Promise.all([read("index.html"), read("script.js")]);
   assert.match(html, /data-intro-skip/);
