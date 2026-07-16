@@ -181,6 +181,8 @@ p:last-child { margin-bottom: 0; }
   object-fit: contain;
   filter: var(--logo-filter);
 }
+.site-header .brand { gap: .08rem; }
+.site-header .brand-word { margin-left: -.05rem; }
 
 .main-nav { display: flex; align-items: center; gap: clamp(1rem, 2.5vw, 2.5rem); }
 .main-nav a, .footer-nav a {
@@ -674,6 +676,8 @@ p:last-child { margin-bottom: 0; }
 
 @media (max-width: 680px) {
   :root { --header: 4.2rem; }
+  .site-header .brand-word { display: none; }
+  .site-header .brand img { width: 2.2rem; height: 1.6rem; }
   .section, .page-hero { padding-inline: 1rem; }
   .display { font-size: clamp(3rem, 15vw, 5rem); }
   .page-title { font-size: clamp(3.6rem, 16vw, 6.2rem); }

@@ -56,6 +56,16 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(explorer, /theme-init\.js/);
 });
 
+test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {
+  const [home, explorer, styles] = await Promise.all([
+    read("index.html"), read("explorer/index.html"), read("styles.css")
+  ]);
+  assert.match(home, /aria-label="Vestiges, accueil"[\s\S]*brand-word" aria-hidden="true">estiges/);
+  assert.match(explorer, /aria-label="Vestiges, accueil"[\s\S]*brand-word" aria-hidden="true">estiges/);
+  assert.match(styles, /\.site-header \.brand-word \{ margin-left: -\.05rem; \}/);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*\.site-header \.brand-word \{ display: none; \}/);
+});
+
 test("l’accueil explique le produit avant la technologie et oriente par rôle", async () => {
   const html = await read("index.html");
   assert.match(html, /Vestiges conçoit, avec les artistes et les lieux culturels, des dossiers numériques/);
