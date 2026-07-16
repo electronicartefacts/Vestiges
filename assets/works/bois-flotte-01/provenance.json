@@ -6,7 +6,12 @@
     "type": "natural found object",
     "material": "driftwood",
     "artist_attribution": null,
-    "origin": "not documented"
+    "discovery_country": "Norway",
+    "discovery_location": null,
+    "dimensions_cm_approximate": [20, 20, 25],
+    "weight_kg_estimate": 0.7,
+    "wood_species": null,
+    "measurement_status": "approximate and not physically verified"
   },
   "digital_production": {
     "producer": "Electronic Artefacts",

@@ -15,17 +15,18 @@ test("les pages publiques chargent une version cohérente des ressources", async
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.20260716f\.js/);
-    assert.match(html, /styles\.20260716f\.css/);
-    assert.match(html, /script\.20260716f\.js/);
+    assert.match(html, /theme-init\.20260716g\.js/);
+    assert.match(html, /styles\.20260716g\.css/);
+    assert.match(html, /script\.20260716g\.js/);
   }
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
-    ["theme-init.js", "theme-init.20260716f.js"],
-    ["styles.css", "styles.20260716f.css"],
-    ["script.js", "script.20260716f.js"]
+    ["theme-init.js", "theme-init.20260716g.js"],
+    ["styles.css", "styles.20260716g.css"],
+    ["script.js", "script.20260716g.js"],
+    ["forge-viewer.js", "forge-viewer.20260716g.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
 });
@@ -50,7 +51,7 @@ test("les pages publiques exposent des métadonnées de partage propres", async 
 test("l’introduction est courte, évitable, déterministe et mémorisée", async () => {
   const [html, script] = await Promise.all([read("index.html"), read("script.js")]);
   assert.match(html, /data-intro-skip/);
-  assert.match(html, /data-brand-intro role="dialog" aria-modal="true"/);
+  assert.match(html, /data-brand-intro[^>]*role="dialog" aria-modal="true"/);
   assert.match(html, /matière[\s\S]*geste[\s\S]*œuvre[\s\S]*mémoire[\s\S]*relation[\s\S]*Vestiges/);
   assert.doesNotMatch(script, /Math\.random/);
   assert.match(script, /localStorage\.setItem/);
@@ -120,8 +121,8 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(theme, /localStorage\.setItem/);
   assert.match(theme, /prefers-color-scheme: dark/);
   assert.match(theme, /aria-label/);
-  assert.match(home, /theme-init\.20260716f\.js/);
-  assert.match(explorer, /theme-init\.20260716f\.js/);
+  assert.match(home, /theme-init\.20260716g\.js/);
+  assert.match(explorer, /theme-init\.20260716g\.js/);
 });
 
 test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {
@@ -151,13 +152,13 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
   assert.match(artistes, /Votre pratique déborde de l’image/);
-  assert.match(artistes, /v=20260716f&amp;parcours=artistes#conversation/);
+  assert.match(artistes, /v=20260716g&amp;parcours=artistes#conversation/);
   assert.match(transmission, /Transmettre sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
-  assert.match(transmission, /v=20260716f&amp;parcours=transmission#conversation/);
+  assert.match(transmission, /v=20260716g&amp;parcours=transmission#conversation/);
   assert.match(organisations, /Commencer par un terrain/);
   assert.match(organisations, /Quatre décisions avant toute production/);
-  assert.match(organisations, /v=20260716f&amp;parcours=institutions#conversation/);
+  assert.match(organisations, /v=20260716g&amp;parcours=institutions#conversation/);
 });
 
 test("le menu compact conserve l’action principale et le focus clavier", async () => {
@@ -180,16 +181,26 @@ test("Explorer annonce le futur corpus au lieu d’ouvrir un artefact", async ()
   assert.doesNotMatch(explorer, /data-forge-viewer|404 304 faces|atlas de texture/);
 });
 
-test("Bois flotté 01 est une preuve de laboratoire attribuée et exacte", async () => {
+test("Bois flotté 01 distingue les faits, estimations, inconnues et productions numériques", async () => {
   const [lab, dossier, provenance] = await Promise.all([
     read("laboratoire/index.html"), read("explorer/specimen/index.html"), read("assets/works/bois-flotte-01/provenance.json")
   ]);
   assert.match(lab, /Laboratoire · preuve technique/);
   assert.match(lab, /pas encore l’expérience complète d’un dossier d’artiste/);
-  assert.match(dossier, /Aucun artiste attribué/);
-  assert.match(dossier, /La mention 8K désigne l’atlas de texture/);
-  assert.equal(JSON.parse(provenance).digital_production.mesh_faces, 404304);
-  assert.deepEqual(JSON.parse(provenance).digital_production.texture_atlas_pixels, [8192, 8192]);
+  assert.match(dossier, /Artiste inconnu/);
+  assert.match(dossier, /Les informations non vérifiées restent explicitement signalées/);
+  assert.match(dossier, /20 × 20 × 25/);
+  assert.match(dossier, /≈ 0,7 kg/);
+  assert.match(dossier, /data-model-projection="front"[\s\S]*data-model-projection="side"[\s\S]*data-model-projection="top"/);
+  assert.match(dossier, /data-graph-node="norvege"[\s\S]*data-graph-node="artiste"/);
+  assert.match(dossier, /404 304 faces/);
+  assert.match(dossier, /8192 × 8192 pixels/);
+  const record = JSON.parse(provenance);
+  assert.equal(record.subject.discovery_country, "Norway");
+  assert.deepEqual(record.subject.dimensions_cm_approximate, [20, 20, 25]);
+  assert.equal(record.subject.measurement_status, "approximate and not physically verified");
+  assert.equal(record.digital_production.mesh_faces, 404304);
+  assert.deepEqual(record.digital_production.texture_atlas_pixels, [8192, 8192]);
 });
 
 test("le modèle FORGE est local, transparent et chargé à la demande", async () => {
@@ -199,10 +210,11 @@ test("le modèle FORGE est local, transparent et chargé à la demande", async (
   ]);
   assert.match(lab, /data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
   assert.match(lab, /data-load-model/);
-  assert.match(script, /await import\("\/forge-viewer\.js"\)/);
+  assert.match(script, /await import\("\/forge-viewer\.20260716g\.js"\)/);
   assert.match(script, /connection\?\.saveData/);
   assert.match(viewer, /alpha: true/);
   assert.match(viewer, /setClearColor\(0x000000, 0\)/);
+  assert.match(viewer, /data-model-projection/);
   assert.match(styles, /\.forge-viewer-poster \{ display: none; \}/);
   assert.ok(model.size > 60_000_000);
 });
@@ -224,4 +236,25 @@ test("la participation prépare un contact direct sans prétendre transmettre", 
 test("les états masqués du formulaire restent réellement invisibles", async () => {
   const styles = await read("styles.css");
   assert.match(styles, /\[hidden\] \{ display: none !important; \}/);
+});
+
+test("la typographie évite les césures, les veuves et les débuts de phrase isolés", async () => {
+  const [script, styles] = await Promise.all([read("script.js"), read("styles.css")]);
+  assert.match(styles, /main p,[\s\S]*hyphens: none/);
+  assert.match(styles, /text-wrap: pretty/);
+  assert.match(styles, /main h1,[\s\S]*text-wrap: balance/);
+  assert.match(styles, /text-decoration-skip-ink: auto/);
+  assert.match(styles, /text-decoration-thickness: max\(1px, \.065em\)/);
+  assert.match(script, /new Intl\.Segmenter\("fr", \{ granularity: "sentence" \}\)/);
+  assert.match(script, /countFirstLineWords\(sentence\) <= 4/);
+  assert.match(script, /new ResizeObserver\(schedule\)/);
+});
+
+test("la politique de sécurité ne bloque aucun style applicatif", async () => {
+  const pages = ["index.html", "methode/index.html", "participer/index.html", "explorer/specimen/index.html"];
+  const [script, home] = await Promise.all([read("script.js"), read("index.html")]);
+  for (const page of pages) assert.doesNotMatch(await read(page), /\sstyle="/);
+  assert.doesNotMatch(script, /\.style\./);
+  assert.match(home, /style-src 'self'/);
+  assert.match(home, /data-progress-step="0"/);
 });
