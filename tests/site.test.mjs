@@ -27,6 +27,17 @@ test("tous les titres utilisent une vague de graisse déterministe et réversibl
   assert.doesNotMatch(script, /Math\.random/);
 });
 
+test("les boutons d’action sont uniquement en contour et se renforcent sans translation", async () => {
+  const styles = await read("styles.css");
+  assert.match(styles, /\.button-dark \{ background: transparent; color: var\(--ink\); \}/);
+  assert.match(styles, /\.button-light \{ border-color: var\(--inverse\); color: var\(--inverse\); \}/);
+  assert.match(styles, /box-shadow: inset 0 0 0 1px currentColor/);
+  assert.match(styles, /font-variation-settings: "wght" 720/);
+  assert.doesNotMatch(styles, /\.button:hover[^}]*transform/s);
+  assert.doesNotMatch(styles, /\.button-light:hover[^}]*background/s);
+  assert.doesNotMatch(styles, /\.forge-viewer \.button:hover[^}]*background/s);
+});
+
 test("l’accueil explique le produit avant la technologie et oriente par rôle", async () => {
   const html = await read("index.html");
   assert.match(html, /Vestiges conçoit, avec les artistes et les lieux culturels, des dossiers numériques/);

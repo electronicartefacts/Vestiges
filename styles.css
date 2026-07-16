@@ -159,20 +159,28 @@ p:last-child { margin-bottom: 0; }
   background: transparent;
   color: var(--ink);
   font-size: .82rem;
-  font-weight: 600;
+  font-weight: 560;
+  font-variation-settings: "wght" 560;
   line-height: 1.1;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  transition: background .25s, color .25s, transform .25s var(--ease);
+  transition: border-color .22s ease, box-shadow .22s ease, color .22s ease, font-weight .22s ease, font-variation-settings .22s ease;
 }
-.button:hover, .text-button:hover { transform: translateY(-2px); }
+.button:hover,
+.button:focus-visible,
+.text-button:hover,
+.text-button:focus-visible {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px currentColor;
+  font-weight: 720;
+  font-variation-settings: "wght" 720;
+}
 .role-card { color: inherit; text-decoration: none; transition: transform .3s var(--ease), background .3s, color .3s; }
 .role-card:hover { transform: translateY(-6px); background: var(--ink); color: var(--inverse); }
 .section-dark .role-card:hover { background: var(--paper); color: var(--ink); }
-.button-dark { background: var(--ink); color: var(--inverse); }
+.button-dark { background: transparent; color: var(--ink); }
 .button-light { border-color: var(--inverse); color: var(--inverse); }
-.button-light:hover { background: var(--inverse); color: var(--ink); }
 .button-arrow::after { content: "↘"; font-size: 1rem; }
 .text-link { font-size: .86rem; text-underline-offset: .3rem; }
 .text-link:hover { text-decoration-thickness: 2px; }
@@ -465,7 +473,6 @@ p:last-child { margin-bottom: 0; }
 .dossier-side .forge-viewer-action { bottom: 1rem; }
 .forge-viewer-action span { max-width: 18rem; color: var(--muted); font-size: .68rem; line-height: 1.35; text-align: right; }
 .forge-viewer .button { flex: 0 0 auto; border-color: var(--ink); color: var(--ink); }
-.forge-viewer .button:hover { background: var(--ink); color: var(--inverse); }
 .forge-viewer figcaption { z-index: 2; padding-right: 12rem; color: var(--ink); text-shadow: none; }
 .forge-viewer.is-model-loaded .forge-viewer-action { pointer-events: none; }
 .forge-viewer.is-model-loaded .forge-viewer-action span { padding: .45rem .65rem; background: rgba(243,241,235,.78); backdrop-filter: blur(.35rem); }
