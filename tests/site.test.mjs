@@ -15,17 +15,17 @@ test("les pages publiques chargent une version cohérente des ressources", async
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.20260716h\.js/);
-    assert.match(html, /styles\.20260716h\.css/);
-    assert.match(html, /script\.20260716h\.js/);
+    assert.match(html, /theme-init\.20260717a\.js/);
+    assert.match(html, /styles\.20260717a\.css/);
+    assert.match(html, /script\.20260717a\.js/);
   }
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
-    ["theme-init.js", "theme-init.20260716h.js"],
-    ["styles.css", "styles.20260716h.css"],
-    ["script.js", "script.20260716h.js"],
+    ["theme-init.js", "theme-init.20260717a.js"],
+    ["styles.css", "styles.20260717a.css"],
+    ["script.js", "script.20260717a.js"],
     ["forge-viewer.js", "forge-viewer.20260716g.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
@@ -84,7 +84,7 @@ test("les navigations de pied de page sont toutes nommées", async () => {
   }
 });
 
-test("le footer attribue Vestiges à electronicArtefacts avec un lien explicite", async () => {
+test("le shell public nomme ses navigations et garde une signature constante", async () => {
   const pages = [
     "index.html", "programme-fondateur/index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
     "organisations/index.html", "comment-ca-marche/index.html", "methode/index.html",
@@ -93,7 +93,10 @@ test("le footer attribue Vestiges à electronicArtefacts avec un lien explicite"
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /<span>Vestiges by <a href="https:\/\/www\.electronicartefacts\.com">electronicArtefacts<\/a><\/span>/);
+    assert.match(html, /<nav class="main-nav"[^>]*aria-label="Navigation principale"/);
+    assert.match(html, /<meta name="theme-color" content="#ffffff">/);
+    assert.match(html, /<span>Vestiges · Produit par <a href="https:\/\/www\.electronicartefacts\.com">Electronic Artefacts<\/a><\/span>/);
+    assert.match(html, /<a href="https:\/\/vestiges\.world\/">www\.vestiges\.world<\/a>/);
   }
 });
 
@@ -134,8 +137,8 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(theme, /localStorage\.setItem/);
   assert.match(theme, /prefers-color-scheme: dark/);
   assert.match(theme, /aria-label/);
-  assert.match(home, /theme-init\.20260716h\.js/);
-  assert.match(explorer, /theme-init\.20260716h\.js/);
+  assert.match(home, /theme-init\.20260717a\.js/);
+  assert.match(explorer, /theme-init\.20260717a\.js/);
 });
 
 test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {
@@ -165,13 +168,13 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
   assert.match(artistes, /Votre pratique déborde de l’image/);
-  assert.match(artistes, /v=20260716h&amp;parcours=artistes#conversation/);
+  assert.match(artistes, /v=20260717a&amp;parcours=artistes#conversation/);
   assert.match(transmission, /Transmettre sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
-  assert.match(transmission, /v=20260716h&amp;parcours=transmission#conversation/);
+  assert.match(transmission, /v=20260717a&amp;parcours=transmission#conversation/);
   assert.match(organisations, /Commencer par un terrain/);
   assert.match(organisations, /Quatre décisions avant toute production/);
-  assert.match(organisations, /v=20260716h&amp;parcours=institutions#conversation/);
+  assert.match(organisations, /v=20260717a&amp;parcours=institutions#conversation/);
 });
 
 test("le menu compact conserve l’action principale et le focus clavier", async () => {

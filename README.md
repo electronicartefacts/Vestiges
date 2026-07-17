@@ -21,6 +21,8 @@ Le site correspond à l’état de maturité **premier prototype public, sans do
 
 ## Choix d’expérience
 
+Les règles transversales de composition, typographie, couleur, interaction et responsive sont formalisées dans [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md).
+
 L’introduction typographique est déterministe, courte, immédiatement évitable, mémorisée localement et rejouable. La réduction de mouvement donne accès à un état stable. La séquence publique utilise `matière → geste → œuvre → mémoire → relation → Vestiges` afin d’éviter de limiter le projet à la sculpture ou au monument.
 
 Les titres éditoriaux utilisent un système typographique variable déterministe. Chaque mot conserve ses retours de ligne naturels ; une vague gaussienne de graisse suit le pointeur, réagit au toucher et accompagne la première apparition dans le viewport. Seul le `h1` conserve une respiration ambiante très légère. En réduction de mouvement, les titres restent entièrement statiques et ne sont pas découpés en glyphes.

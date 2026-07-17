@@ -12,6 +12,7 @@ for (const route of routes) {
   const requirements = [
     [/<title>[^<]+<\/title>/, "un titre"],
     [/<meta name="description"/, "une description"],
+    [/<meta name="theme-color" content="#ffffff">/, "une couleur de navigateur cohérente"],
     [/<link rel="canonical"/, "une URL canonique"],
     [/<h1[\s>]/, "un titre h1"],
     [/<main[\s>]/, "un contenu principal"]
@@ -29,7 +30,7 @@ for (const route of routes) {
   }
 }
 
-for (const asset of ["styles.css", "styles.20260716h.css", "script.js", "script.20260716h.js", "theme-init.js", "theme-init.20260716h.js", "forge-viewer.js", "forge-viewer.20260716g.js", "robots.txt", "sitemap.xml", "assets/logo/vestiges-monogram.svg", "assets/logo/vestiges-favicon.png", "assets/logo/vestiges-monogram-og.png"]) {
+for (const asset of ["styles.css", "styles.20260717a.css", "script.js", "script.20260717a.js", "theme-init.js", "theme-init.20260717a.js", "forge-viewer.js", "forge-viewer.20260716g.js", "robots.txt", "sitemap.xml", "assets/logo/vestiges-monogram.svg", "assets/logo/vestiges-favicon.png", "assets/logo/vestiges-monogram-og.png"]) {
   await access(join(root, asset));
 }
 
