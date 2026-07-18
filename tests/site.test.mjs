@@ -15,17 +15,17 @@ test("les pages publiques chargent une version cohérente des ressources", async
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.20260717a\.js/);
-    assert.match(html, /styles\.20260717a\.css/);
-    assert.match(html, /script\.20260717a\.js/);
+    assert.match(html, /theme-init\.20260718a\.js/);
+    assert.match(html, /styles\.20260718a\.css/);
+    assert.match(html, /script\.20260718a\.js/);
   }
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
-    ["theme-init.js", "theme-init.20260717a.js"],
-    ["styles.css", "styles.20260717a.css"],
-    ["script.js", "script.20260717a.js"],
+    ["theme-init.js", "theme-init.20260718a.js"],
+    ["styles.css", "styles.20260718a.css"],
+    ["script.js", "script.20260718a.js"],
     ["forge-viewer.js", "forge-viewer.20260716g.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
@@ -59,6 +59,7 @@ test("l’introduction est courte, évitable, déterministe et mémorisée", asy
   assert.match(script, /element\.inert = value/);
   assert.match(script, /focusAfterIntro/);
   assert.match(script, /event\.key !== "Tab"/);
+  assert.match(script, /skipForJourney/);
 });
 
 test("la participation conserve une issue explicite sans JavaScript", async () => {
@@ -137,8 +138,8 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(theme, /localStorage\.setItem/);
   assert.match(theme, /prefers-color-scheme: dark/);
   assert.match(theme, /aria-label/);
-  assert.match(home, /theme-init\.20260717a\.js/);
-  assert.match(explorer, /theme-init\.20260717a\.js/);
+  assert.match(home, /theme-init\.20260718a\.js/);
+  assert.match(explorer, /theme-init\.20260718a\.js/);
 });
 
 test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {
@@ -160,6 +161,16 @@ test("l’accueil explique le produit avant la technologie et oriente par rôle"
   assert.doesNotMatch(html.split("Trois manières d’entrer")[0], /FORGE|8K|Bois flotté/);
 });
 
+test("Comment ça marche montre une anatomie de dossier sans fabriquer de cas réel", async () => {
+  const [html, styles] = await Promise.all([read("comment-ca-marche/index.html"), read("styles.css")]);
+  assert.match(html, /Prototype de structure/);
+  assert.match(html, /ne représente ni un artiste réel, ni un dossier déjà produit/);
+  assert.match(html, /Récit de pratique[\s\S]*Éléments reliés[\s\S]*Registre vérifiable[\s\S]*Droits praticables/);
+  assert.match(html, /30 à 45 minutes d’échange initial/);
+  assert.match(styles, /\.dossier-blueprint/);
+  assert.match(styles, /\.effort-strip/);
+});
+
 test("les trois cibles disposent d’une route dédiée", async () => {
   const [hub, artistes, transmission, organisations] = await Promise.all([
     read("pour-qui/index.html"), read("artistes/index.html"), read("transmission/index.html"), read("organisations/index.html")
@@ -168,23 +179,23 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
   assert.match(artistes, /Votre pratique déborde de l’image/);
-  assert.match(artistes, /v=20260717a&amp;parcours=artistes#conversation/);
+  assert.match(artistes, /v=20260718a&amp;parcours=artistes#conversation/);
   assert.match(transmission, /Transmettre sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
-  assert.match(transmission, /v=20260717a&amp;parcours=transmission#conversation/);
+  assert.match(transmission, /v=20260718a&amp;parcours=transmission#conversation/);
   assert.match(organisations, /Commencer par un terrain/);
   assert.match(organisations, /Quatre décisions avant toute production/);
-  assert.match(organisations, /v=20260717a&amp;parcours=institutions#conversation/);
+  assert.match(organisations, /v=20260718a&amp;parcours=institutions#conversation/);
 });
 
-test("le menu compact conserve l’action principale et le focus clavier", async () => {
+test("le header mobile conserve l’action principale et le focus clavier", async () => {
   const [script, styles] = await Promise.all([read("script.js"), read("styles.css")]);
-  assert.match(script, /mobile-nav-cta/);
   assert.match(script, /navigation\.setAttribute\("aria-label", "Navigation principale"\)/);
   assert.match(script, /close\(\{ returnFocus: true \}\)/);
   assert.match(script, /button\.textContent = open \? "Fermer" : "Menu"/);
-  assert.match(styles, /\.main-nav \.mobile-nav-cta/);
-  assert.match(styles, /font-variation-settings: "wght" 720/);
+  assert.doesNotMatch(script, /mobile-nav-cta/);
+  assert.match(styles, /\.header-actions > a\[href\^="\/participer\/"\]/);
+  assert.match(styles, /content: "Échanger"/);
   assert.match(styles, /\.site-header \.brand \{ min-width: 2\.75rem; min-height: 2\.75rem; \}/);
   assert.match(styles, /\.footer-nav a,[\s\S]*min-height: 2\.75rem/);
   assert.match(styles, /\[id\] \{ scroll-margin-top: calc\(var\(--header\) \+ 1rem\); \}/);
@@ -247,11 +258,18 @@ test("la participation prépare un contact direct sans prétendre transmettre", 
   assert.match(script, /institutions: "Institutions et territoires"/);
   assert.match(script, /route\.checked = true/);
   assert.match(script, /scrollIntoView/);
-  assert.match(html, /Situation, une difficulté ou un exemple récent/i);
+  assert.match(html, /01 \/ 04[\s\S]*02 \/ 04[\s\S]*03 \/ 04[\s\S]*04 \/ 04/);
+  assert.match(html, /Votre contexte et la situation qui vous amène aujourd’hui/);
+  assert.doesNotMatch(html, /name="practice"|name="situation"|name="territory"/);
+  assert.match(html, /data-cold-path/);
   assert.match(html, /data-form-review/);
   assert.match(script, /originLabel/);
   assert.match(script, /invitationId/);
   assert.match(script, /Résultat recherché/);
+  assert.match(script, /displayValue\(data, "context"\)/);
+  assert.match(script, /data-copy-prepared-message/);
+  assert.match(script, /navigator\.clipboard\.writeText/);
+  assert.match(script, /journeyContext/);
 });
 
 test("le programme fondateur rend la proposition et ses limites décidables", async () => {

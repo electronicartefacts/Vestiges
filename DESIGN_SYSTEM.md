@@ -35,6 +35,7 @@ Ce document décrit le système déjà exprimé par le site. Il ne constitue pas
 - Les boutons sont des pilules en contour, d’une hauteur minimale `--control`. Ils se renforcent sans déplacement.
 - Les liens éditoriaux restent des liens soulignés. Une action ne change pas de nature visuelle selon la page.
 - Les cartes partagent bordures, padding, hauteur et hiérarchie. Une variation doit provenir du rôle du contenu, pas d’une préférence locale.
+- L’anatomie de dossier distingue couverture, profondeurs, effort et statut de prototype. Elle peut expliquer une structure future, mais jamais simuler un cas réel sans le dire.
 - Les rayons sont réservés aux pilules, contrôles circulaires et nœuds relationnels. Les surfaces éditoriales restent orthogonales.
 
 ## 6. Des interactions équivalentes
@@ -49,7 +50,7 @@ Ce document décrit le système déjà exprimé par le site. Il ne constitue pas
 - Desktop organise les relations en colonnes ; mobile les remet dans l’ordre de lecture.
 - Les seuils globaux sont `960px` pour le shell et les compositions, puis `680px` pour la lecture compacte.
 - Aucun contenu essentiel ne doit dépendre d’un survol, d’une largeur fixe ou d’un défilement horizontal non annoncé.
-- Les cibles tactiles font au moins 44 px et les actions importantes restent visibles ou réapparaissent dans le menu compact.
+- Les cibles tactiles font au moins 44 px et l’action de conversation reste visible dans le shell compact sous un libellé court.
 
 ## 8. Un shell public constant
 

@@ -37,7 +37,9 @@ Le laboratoire révèle la chaîne vidéo → FORGE → modèle 3D après la com
 
 Le Worker Cloudflare et sa base chiffrée restent dans `worker/`, mais leur mode public n’est pas encore ouvert. Le site ne doit jamais exposer le code du test propriétaire.
 
-Dans l’état actuel, le formulaire public prépare un e-mail dans la messagerie de la personne. Il indique explicitement qu’aucune information n’est reçue avant l’envoi manuel. Quand les gates juridiques, opérationnelles et anti-abus seront fermées, cette surface pourra être reliée au Worker sans changer l’ordre cognitif du formulaire.
+Dans l’état actuel, le formulaire public prépare un e-mail en quatre étapes dans la messagerie de la personne. Il indique explicitement qu’aucune information n’est reçue avant l’envoi manuel et permet de copier le message si aucun client e-mail ne s’ouvre. Une arrivée depuis une invitation ou une page de rôle masque les détours d’orientation déjà parcourus. Quand les gates juridiques, opérationnelles et anti-abus seront fermées, cette surface pourra être reliée au Worker sans changer l’ordre cognitif du formulaire.
+
+La page `Comment ça marche` contient une anatomie de dossier explicitement présentée comme prototype de structure. Elle montre le livrable attendu sans fabriquer de cas, d’artiste ou de partenariat réel.
 
 ## Technique
 
