@@ -39,7 +39,11 @@ Le Worker Cloudflare et sa base chiffrée restent dans `worker/`, mais leur mode
 
 Dans l’état actuel, le formulaire public prépare un e-mail en quatre étapes dans la messagerie de la personne. Il indique explicitement qu’aucune information n’est reçue avant l’envoi manuel et permet de copier le message si aucun client e-mail ne s’ouvre. Une arrivée depuis une invitation ou une page de rôle masque les détours d’orientation déjà parcourus. Quand les gates juridiques, opérationnelles et anti-abus seront fermées, cette surface pourra être reliée au Worker sans changer l’ordre cognitif du formulaire.
 
+Le parcours émet des événements `vestiges:journey` uniquement dans la page, sans réseau, cookie, stockage persistant ni contenu personnel. `?qa=1` les expose en mémoire dans `window.VESTIGES_QA_EVENTS` pour les tests modérés. Ce mécanisme n’est pas un outil d’analytics et n’autorise aucune collecte distante.
+
 La page `Comment ça marche` contient une anatomie de dossier explicitement présentée comme prototype de structure. Elle montre le livrable attendu sans fabriquer de cas, d’artiste ou de partenariat réel.
+
+Le protocole de ronde, la réponse humaine, la porte du premier dossier et les variantes d’invitation sont définis dans [`docs/FOUNDER_PILOT_PLAYBOOK.md`](docs/FOUNDER_PILOT_PLAYBOOK.md). La fiche d’observation réutilisable se trouve dans [`docs/PILOT_SESSION_SCORECARD.md`](docs/PILOT_SESSION_SCORECARD.md).
 
 ## Technique
 

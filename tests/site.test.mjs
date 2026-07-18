@@ -15,17 +15,17 @@ test("les pages publiques chargent une version cohérente des ressources", async
   ];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.20260718a\.js/);
-    assert.match(html, /styles\.20260718a\.css/);
-    assert.match(html, /script\.20260718a\.js/);
+    assert.match(html, /theme-init\.20260718b\.js/);
+    assert.match(html, /styles\.20260718b\.css/);
+    assert.match(html, /script\.20260718b\.js/);
   }
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
-    ["theme-init.js", "theme-init.20260718a.js"],
-    ["styles.css", "styles.20260718a.css"],
-    ["script.js", "script.20260718a.js"],
+    ["theme-init.js", "theme-init.20260718b.js"],
+    ["styles.css", "styles.20260718b.css"],
+    ["script.js", "script.20260718b.js"],
     ["forge-viewer.js", "forge-viewer.20260716g.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
@@ -138,8 +138,8 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(theme, /localStorage\.setItem/);
   assert.match(theme, /prefers-color-scheme: dark/);
   assert.match(theme, /aria-label/);
-  assert.match(home, /theme-init\.20260718a\.js/);
-  assert.match(explorer, /theme-init\.20260718a\.js/);
+  assert.match(home, /theme-init\.20260718b\.js/);
+  assert.match(explorer, /theme-init\.20260718b\.js/);
 });
 
 test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {
@@ -179,13 +179,13 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
   assert.match(artistes, /Votre pratique déborde de l’image/);
-  assert.match(artistes, /v=20260718a&amp;parcours=artistes#conversation/);
+  assert.match(artistes, /v=20260718b&amp;parcours=artistes#conversation/);
   assert.match(transmission, /Transmettre sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
-  assert.match(transmission, /v=20260718a&amp;parcours=transmission#conversation/);
+  assert.match(transmission, /v=20260718b&amp;parcours=transmission#conversation/);
   assert.match(organisations, /Commencer par un terrain/);
   assert.match(organisations, /Quatre décisions avant toute production/);
-  assert.match(organisations, /v=20260718a&amp;parcours=institutions#conversation/);
+  assert.match(organisations, /v=20260718b&amp;parcours=institutions#conversation/);
 });
 
 test("le header mobile conserve l’action principale et le focus clavier", async () => {
@@ -202,9 +202,14 @@ test("le header mobile conserve l’action principale et le focus clavier", asyn
 });
 
 test("Explorer annonce le futur corpus au lieu d’ouvrir un artefact", async () => {
-  const explorer = await read("explorer/index.html");
+  const [explorer, specimen, sitemap] = await Promise.all([
+    read("explorer/index.html"), read("explorer/specimen/index.html"), read("sitemap.xml")
+  ]);
   assert.match(explorer, /corpus à venir/);
   assert.match(explorer, /plusieurs dossiers consentis/);
+  assert.match(explorer, /<meta name="robots" content="noindex, follow">/);
+  assert.match(specimen, /<meta name="robots" content="noindex, follow">/);
+  assert.doesNotMatch(sitemap, /\/explorer\//);
   assert.doesNotMatch(explorer, /data-forge-viewer|404 304 faces|atlas de texture/);
 });
 
@@ -270,6 +275,40 @@ test("la participation prépare un contact direct sans prétendre transmettre", 
   assert.match(script, /data-copy-prepared-message/);
   assert.match(script, /navigator\.clipboard\.writeText/);
   assert.match(script, /journeyContext/);
+  assert.match(html, /data-invitation-relevance/);
+  assert.match(html, /role="progressbar"[^>]*aria-valuemax="4"[^>]*aria-valuenow="1"/);
+  assert.match(script, /progressMeter\?\.setAttribute\("aria-valuenow"/);
+  assert.match(script, /invitedSources = new Set\(\["direct", "joey", "recommendation", "scouting"\]\)/);
+  assert.match(script, /sourceSlug === "programme"/);
+  assert.match(script, /invitationContext\.hidden = !invitedArrival/);
+  assert.match(script, /Après l’envoi/);
+  assert.match(script, /À : contact@vestiges\.world/);
+  assert.doesNotMatch(html.match(/<section class="section section-compact"[\s\S]*?<\/section>/)?.[0] || "", /data-cold-path/);
+});
+
+test("la mesure de parcours reste locale, minimale et activable seulement pour la QA", async () => {
+  const script = await read("script.js");
+  assert.match(script, /new CustomEvent\("vestiges:journey"/);
+  assert.match(script, /window\.VESTIGES_QA_EVENTS/);
+  assert.match(script, /get\("qa"\) === "1"/);
+  assert.match(script, /contact_step/);
+  assert.match(script, /contact_error/);
+  assert.match(script, /message_prepared/);
+  assert.doesNotMatch(script, /sendBeacon|gtag\(|dataLayer|google-analytics|plausible\.io/);
+});
+
+test("le pilote dispose d’un protocole exécutable sans revendiquer de validation terrain", async () => {
+  const [playbook, scorecard] = await Promise.all([
+    read("docs/FOUNDER_PILOT_PLAYBOOK.md"), read("docs/PILOT_SESSION_SCORECARD.md")
+  ]);
+  assert.match(playbook, /prêt à exécuter, sans participant ni résultat déclaré/);
+  assert.match(playbook, /5 personnes sur 6/);
+  assert.match(playbook, /première lecture visée sous deux jours ouvrés/);
+  assert.match(playbook, /aucun délai n’est promis publiquement/);
+  assert.match(playbook, /Premier dossier réel/);
+  assert.match(playbook, /Variantes d’invitation à tester/);
+  assert.match(scorecard, /Échec critique/);
+  assert.match(scorecard, /Ne conserver aucun verbatim identifiable sans accord explicite/);
 });
 
 test("le programme fondateur rend la proposition et ses limites décidables", async () => {
@@ -283,6 +322,15 @@ test("le programme fondateur rend la proposition et ses limites décidables", as
   assert.match(home, /Programme fondateur/);
   assert.match(artistes, /Premiers praticiens/);
   assert.match(about, /Joey-Néot Marquet/);
+});
+
+test("chaque page de rôle propose une action intermédiaire contextualisée", async () => {
+  const [artistes, transmission, organisations] = await Promise.all([
+    read("artistes/index.html"), read("transmission/index.html"), read("organisations/index.html")
+  ]);
+  assert.match(artistes, /micro-conversion[\s\S]*parcours=artistes/);
+  assert.match(transmission, /micro-conversion[\s\S]*parcours=transmission/);
+  assert.match(organisations, /micro-conversion[\s\S]*parcours=institutions/);
 });
 
 test("la navigation privilégie le programme réel au dossier témoin", async () => {

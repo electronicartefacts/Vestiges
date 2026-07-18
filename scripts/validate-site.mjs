@@ -30,7 +30,7 @@ for (const route of routes) {
   }
 }
 
-for (const asset of ["styles.css", "styles.20260718a.css", "script.js", "script.20260718a.js", "theme-init.js", "theme-init.20260718a.js", "forge-viewer.js", "forge-viewer.20260716g.js", "robots.txt", "sitemap.xml", "assets/logo/vestiges-monogram.svg", "assets/logo/vestiges-favicon.png", "assets/logo/vestiges-monogram-og.png"]) {
+for (const asset of ["styles.css", "styles.20260718b.css", "script.js", "script.20260718b.js", "theme-init.js", "theme-init.20260718b.js", "forge-viewer.js", "forge-viewer.20260716g.js", "robots.txt", "sitemap.xml", "assets/logo/vestiges-monogram.svg", "assets/logo/vestiges-favicon.png", "assets/logo/vestiges-monogram-og.png"]) {
   await access(join(root, asset));
 }
 
