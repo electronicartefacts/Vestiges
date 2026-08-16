@@ -26,6 +26,7 @@ test("les ressources versionnées correspondent aux sources validées", async ()
     ["theme-init.js", "theme-init.20260718b.js"],
     ["styles.css", "styles.20260718b.css"],
     ["script.js", "script.20260718b.js"],
+    ["exploration-data.js", "exploration-data.20260816a.js"],
     ["forge-viewer.js", "forge-viewer.20260716g.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
@@ -159,6 +160,24 @@ test("l’accueil explique le produit avant la technologie et oriente par rôle"
   assert.match(html, /couverture éditoriale/i);
   assert.match(html, /href="\/pour-qui\/"/);
   assert.doesNotMatch(html.split("Trois manières d’entrer")[0], /FORGE|8K|Bois flotté/);
+});
+
+test("l’accueil ouvre par une exploration locale, accessible et explicitement provisoire", async () => {
+  const [html, script, styles, data] = await Promise.all([
+    read("index.html"), read("script.js"), read("styles.css"), read("exploration-data.js")
+  ]);
+  assert.match(html, /data-exploration/);
+  assert.match(html, /[Ff]ragment de démonstration/);
+  assert.match(html, /aucune entrée ne représente encore un dossier réel/);
+  assert.match(html, /exploration-data\.20260816a\.js/);
+  assert.match(script, /function initExploration/);
+  assert.match(script, /ArrowRight/);
+  assert.match(script, /aria-pressed/);
+  assert.match(script, /!heading\.closest\("\[data-exploration\]"\)/);
+  assert.match(styles, /\.exploration-hero/);
+  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.exploration-item/s);
+  assert.match(data, /relatedIds/);
+  assert.match(data, /window\.VESTIGES_EXPLORATION_ITEMS/);
 });
 
 test("Comment ça marche montre une anatomie de dossier sans fabriquer de cas réel", async () => {

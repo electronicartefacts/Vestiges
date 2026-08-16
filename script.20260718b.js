@@ -8,6 +8,7 @@
   initReveals();
   initEditorialRhythm();
   initKineticType();
+  initExploration();
   initGraph();
   initForgeViewer();
   initJourneySignals();
@@ -298,7 +299,7 @@
     if (reduceMotion.matches) return;
 
     const headings = Array.from(document.querySelectorAll("main h1, main h2, main h3"))
-      .filter((heading) => !heading.querySelector("input, button, a") && heading.textContent.trim());
+      .filter((heading) => !heading.closest("[data-exploration]") && !heading.querySelector("input, button, a") && heading.textContent.trim());
     if (!headings.length) return;
 
     const segment = (value) => {
@@ -461,6 +462,88 @@
     }
 
     states.filter((state) => state.ambient).forEach(requestFrame);
+  }
+
+  function initExploration() {
+    const root = document.querySelector("[data-exploration]");
+    const items = window.VESTIGES_EXPLORATION_ITEMS;
+    if (!root || !Array.isArray(items) || !items.length) return;
+
+    const field = root.querySelector("[data-exploration-field]");
+    const list = root.querySelector("[data-exploration-items]");
+    const relationLayer = root.querySelector("[data-exploration-relations]");
+    const type = root.querySelector("[data-exploration-type]");
+    const name = root.querySelector("[data-exploration-name]");
+    const description = root.querySelector("[data-exploration-description]");
+    const relation = root.querySelector("[data-exploration-relation]");
+    if (!field || !list) return;
+
+    const byId = new Map(items.map((item) => [item.id, item]));
+    const buttons = new Map();
+    let selectedId = items[0].id;
+
+    items.forEach((item, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `exploration-item exploration-item--${index + 1}`;
+      button.dataset.explorationId = item.id;
+      button.setAttribute("aria-pressed", String(index === 0));
+      button.innerHTML = `<span>${item.type}</span><strong>${item.title}</strong>`;
+      button.addEventListener("pointerenter", () => select(item.id, false));
+      button.addEventListener("focus", () => select(item.id, false));
+      button.addEventListener("click", () => select(item.id, true));
+      buttons.set(item.id, button);
+      list.append(button);
+    });
+
+    const drawRelations = (item) => {
+      if (!relationLayer) return;
+      const source = buttons.get(item.id);
+      if (!source) return;
+      const bounds = field.getBoundingClientRect();
+      const origin = source.getBoundingClientRect();
+      const lines = item.relatedIds.map((relatedId) => {
+        const target = buttons.get(relatedId);
+        if (!target) return "";
+        const end = target.getBoundingClientRect();
+        const x1 = origin.left - bounds.left + origin.width / 2;
+        const y1 = origin.top - bounds.top + origin.height / 2;
+        const x2 = end.left - bounds.left + end.width / 2;
+        const y2 = end.top - bounds.top + end.height / 2;
+        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"></line>`;
+      }).join("");
+      relationLayer.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
+      relationLayer.innerHTML = lines;
+    };
+
+    const select = (id, pinned) => {
+      const item = byId.get(id);
+      if (!item) return;
+      if (pinned) selectedId = id;
+      type.textContent = `${item.type} · fragment de démonstration`;
+      name.textContent = item.title;
+      description.textContent = item.shortDescription;
+      relation.textContent = `${item.relatedIds.length} relations suggérées`;
+      root.dataset.selected = item.id;
+      buttons.forEach((button, buttonId) => {
+        const connected = buttonId === item.id || item.relatedIds.includes(buttonId);
+        button.classList.toggle("is-connected", connected);
+        button.setAttribute("aria-pressed", String(buttonId === selectedId));
+      });
+      drawRelations(item);
+    };
+
+    list.addEventListener("keydown", (event) => {
+      if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) return;
+      const current = items.findIndex((item) => item.id === document.activeElement?.dataset.explorationId);
+      if (current < 0) return;
+      event.preventDefault();
+      const direction = ['ArrowRight', 'ArrowDown'].includes(event.key) ? 1 : -1;
+      const next = (current + direction + items.length) % items.length;
+      buttons.get(items[next].id)?.focus();
+    });
+    window.addEventListener("resize", () => drawRelations(byId.get(selectedId)), { passive: true });
+    select(selectedId, true);
   }
 
   function initGraph() {

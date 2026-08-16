@@ -17,6 +17,8 @@ Mini-site statique de [Vestiges](https://vestiges.world), projet culturel et éd
 - `/explorer/` — emplacement réservé au futur corpus réel ;
 - `/explorer/specimen/` — URL historique du dossier technique détaillé.
 
+L’accueil commence par une **constellation éditoriale** de douze fragments de démonstration. Son jeu de données est isolé dans `exploration-data.js` ; il ne décrit aucun dossier réel et pourra être remplacé par une projection de VASTE sans réécrire la couche d’interaction.
+
 Le site correspond à l’état de maturité **premier prototype public, sans dossier d’artiste validé**. Bois flotté 01 est un sujet naturel sans artiste attribué. La capture, la reconstruction et les médias numériques sont attribués à Electronic Artefacts et ne sont pas déclarés dans le domaine public.
 
 ## Choix d’expérience
