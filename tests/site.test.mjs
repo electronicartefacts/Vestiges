@@ -153,13 +153,15 @@ test("le header compose le monogramme avec estiges et conserve seulement le logo
   assert.match(styles, /@media \(max-width: 960px\)[\s\S]*\.site-header \.brand-word \{ display: none; \}/);
 });
 
-test("l’accueil explique le produit avant la technologie et oriente par rôle", async () => {
+test("l’accueil ouvre par le produit, puis rend le langage du spécimen et oriente par rôle", async () => {
   const html = await read("index.html");
   assert.match(html, /Vestiges conçoit, avec les artistes et les lieux culturels, des dossiers numériques/);
   assert.match(html, /Je crée[\s\S]*Je transmets[\s\S]*Je structure un terrain/);
   assert.match(html, /couverture éditoriale/i);
   assert.match(html, /href="\/pour-qui\/"/);
-  assert.doesNotMatch(html.split("Trois manières d’entrer")[0], /FORGE|8K|Bois flotté/);
+  assert.match(html, /focus-banner[\s\S]*Une œuvre n’est jamais seule/);
+  assert.match(html, /data-forge-viewer[\s\S]*Objet FORGE/);
+  assert.ok(html.indexOf("Une œuvre n’est jamais seule") < html.indexOf("Objet FORGE"));
 });
 
 test("l’accueil ouvre par une exploration locale, accessible et explicitement provisoire", async () => {
