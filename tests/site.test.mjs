@@ -370,7 +370,7 @@ test("les états masqués du formulaire restent réellement invisibles", async (
 
 test("la typographie évite les césures, les veuves et les débuts de phrase isolés", async () => {
   const [script, styles] = await Promise.all([read("script.js"), read("styles.css")]);
-  assert.match(styles, /main p,[\s\S]*hyphens: none/);
+  assert.match(styles, /main p,[\s\S]*hyphens: none[\s\S]*overflow-wrap: normal/);
   assert.match(styles, /text-wrap: pretty/);
   assert.match(styles, /main h1,[\s\S]*text-wrap: balance/);
   assert.match(styles, /text-decoration-skip-ink: auto/);
