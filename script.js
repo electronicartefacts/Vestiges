@@ -524,10 +524,12 @@
       buttons.forEach((button) => {
         const label = button.querySelector("strong");
         if (!label) return;
-        button.classList.remove("is-compact", "is-tight");
-        const safeHeight = button.clientWidth * .58;
-        if (label.getBoundingClientRect().height > safeHeight) button.classList.add("is-compact");
-        if (label.getBoundingClientRect().height > safeHeight) button.classList.add("is-tight");
+        button.classList.remove("is-compact", "is-tight", "is-micro");
+        const safeWidth = button.clientWidth * .7;
+        const exceedsAvailableWidth = () => label.getBoundingClientRect().width > safeWidth;
+        if (exceedsAvailableWidth()) button.classList.add("is-compact");
+        if (exceedsAvailableWidth()) button.classList.add("is-tight");
+        if (exceedsAvailableWidth()) button.classList.add("is-micro");
       });
     };
 

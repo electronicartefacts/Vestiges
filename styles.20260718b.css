@@ -521,9 +521,10 @@ main p a:not(.button):focus-visible,
 .exploration-item--1 { left: 9%; top: 13%; }.exploration-item--2 { left: 30%; top: 8%; }.exploration-item--3 { left: 50%; top: 18%; }.exploration-item--4 { left: 73%; top: 9%; }.exploration-item--5 { left: 89%; top: 28%; }.exploration-item--6 { left: 12%; top: 48%; }.exploration-item--7 { left: 34%; top: 64%; }.exploration-item--8 { left: 56%; top: 48%; }.exploration-item--9 { left: 79%; top: 60%; }.exploration-item--10 { left: 7%; top: 79%; }.exploration-item--11 { left: 49%; top: 84%; }.exploration-item--12 { left: 87%; top: 82%; }
 .exploration-item::before { position: absolute; inset: .35rem; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: inherit; content: ""; pointer-events: none; }
 .exploration-item span { color: var(--muted); font-size: var(--node-type-size); letter-spacing: .08em; line-height: 1.1; text-transform: uppercase; }
-.exploration-item strong { max-width: 100%; font-family: var(--serif); font-size: var(--node-title-size); font-weight: 390; letter-spacing: -.045em; line-height: .88; overflow-wrap: normal; word-break: normal; }
+.exploration-item strong { display: block; width: max-content; max-width: none; font-family: var(--serif); font-size: var(--node-title-size); font-weight: 390; letter-spacing: -.045em; line-height: .88; overflow-wrap: normal; white-space: nowrap; word-break: normal; }
 .exploration-item.is-compact strong { font-size: min(var(--node-title-size), 1rem); }
 .exploration-item.is-tight strong { font-size: .78rem; }
+.exploration-item.is-micro strong { font-size: .66rem; letter-spacing: -.055em; }
 .exploration-item:hover, .exploration-item:focus-visible, .exploration-item.is-connected { z-index: 1; border-color: var(--accent); background: color-mix(in srgb, var(--paper) 88%, transparent); color: var(--accent); outline: 0; transform: translate(-50%, -50%) scale(1.08); }
 .exploration-item:focus-visible { box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--accent), 0 .55rem 1.4rem rgba(0, 0, 0, .1); }
 .exploration-detail { align-self: end; min-height: 15rem; padding-top: 1rem; border-top: 1px solid var(--line); }
