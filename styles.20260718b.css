@@ -524,10 +524,10 @@ main p a:not(.button):focus-visible,
 .exploration-detail__relation { margin-top: 1.4rem !important; color: var(--accent) !important; font-size: .68rem !important; letter-spacing: .08em; text-transform: uppercase; }
 .exploration-hero__footer { grid-column: 1 / -1; display: flex; align-items: end; justify-content: space-between; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .7rem; }
 .exploration-hero__footer p { margin: 0; }
-.home-graph-section { display: grid; min-height: 0; grid-template-columns: minmax(0, 1fr) minmax(18rem, .42fr); gap: 0; padding: 0; border-bottom: 1px solid var(--line); }
+.home-graph-section { position: relative; left: 50%; display: grid; width: 100vw; min-height: 0; grid-template-columns: minmax(0, 1fr) minmax(18rem, .42fr); gap: 0; margin-left: -50vw; padding: 0; border-bottom: 1px solid var(--line); }
 .home-graph-section .exploration-hero__heading { grid-column: 1 / -1; max-width: none; display: grid; grid-template-columns: minmax(16rem, 1fr) minmax(20rem, .7fr); gap: 1.5rem 4rem; align-items: end; padding: clamp(2rem, 5vw, 5rem) var(--gutter) 2rem; border-bottom: 1px solid var(--line); }
 .home-graph-section .exploration-hero__heading .eyebrow { grid-column: 1 / -1; margin: 0; }.home-graph-section .exploration-hero__heading h2 { max-width: 8ch; margin: 0; }.home-graph-section .exploration-hero__heading p:not(.eyebrow) { max-width: 31rem; margin: 0 0 .4rem; font-size: 1rem; }
-.home-graph-section .exploration-field { grid-column: 1 / -1; width: 100%; min-height: min(47rem, 72vw); border-inline: 0; }
+.home-graph-section .exploration-field { grid-column: 1 / -1; width: 100vw; min-height: max(48rem, calc(100svh - var(--header))); border-inline: 0; }
 .home-graph-section .exploration-detail { grid-column: 1; min-height: 0; margin: 0; padding: clamp(1.5rem, 3vw, 3rem) var(--gutter); border-top: 1px solid var(--line); background: var(--paper); }
 .home-graph-section .exploration-detail h2 { font-size: clamp(3.4rem, 5vw, 6.2rem); }.home-graph-section .exploration-detail > p:not(.meta) { max-width: 40rem; font-size: .95rem; }
 .home-graph-section .exploration-hero__footer { grid-column: 2; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; margin: 0; padding: clamp(1.5rem, 3vw, 3rem); border-top: 1px solid var(--line); border-left: 1px solid var(--line); font-size: .76rem; }
