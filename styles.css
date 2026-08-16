@@ -118,6 +118,12 @@ body {
 
 body.intro-open { overflow: hidden; }
 
+/* Shared dossier language: quiet technical geometry behind the editorial surface. */
+body:not(.dossier-product-page) main > .section:not(.section-dark) {
+  background-image: linear-gradient(color-mix(in srgb, var(--line) 35%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--line) 35%, transparent) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+}
+
 img, svg { display: block; max-width: 100%; }
 button, input, textarea, select { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
