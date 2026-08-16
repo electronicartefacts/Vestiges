@@ -482,12 +482,17 @@
     const buttons = new Map();
     let selectedId = items[0].id;
 
+    const connectionDegree = (item) => item.relatedIds.length + items.filter((candidate) => candidate.relatedIds.includes(item.id)).length;
+
     items.forEach((item, index) => {
+      const degree = connectionDegree(item);
       const button = document.createElement("button");
       button.type = "button";
       button.className = `exploration-item exploration-item--${index + 1}`;
       button.dataset.explorationId = item.id;
+      button.dataset.connectionDegree = String(degree);
       button.setAttribute("aria-pressed", String(index === 0));
+      button.setAttribute("aria-label", `${item.title} — ${degree} relations dans ce graphe`);
       button.innerHTML = `<span>${item.type}</span><strong>${item.title}</strong>`;
       button.addEventListener("pointerenter", () => select(item.id, false));
       button.addEventListener("focus", () => select(item.id, false));
