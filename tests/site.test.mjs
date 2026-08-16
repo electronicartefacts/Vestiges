@@ -160,8 +160,8 @@ test("l’accueil ouvre par le produit, puis rend le langage du spécimen et ori
   assert.match(html, /couverture éditoriale/i);
   assert.match(html, /href="\/pour-qui\/"/);
   assert.match(html, /focus-banner[\s\S]*Une œuvre n’est jamais seule/);
-  assert.match(html, /data-forge-viewer[\s\S]*Objet FORGE/);
-  assert.ok(html.indexOf("Une œuvre n’est jamais seule") < html.indexOf("Objet FORGE"));
+  assert.match(html, /data-forge-viewer[\s\S]*Vue 3D FORGE/);
+  assert.ok(html.indexOf("Une œuvre n’est jamais seule") < html.indexOf("Vue 3D FORGE"));
 });
 
 test("l’accueil ouvre par une exploration locale, accessible et explicitement provisoire", async () => {
