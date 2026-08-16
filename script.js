@@ -214,79 +214,61 @@
   function initEditorialRhythm() {
     if (typeof Intl.Segmenter !== "function") return;
 
-    const sentenceSegmenter = new Intl.Segmenter("fr", { granularity: "sentence" });
+    const wordSegmenter = new Intl.Segmenter("fr", { granularity: "word" });
     const paragraphs = Array.from(document.querySelectorAll("main p")).filter((paragraph) => {
       if (paragraph.closest("[data-brand-intro]")) return false;
       if (paragraph.matches(".eyebrow, .section-index, .meta, .status-label, .object-truth, .visually-hidden")) return false;
       if (paragraph.children.length || paragraph.textContent.trim().length < 80) return false;
-      return Array.from(sentenceSegmenter.segment(paragraph.textContent.trim())).length > 1;
+      return Array.from(wordSegmenter.segment(paragraph.textContent.trim())).some((part) => part.isWordLike);
     });
     if (!paragraphs.length) return;
 
-    const records = paragraphs.map((paragraph) => {
-      const text = paragraph.textContent.trim();
-      const sentences = Array.from(sentenceSegmenter.segment(text), (part) => part.segment.trim()).filter(Boolean);
-      const fragment = document.createDocumentFragment();
-      const breaks = [];
-      const sentenceNodes = [];
-
-      sentences.forEach((sentence, sentenceIndex) => {
-        if (sentenceIndex) {
-          const lineBreak = document.createElement("br");
-          lineBreak.className = "editorial-sentence-break";
-          lineBreak.hidden = true;
-          lineBreak.setAttribute("aria-hidden", "true");
-          breaks.push(lineBreak);
-          fragment.append(lineBreak);
-        }
-
-        const sentenceNode = document.createElement("span");
-        sentenceNode.className = "editorial-sentence";
-        sentenceNode.append(`${sentenceIndex ? " " : ""}${sentence}`);
-        sentenceNodes.push(sentenceNode);
-        fragment.append(sentenceNode);
-      });
-
-      paragraph.replaceChildren(fragment);
-      return { paragraph, breaks, sentenceNodes };
-    });
+    const records = paragraphs.map((paragraph) => ({ paragraph, source: paragraph.textContent.trim() }));
 
     let frame = 0;
-    const countFirstLineWords = (sentence) => {
+    const finalLineWordCount = (paragraph) => {
       const range = document.createRange();
-      const textNode = sentence.firstChild;
-      if (!(textNode instanceof Text)) return Infinity;
+      const textNode = paragraph.firstChild;
+      if (!(textNode instanceof Text)) return 0;
       const text = textNode.data;
-      const words = [...text.matchAll(/\S+/gu)];
-      let firstTop;
-      let count = 0;
-      let wraps = false;
-
-      words.forEach((word) => {
+      const words = Array.from(wordSegmenter.segment(text)).filter((part) => part.isWordLike);
+      const positions = words.map((word) => {
         range.setStart(textNode, word.index);
-        range.setEnd(textNode, word.index + word[0].length);
+        range.setEnd(textNode, word.index + word.segment.length);
         const rect = range.getBoundingClientRect();
-        if (firstTop === undefined) firstTop = rect.top;
-        if (Math.abs(rect.top - firstTop) < 1) count += 1;
-        else wraps = true;
+        return { word, top: rect.top };
       });
       range.detach();
-      return wraps ? count : Infinity;
+      if (!positions.length) return 0;
+      const lastTop = positions.at(-1).top;
+      return positions.filter((item) => Math.abs(item.top - lastTop) < 1).length;
     };
 
-    const balance = () => {
+    const bindTailWords = (text, count) => {
+      const words = Array.from(wordSegmenter.segment(text)).filter((part) => part.isWordLike);
+      const tail = words.slice(-count);
+      let composed = text;
+      for (let index = tail.length - 1; index > 0; index -= 1) {
+        const previous = tail[index - 1];
+        const current = tail[index];
+        const gap = composed.slice(previous.index + previous.segment.length, current.index);
+        if (/^\s+$/u.test(gap)) composed = `${composed.slice(0, previous.index + previous.segment.length)}\u00a0${composed.slice(current.index)}`;
+      }
+      return composed;
+    };
+
+    const compose = () => {
       frame = 0;
-      records.forEach(({ breaks }) => breaks.forEach((lineBreak) => { lineBreak.hidden = true; }));
-      records.forEach(({ breaks, sentenceNodes }) => {
-        sentenceNodes.slice(1).forEach((sentence, index) => {
-          if (countFirstLineWords(sentence) <= 4) breaks[index].hidden = false;
-        });
+      records.forEach(({ paragraph, source }) => {
+        paragraph.textContent = source;
+        const tailLength = finalLineWordCount(paragraph) <= 2 ? 3 : 2;
+        paragraph.textContent = bindTailWords(source, tailLength);
       });
     };
 
     const schedule = () => {
       if (frame) window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(balance);
+      frame = window.requestAnimationFrame(compose);
     };
     const observer = typeof ResizeObserver === "function" ? new ResizeObserver(schedule) : null;
     records.forEach(({ paragraph }) => observer?.observe(paragraph));
@@ -538,6 +520,17 @@
       drawRelations(item);
     };
 
+    const fitNodeLabels = () => {
+      buttons.forEach((button) => {
+        const label = button.querySelector("strong");
+        if (!label) return;
+        button.classList.remove("is-compact", "is-tight");
+        const safeHeight = button.clientWidth * .58;
+        if (label.getBoundingClientRect().height > safeHeight) button.classList.add("is-compact");
+        if (label.getBoundingClientRect().height > safeHeight) button.classList.add("is-tight");
+      });
+    };
+
     list.addEventListener("keydown", (event) => {
       if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) return;
       const current = items.findIndex((item) => item.id === document.activeElement?.dataset.explorationId);
@@ -548,7 +541,9 @@
       buttons.get(items[next].id)?.focus();
     });
     window.addEventListener("resize", () => drawRelations(byId.get(selectedId)), { passive: true });
+    if (typeof ResizeObserver === "function") new ResizeObserver(fitNodeLabels).observe(field);
     select(selectedId, true);
+    fitNodeLabels();
   }
 
   function initGraph() {

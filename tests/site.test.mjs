@@ -375,8 +375,8 @@ test("la typographie évite les césures, les veuves et les débuts de phrase is
   assert.match(styles, /main h1,[\s\S]*text-wrap: balance/);
   assert.match(styles, /text-decoration-skip-ink: auto/);
   assert.match(styles, /text-decoration-thickness: max\(1px, \.065em\)/);
-  assert.match(script, /new Intl\.Segmenter\("fr", \{ granularity: "sentence" \}\)/);
-  assert.match(script, /countFirstLineWords\(sentence\) <= 4/);
+  assert.match(script, /new Intl\.Segmenter\("fr", \{ granularity: "word" \}\)/);
+  assert.match(script, /bindTailWords\(source, tailLength\)/);
   assert.match(script, /new ResizeObserver\(schedule\)/);
 });
 

@@ -522,6 +522,8 @@ main p a:not(.button):focus-visible,
 .exploration-item::before { position: absolute; inset: .35rem; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: inherit; content: ""; pointer-events: none; }
 .exploration-item span { color: var(--muted); font-size: var(--node-type-size); letter-spacing: .08em; line-height: 1.1; text-transform: uppercase; }
 .exploration-item strong { max-width: 100%; font-family: var(--serif); font-size: var(--node-title-size); font-weight: 390; letter-spacing: -.045em; line-height: .88; overflow-wrap: normal; word-break: normal; }
+.exploration-item.is-compact strong { font-size: min(var(--node-title-size), 1rem); }
+.exploration-item.is-tight strong { font-size: .78rem; }
 .exploration-item:hover, .exploration-item:focus-visible, .exploration-item.is-connected { z-index: 1; border-color: var(--accent); background: color-mix(in srgb, var(--paper) 88%, transparent); color: var(--accent); outline: 0; transform: translate(-50%, -50%) scale(1.08); }
 .exploration-item:focus-visible { box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--accent), 0 .55rem 1.4rem rgba(0, 0, 0, .1); }
 .exploration-detail { align-self: end; min-height: 15rem; padding-top: 1rem; border-top: 1px solid var(--line); }
