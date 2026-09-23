@@ -17,7 +17,7 @@ test("les pages publiques chargent une version cohérente des ressources", async
     const html = await read(page);
     assert.match(html, /theme-init\.20260718b\.js/);
     assert.match(html, /styles\.20260718b\.css/);
-    assert.match(html, /script\.20260718b\.js/);
+    assert.match(html, /script\.20260923a\.js/);
   }
 });
 
@@ -25,7 +25,8 @@ test("les ressources versionnées correspondent aux sources validées", async ()
   const pairs = [
     ["theme-init.js", "theme-init.20260718b.js"],
     ["styles.css", "styles.20260718b.css"],
-    ["script.js", "script.20260718b.js"],
+    ["script.js", "script.20260923a.js"],
+    ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20260923b.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
     ["forge-viewer.js", "forge-viewer.20260716g.js"]
   ];
@@ -150,18 +151,104 @@ test("le header compose le monogramme avec estiges et conserve seulement le logo
   assert.match(home, /aria-label="Vestiges, accueil"[\s\S]*brand-word" aria-hidden="true">estiges/);
   assert.match(explorer, /aria-label="Vestiges, accueil"[\s\S]*brand-word" aria-hidden="true">estiges/);
   assert.match(styles, /\.site-header \.brand-word \{ margin-left: -\.05rem; \}/);
-  assert.match(styles, /@media \(max-width: 960px\)[\s\S]*\.site-header \.brand-word \{ display: none; \}/);
+  assert.match(styles, /@media \(max-width: 1120px\)[\s\S]*\.site-header \.brand-word \{ display: none; \}/);
 });
 
-test("l’accueil ouvre par le produit, puis rend le langage du spécimen et oriente par rôle", async () => {
+test("l’accueil présente les quatre portes de Vestiges avant ses démonstrations", async () => {
   const html = await read("index.html");
-  assert.match(html, /Vestiges conçoit, avec les artistes et les lieux culturels, des dossiers numériques/);
-  assert.match(html, /Je crée[\s\S]*Je transmets[\s\S]*Je structure un terrain/);
-  assert.match(html, /couverture éditoriale/i);
+  assert.match(html, /Vitrine artisanale[\s\S]*Marketplace[\s\S]*Encyclopédie[\s\S]*Collaboration/);
+  assert.match(html, /L’artisanat à découvrir et à faire vivre/);
+  assert.match(html, /Marketplace[\s\S]*Premières offres en préparation/);
+  assert.match(html, /Un objet, plusieurs façons de le comprendre/);
   assert.match(html, /href="\/pour-qui\/"/);
-  assert.match(html, /focus-banner[\s\S]*Une œuvre n’est jamais seule/);
+  assert.match(html, /focus-banner[\s\S]*L’artisanat à découvrir et à faire vivre/);
+  assert.match(html, /Proposer un échange/);
+  assert.doesNotMatch(html, /De la découverte à la rencontre|Un dossier, plusieurs profondeurs|Écouter avant de publier/);
   assert.match(html, /data-forge-viewer[\s\S]*Vue 3D FORGE/);
-  assert.ok(html.indexOf("Une œuvre n’est jamais seule") < html.indexOf("Vue 3D FORGE"));
+  assert.ok(html.indexOf("L’artisanat à découvrir et à faire vivre") < html.indexOf("Vue 3D FORGE"));
+});
+
+test("l’encyclopédie distingue ses cinq vues du prototype actuellement disponible", async () => {
+  const [html, script, styles, specimenViewer] = await Promise.all([
+    read("encyclopedie/index.html"), read("script.js"), read("styles.css"), read("mosaic-specimen-viewer.js")
+  ]);
+  for (const mode of ["editorial", "grid", "timeline", "graph", "mosaic"]) {
+    assert.match(html, new RegExp(`data-view-button="${mode}"`), `Sélecteur manquant : ${mode}`);
+    assert.match(html, new RegExp(`data-view-panel="${mode}"`), `Vue manquante : ${mode}`);
+  }
+  assert.match(html, /data-view-panel="editorial"[^>]*>[\s\S]*?<h2[^>]*>Marqueterie/);
+  const mosaic = html.match(/data-view-panel="mosaic"[\s\S]*?<\/section>/)?.[0] || "";
+  assert.match(mosaic, /Bois flotté 01, en blocs recomposables/);
+  assert.equal((mosaic.match(/data-widget data-cols=/g) || []).length, 8, "Le dossier de référence couvre huit blocs visuels sans dupliquer le visuel du spécimen.");
+  for (const specimenFacet of ["≈ 0,7 kg", "Norvège", "Bois flotté 01", "Auteur·ice", "rel=\"external\"", "/explorer/specimen/"]) {
+    assert.ok(mosaic.includes(specimenFacet), `Élément du spécimen absent de la mosaïque : ${specimenFacet}`);
+  }
+  assert.match(mosaic, /Domaine public<\/span><strong>Non revendiqué/);
+  assert.match(mosaic, /data-specimen-3d data-mosaic-no-drag/);
+  assert.match(html, /img-src 'self' data: blob:/);
+  assert.match(mosaic, /<h3>Bois flotté 01<\/h3>[\s\S]*data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
+  assert.equal((mosaic.match(/data-specimen-3d/g) || []).length, 1, "Le modèle 3D ne doit apparaître qu’une fois.");
+  assert.ok(mosaic.indexOf("data-specimen-3d") < mosaic.indexOf("specimen-card--measure"), "Le modèle remplace la première vignette.");
+  assert.doesNotMatch(mosaic, /specimen-card-image|specimen-card--portrait/, "La vignette photo remplacée ne doit pas rester en doublon.");
+  assert.doesNotMatch(mosaic, /volume · fenêtre 3D interactive|visualisation générative/i);
+  assert.doesNotMatch(mosaic, /FORGE|vidéo orbitale|67 Mo|404 304 faces|texture 8K|SHA-256/);
+  assert.match(specimenViewer, /GLTFLoader/);
+  assert.match(specimenViewer, /new GLTFLoader\(\)\.load\(source/);
+  assert.match(specimenViewer, /model\.scale\.setScalar\(scale\)/);
+  assert.match(specimenViewer, /new OrbitControls/);
+  assert.doesNotMatch(specimenViewer, /makeWeatheredBranch|SphereGeometry|CylinderGeometry/);
+  assert.match(html, /Rechercher un savoir[\s\S]*data-active-subject/);
+  assert.doesNotMatch(html, /data-widget-dimension|data-widget-move|widget-controls/);
+  assert.match(script, /function initEncyclopediaWorkspace/);
+  assert.match((await read("index.html")), /href="\/encyclopedie\/#graphe"/);
+  assert.match(script, /showView\(window\.location\.hash === "#graphe" \? "graph" : "editorial"\)/);
+  assert.match(script, /addEventListener\("hashchange", activateViewFromHash\)/);
+  assert.match(script, /const installMosaicInteractions = \(\) =>/);
+  assert.match(script, /data-resize-handle/);
+  assert.match(script, /setTimeout\([\s\S]*?320\)/);
+  assert.match(script, /canvas, \[contenteditable="true"\], \[data-mosaic-no-drag\]/);
+  assert.match(script, /mosaic-specimen-viewer\.20260923b\.js/);
+  assert.match(script, /is-selected.*is-dragging/);
+  assert.match(script, /Fenêtre sélectionnée/);
+  assert.match(script, /widget\.dataset\.dragX/);
+  assert.match(script, /setPointerCapture/);
+  assert.match(script, /gridTrackCount/);
+  assert.match(script, /renderMosaicRows/);
+  assert.match(script, /const rowHeight = Math\.max\(8, \.\.\.pair\.map/);
+  assert.match(script, /const pair = firstWidth >= tracks \? \[widgets\[index\]\] : widgets\.slice\(index, index \+ 2\)/);
+  assert.match(script, /index \+= pair\.length/);
+  assert.match(script, /row\?\.querySelectorAll\("\[data-widget\]"\)\.forEach\(\(item\) => \{ item\.dataset\.rows = rowHeight; \}\)/);
+  assert.match(script, /neighbor\.dataset\.cols = String\(tracks - requestedCols\)/);
+  assert.match(script, /\[widgets\[from\], widgets\[to\]\] = \[widgets\[to\], widgets\[from\]\]/);
+  assert.match(script, /positioned\.find\(\(\{ rect \}\) => x >= rect\.left && x <= rect\.right && y >= rect\.top && y <= rect\.bottom\)/);
+  assert.match(script, /nearest\.distance <= 32 \? nearest : null/);
+  assert.match(script, /aria-pressed/);
+  assert.match(script, /vestiges:subject-change/);
+  assert.match(script, /vestiges:select-subject/);
+  assert.match(styles, /\.mosaic-widget\[data-cols="48"\]/);
+  assert.match(styles, /\.mosaic-widget\[data-rows="60"\]/);
+  assert.match(styles, /\.mosaic-widget\[data-resize-edge="ne"\]/);
+  assert.match(styles, /\.mosaic-widget\.is-selected \{ z-index: 10/);
+  assert.match(styles, /\.mosaic-widget\.is-dragging \{ z-index: 20/);
+  assert.match(styles, /translate: attr\(data-drag-x px/);
+  assert.match(styles, /\.mosaic-row \{ display: grid/);
+  assert.match(styles, /\.specimen-3d-stage \{[^}]*background: transparent/);
+  assert.match(styles, /\.widget-resize-handle:hover, \.widget-resize-handle\.is-active \{ opacity: 0; background: transparent; \}/);
+  assert.doesNotMatch(styles, /\.mosaic-widget\[data-drop-position=/);
+});
+
+test("les widgets de la mosaïque adaptent densité, contenu et interactions à leur propre taille", async () => {
+  const [html, styles] = await Promise.all([read("encyclopedie/index.html"), read("styles.css")]);
+  const mosaic = html.match(/data-view-panel="mosaic"[\s\S]*?<\/section>/)?.[0] || "";
+  assert.match(styles, /\.mosaic-widget\s*\{[^}]*container:\s*specimen-widget\s*\/\s*size/);
+  assert.match(styles, /@container specimen-widget \(max-width: 27rem\)/);
+  assert.match(styles, /@container specimen-widget \(max-height: 20rem\)/);
+  assert.match(styles, /@container specimen-widget \(max-height: 12rem\)/);
+  assert.match(styles, /@container specimen-widget \(min-width: 30rem\) and \(min-height: 26rem\)/);
+  assert.match(styles, /\.specimen-card--measure \.widget-compact \{ display: block/);
+  assert.match(styles, /\.specimen-card--sources \.specimen-source-list small \{ display: none/);
+  assert.ok((mosaic.match(/class="widget-detail"/g) || []).length >= 4, "Les formats spacieux proposent des détails éditoriaux complémentaires.");
+  assert.match(mosaic, /class="widget-compact"/);
 });
 
 test("l’accueil ouvre par une exploration locale, accessible et explicitement provisoire", async () => {
@@ -182,10 +269,34 @@ test("l’accueil ouvre par une exploration locale, accessible et explicitement 
   assert.match(data, /window\.VESTIGES_EXPLORATION_ITEMS/);
 });
 
+test("la nouvelle arborescence expose ses six pages et conserve les anciennes comme ressources secondaires", async () => {
+  const pages = ["index.html", "artisans/index.html", "encyclopedie/index.html", "collaborations/index.html", "approche/index.html", "marketplace/index.html"];
+  for (const page of pages) {
+    const html = await read(page);
+    for (const href of ['href="/"', 'href="/artisans/"', 'href="/encyclopedie/"', 'href="/collaborations/"', 'href="/approche/"', 'href="/marketplace/"']) {
+      assert.ok(html.includes(href), `${page} should link to ${href}`);
+    }
+    assert.match(html, /Ressources complémentaires/);
+    assert.match(html, /Programme fondateur/);
+  }
+  const [artisans, encyclopedia, marketplace, participation, script] = await Promise.all([
+    read("artisans/index.html"), read("encyclopedie/index.html"), read("marketplace/index.html"),
+    read("participer/index.html"), read("script.js")
+  ]);
+  assert.match(artisans, /au moins deux cas réels/);
+  assert.match(encyclopedia, /data-exploration/);
+  assert.match(encyclopedia, /corpus vérifié/);
+  assert.match(marketplace, /n’est pas encore ouverte/);
+  assert.match(marketplace, /ni panier ni paiement intégré/);
+  assert.match(marketplace, /parcours=acheteurs/);
+  assert.match(script, /acheteurs: "Intérêt pour une pièce ou un achat futur"/);
+  assert.match(participation, /data-contact-form/);
+});
+
 test("Comment ça marche montre une anatomie de dossier sans fabriquer de cas réel", async () => {
   const [html, styles] = await Promise.all([read("comment-ca-marche/index.html"), read("styles.css")]);
   assert.match(html, /Prototype de structure/);
-  assert.match(html, /ne représente ni un artiste réel, ni un dossier déjà produit/);
+  assert.match(html, /ne représente ni un (?:artiste|artisan) réel, ni un dossier déjà produit/);
   assert.match(html, /Récit de pratique[\s\S]*Éléments reliés[\s\S]*Registre vérifiable[\s\S]*Droits praticables/);
   assert.match(html, /30 à 45 minutes d’échange initial/);
   assert.match(styles, /\.dossier-blueprint/);
@@ -196,15 +307,15 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   const [hub, artistes, transmission, organisations] = await Promise.all([
     read("pour-qui/index.html"), read("artistes/index.html"), read("transmission/index.html"), read("organisations/index.html")
   ]);
-  assert.match(hub, /Artistes et ateliers/);
+  assert.match(hub, /Artisan·es et ateliers/);
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et territoires/);
-  assert.match(artistes, /Votre pratique déborde de l’image/);
+  assert.match(artistes, /Votre savoir-faire mérite plus qu’une image/);
   assert.match(artistes, /v=20260718b&amp;parcours=artistes#conversation/);
-  assert.match(transmission, /Transmettre sans effacer les nuances/);
+  assert.match(transmission, /Construire l’encyclopédie sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
   assert.match(transmission, /v=20260718b&amp;parcours=transmission#conversation/);
-  assert.match(organisations, /Commencer par un terrain/);
+  assert.match(organisations, /Construire l’encyclopédie avec les lieux/);
   assert.match(organisations, /Quatre décisions avant toute production/);
   assert.match(organisations, /v=20260718b&amp;parcours=institutions#conversation/);
 });
@@ -342,7 +453,8 @@ test("le programme fondateur rend la proposition et ses limites décidables", as
   assert.match(program, /Ni capital, ni emploi, ni mandat/);
   assert.match(home, /Programme fondateur/);
   assert.match(artistes, /Premiers praticiens/);
-  assert.match(about, /Joey-Néot Marquet/);
+  assert.match(about, /L’équipe Vestiges, portée par Electronic Artefacts/);
+  assert.doesNotMatch(about, /Joey-Néot Marquet/);
 });
 
 test("chaque page de rôle propose une action intermédiaire contextualisée", async () => {

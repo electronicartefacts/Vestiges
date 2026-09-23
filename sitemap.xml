@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://vestiges.world/</loc></url>
+  <url><loc>https://vestiges.world/artisans/</loc></url>
+  <url><loc>https://vestiges.world/encyclopedie/</loc></url>
+  <url><loc>https://vestiges.world/collaborations/</loc></url>
+  <url><loc>https://vestiges.world/approche/</loc></url>
+  <url><loc>https://vestiges.world/marketplace/</loc></url>
   <url><loc>https://vestiges.world/programme-fondateur/</loc></url>
   <url><loc>https://vestiges.world/pour-qui/</loc></url>
   <url><loc>https://vestiges.world/comment-ca-marche/</loc></url>

@@ -525,7 +525,7 @@
     };
     const sourceBySlug = {
       direct: "Invitation directe de Vestiges",
-      joey: "Invitation directe de Joey pour Vestiges",
+      joey: "Invitation directe de l’équipe Vestiges",
       recommendation: "Invitation transmise par recommandation",
       scouting: "Invitation issue d’un repérage professionnel",
       programme: "Parcours du Programme fondateur Vestiges"

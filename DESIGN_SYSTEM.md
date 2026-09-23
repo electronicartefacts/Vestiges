@@ -2,9 +2,14 @@
 
 Ce document décrit le système déjà exprimé par le site. Il ne constitue pas une direction parallèle : toute évolution doit pouvoir être expliquée par ces invariants ou documenter explicitement pourquoi elle y déroge.
 
-## 1. Une structure éditoriale, pas une interface de catalogue
+## 1. Quatre portes sur un même écosystème
 
 - La page commence par une proposition compréhensible, puis ouvre des profondeurs de lecture.
+- La proposition publique présente quatre parts complémentaires : vitrine artisanale, marketplace, encyclopédie et collaboration.
+- Le premier écran exprime la promesse en une phrase simple, puis rend les quatre portes immédiatement repérables.
+- Chaque porte indique clairement son état actuel. Une ambition future ne doit pas ressembler à une fonction déjà ouverte.
+- La vitrine donne à voir artisan·es, ateliers et pièces ; l’encyclopédie apporte le contexte et la transmission.
+- Les appels à l’action ont une hiérarchie stable : conversation dans l’en-tête, exploration depuis le hero, liens propres à chaque pilier, invitation explicite en clôture.
 - Les grands titres donnent le rythme ; les textes sans-serif apportent les faits, limites et actions.
 - La technologie reste après la compréhension du produit, sauf dans le Laboratoire et le dossier technique.
 - Les bordures structurent les groupes. Les ombres, cartes flottantes et effets décoratifs ne constituent pas la grammaire du site.
@@ -36,6 +41,7 @@ Ce document décrit le système déjà exprimé par le site. Il ne constitue pas
 - Les liens éditoriaux restent des liens soulignés. Une action ne change pas de nature visuelle selon la page.
 - Les cartes partagent bordures, padding, hauteur et hiérarchie. Une variation doit provenir du rôle du contenu, pas d’une préférence locale.
 - L’anatomie de dossier distingue couverture, profondeurs, effort et statut de prototype. Elle peut expliquer une structure future, mais jamais simuler un cas réel sans le dire.
+- Les horizons de collaboration, de partenariat, d’ambassade et de vente peuvent être nommés comme des développements futurs, sans les présenter comme disponibles.
 - Les rayons sont réservés aux pilules, contrôles circulaires et nœuds relationnels. Les surfaces éditoriales restent orthogonales.
 
 ## 6. Des interactions équivalentes

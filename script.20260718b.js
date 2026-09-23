@@ -638,13 +638,45 @@
     const parameters = new URLSearchParams(window.location.search);
     const routeBySlug = {
       artistes: "Artistes et ateliers",
+      artisans: "Artistes et ateliers",
       transmission: "Recherche et transmission",
       institutions: "Institutions et territoires",
-      organisations: "Institutions et territoires"
+      organisations: "Institutions et territoires",
+      acheteurs: "Intérêt pour une pièce ou un achat futur",
+      autre: "Autre demande"
     };
+    const routeChoices = form.querySelector(".choice-grid");
+    if (routeChoices) {
+      const buyerLabel = document.createElement("label");
+      buyerLabel.className = "choice";
+      const buyerInput = document.createElement("input");
+      buyerInput.type = "radio";
+      buyerInput.name = "route";
+      buyerInput.value = routeBySlug.acheteurs;
+      buyerInput.required = true;
+      const buyerDescription = document.createElement("span");
+      const buyerTitle = document.createElement("strong");
+      buyerTitle.textContent = "Intérêt pour une pièce ou un achat futur";
+      buyerDescription.append(buyerTitle, document.createElement("br"), document.createTextNode("Une création que vous aimeriez découvrir, ou une question d’achat."));
+      buyerLabel.append(buyerInput, buyerDescription);
+      routeChoices.append(buyerLabel);
+      const otherLabel = document.createElement("label");
+      otherLabel.className = "choice";
+      const otherInput = document.createElement("input");
+      otherInput.type = "radio";
+      otherInput.name = "route";
+      otherInput.value = routeBySlug.autre;
+      otherInput.required = true;
+      const otherDescription = document.createElement("span");
+      const otherTitle = document.createElement("strong");
+      otherTitle.textContent = "Autre demande";
+      otherDescription.append(otherTitle, document.createElement("br"), document.createTextNode("Une autre raison de découvrir ou de contribuer à Vestiges."));
+      otherLabel.append(otherInput, otherDescription);
+      routeChoices.append(otherLabel);
+    }
     const sourceBySlug = {
       direct: "Invitation directe de Vestiges",
-      joey: "Invitation directe de Joey pour Vestiges",
+      joey: "Invitation directe de l’équipe Vestiges",
       recommendation: "Invitation transmise par recommandation",
       scouting: "Invitation issue d’un repérage professionnel",
       programme: "Parcours du Programme fondateur Vestiges"
@@ -664,7 +696,9 @@
     const relevanceByRoute = {
       "Artistes et ateliers": "Le parcours porte sur une pratique, une œuvre, un geste ou une matière. Vous restez libre de corriger ce point de départ.",
       "Recherche et transmission": "Le parcours porte sur un corpus, une source ou une situation de transmission. Vous restez libre de corriger ce point de départ.",
-      "Institutions et territoires": "Le parcours porte sur un usage, un corpus ou un terrain culturel limité. Vous restez libre de corriger ce point de départ."
+      "Institutions et territoires": "Le parcours porte sur un usage, un corpus ou un terrain culturel limité. Vous restez libre de corriger ce point de départ.",
+      "Intérêt pour une pièce ou un achat futur": "Le parcours porte sur une pièce ou l’évolution de l’espace de vente. Cela ne constitue pas une commande ni une inscription à une liste d’e-mails.",
+      "Autre demande": "Votre demande ne correspond pas exactement aux choix proposés. Vous pouvez expliquer votre propre point de départ."
     };
 
     document.body.dataset.journeyContext = guidedArrival ? "guided" : "direct";
@@ -813,7 +847,7 @@
       confirmation.className = "form-step";
       confirmation.tabIndex = -1;
       confirmation.setAttribute("role", "status");
-      confirmation.innerHTML = "<p class='eyebrow'>Message préparé</p><h3>Votre messagerie doit maintenant s’ouvrir.</h3><p>Relisez puis envoyez le message depuis votre application. Vestiges n’a rien reçu tant que vous ne l’avez pas envoyé.</p><div class='prepared-message-actions'><a class='button button-dark' data-open-prepared-mail>Ouvrir ma messagerie</a><button class='button' type='button' data-copy-prepared-message>Copier le message complet</button></div><p class='form-note' data-copy-status aria-live='polite'>Si aucune application ne s’ouvre, copiez le message puis écrivez à <a href='mailto:contact@vestiges.world'>contact@vestiges.world</a>.</p><div class='prepared-next-steps'><p class='meta'>Après l’envoi</p><ol><li>Joey-Néot Marquet lit personnellement votre message.</li><li>La réponse peut proposer une question, un échange exploratoire ou expliquer honnêtement pourquoi la suite n’est pas adaptée.</li><li>Un entretien, un dossier et une publication restent trois décisions séparées.</li></ol></div>";
+      confirmation.innerHTML = "<p class='eyebrow'>Message préparé</p><h3>Votre messagerie doit maintenant s’ouvrir.</h3><p>Relisez puis envoyez le message depuis votre application. Vestiges n’a rien reçu tant que vous ne l’avez pas envoyé.</p><div class='prepared-message-actions'><a class='button button-dark' data-open-prepared-mail>Ouvrir ma messagerie</a><button class='button' type='button' data-copy-prepared-message>Copier le message complet</button></div><p class='form-note' data-copy-status aria-live='polite'>Si aucune application ne s’ouvre, copiez le message puis écrivez à <a href='mailto:contact@vestiges.world'>contact@vestiges.world</a>.</p><div class='prepared-next-steps'><p class='meta'>Après l’envoi</p><ol><li>L’équipe Vestiges examine personnellement votre message.</li><li>La réponse peut proposer une question, un échange exploratoire ou expliquer honnêtement pourquoi la suite n’est pas adaptée.</li><li>Un entretien, un dossier et une publication restent trois décisions séparées.</li></ol></div>";
       form.replaceChildren(confirmation);
       const openPreparedMail = confirmation.querySelector("[data-open-prepared-mail]");
       const copyPreparedMessage = confirmation.querySelector("[data-copy-prepared-message]");

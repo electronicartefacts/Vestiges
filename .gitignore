@@ -10,3 +10,10 @@ private/
 worker/.dev.vars
 worker/.wrangler/
 worker/.keys/
+/node_modules/
+**/node_modules/
+/outputs/
+/docs/project/
+/docs/EDITORIAL_POSITIONING.md
+/docs/HOMEPAGE_CONTENT_INVENTORY.md
+/AGENTS.md
