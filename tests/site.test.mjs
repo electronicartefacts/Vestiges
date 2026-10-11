@@ -24,7 +24,7 @@ test("les pages publiques chargent une version cohérente des ressources", async
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
     ["theme-init.js", "theme-init.20260718b.js"],
-    ["styles.css", "styles.20261011c.css"],
+    ["styles.css", "styles.20261011d.css"],
     ["script.js", "script.20261011c.js"],
     ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20260923b.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
