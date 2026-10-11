@@ -648,8 +648,42 @@ main p a:not(.button):focus-visible,
 .home-graph-section .home-graph-footer p { max-width: 68ch; margin: 0; line-height: 1.5; }
 .home-graph-section .home-graph-footer .text-link { display: inline-flex; min-height: 2.75rem; align-items: center; white-space: nowrap; }
 .home-graph-section .home-graph-alternative { grid-column: 1 / -1; grid-row: 4; margin: 0; padding-inline: var(--gutter); border-top: 1px solid var(--line); }
-.home-graph-section .home-graph-alternative summary { padding: 1rem 0; font-size: .82rem; font-weight: 620; cursor: pointer; }
-.home-graph-section .home-graph-alternative > p { margin: 0 0 1rem; color: var(--muted); font-size: .78rem; }
+.faq-list summary,
+.home-graph-section .home-graph-alternative > summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  list-style: none;
+  cursor: pointer;
+  transition: color .72s var(--ease);
+}
+.faq-list summary::-webkit-details-marker,
+.home-graph-section .home-graph-alternative > summary::-webkit-details-marker { display: none; }
+.faq-list summary::after,
+.home-graph-section .home-graph-alternative > summary::after {
+  width: .52rem;
+  height: .52rem;
+  flex: 0 0 .52rem;
+  margin-right: .2rem;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  content: "";
+  opacity: .58;
+  transform: translateY(-.12rem) rotate(45deg);
+  transition: transform .82s var(--ease), opacity .72s var(--ease);
+}
+.faq-list summary:hover,
+.faq-list details[open] > summary,
+.home-graph-section .home-graph-alternative > summary:hover,
+.home-graph-section .home-graph-alternative[open] > summary { color: var(--accent); }
+.faq-list details[open] > summary::after,
+.home-graph-section .home-graph-alternative[open] > summary::after { opacity: .9; transform: translateY(.12rem) rotate(225deg); }
+.faq-list summary:focus-visible,
+.home-graph-section .home-graph-alternative > summary:focus-visible { border-radius: 2px; }
+.home-graph-section .home-graph-alternative > summary { min-height: 3.25rem; padding: .8rem 0; font-size: .8rem; font-weight: 540; letter-spacing: -.01em; line-height: 1.4; }
+.home-graph-section .home-graph-alternative > p { max-width: 62ch; margin: 0 0 1rem; color: var(--muted); font-size: .78rem; line-height: 1.6; }
 .home-graph-section .home-graph-alternative ul { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 1.5rem; padding-bottom: 1rem; }
 .home-graph-section .home-graph-text-entry { display: flex; width: 100%; min-height: 2.75rem; align-items: baseline; justify-content: space-between; gap: .8rem; padding: .35rem 0; border: 0; border-bottom: 1px solid var(--soft-line); background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
 .home-graph-section .home-graph-text-entry:hover, .home-graph-section .home-graph-text-entry:focus-visible { color: var(--accent); }
@@ -1188,10 +1222,10 @@ body[data-journey-context="guided"] [data-cold-path] { display: none; }
 .offer-panel + .offer-panel { border-left: 1px solid var(--line); }
 .offer-panel h3 { max-width: 18ch; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.8rem); font-weight: 350; line-height: .98; }
 .plain-list { display: grid; gap: .75rem; margin: 2rem 0 0; padding-left: 1.2rem; color: var(--muted); }
-.faq-list { margin-top: 2rem; border-top: 1px solid var(--line); }
+.faq-list { margin-top: 1.75rem; border-top: 1px solid var(--line); }
 .faq-list details { border-bottom: 1px solid var(--line); }
-.faq-list summary { padding: 1.25rem 3rem 1.25rem 0; font-family: var(--serif); font-size: clamp(1.4rem, 2.5vw, 2.25rem); cursor: pointer; }
-.faq-list details p { max-width: 62rem; margin: 0 0 1.5rem; color: var(--muted); }
+.faq-list summary { min-height: 4.25rem; padding: .9rem 1.5rem .9rem 0; font-family: var(--sans); font-size: clamp(1rem, 1.25vw, 1.12rem); font-weight: 500; letter-spacing: -.025em; line-height: 1.4; text-wrap: pretty; }
+.faq-list details > p { max-width: 62ch; margin: 0; padding: 0 2.25rem 1.35rem 0; color: var(--muted); font-size: .92rem; line-height: 1.7; }
 .contact-layout { display: grid; grid-template-columns: .7fr 1.3fr; border: 1px solid var(--line); }
 .contact-context { padding: clamp(1.5rem, 4vw, 3rem); border-right: 1px solid var(--line); background: var(--paper); color: var(--ink); }
 .contact-context h2 { font-family: var(--serif); font-size: clamp(2.8rem, 5vw, 5rem); font-weight: 340; line-height: .9; }
