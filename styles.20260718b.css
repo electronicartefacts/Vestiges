@@ -412,6 +412,7 @@ main p a:not(.button):focus-visible,
   transition: opacity .45s var(--ease), visibility .45s;
 }
 .brand-intro[hidden], .brand-intro.is-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
+.brand-intro.is-leaving { transition: none; }
 .intro-top, .intro-bottom { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .intro-label { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
 .intro-skip { border-color: var(--line); color: var(--ink); }
@@ -504,7 +505,7 @@ main p a:not(.button):focus-visible,
 .portal-card:hover .portal-arrow, .portal-card:focus-visible .portal-arrow { transform: translate(3px, -3px); }
 .portal-market { background: var(--soft-surface); }
 .portal-encyclopedia { color: #fff; background: #803527; }
-.portal-encyclopedia .portal-label, .portal-encyclopedia .portal-status { color: rgba(255,255,255,.66); }
+.portal-encyclopedia .portal-label, .portal-encyclopedia .portal-status { color: #fff; }
 .portal-encyclopedia .portal-status { border-color: rgba(255,255,255,.36); }
 @media (max-width: 960px) { .portal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .portal-card { min-height: 19rem; } }
 .exploration-hero {

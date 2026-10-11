@@ -465,75 +465,278 @@
     const buttons = new Map();
     let selectedId = items[0].id;
 
-    const connectionDegree = (item) => item.relatedIds.length + items.filter((candidate) => candidate.relatedIds.includes(item.id)).length;
+    if (!root.classList.contains("home-graph-section")) {
+      const connectionDegree = (item) => item.relatedIds.length + items.filter((candidate) => candidate.relatedIds.includes(item.id)).length;
 
-    items.forEach((item, index) => {
-      const degree = connectionDegree(item);
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = `exploration-item exploration-item--${index + 1}`;
-      button.dataset.explorationId = item.id;
-      button.dataset.connectionDegree = String(degree);
-      button.setAttribute("aria-pressed", String(index === 0));
-      button.setAttribute("aria-label", `${item.title} — ${degree} relations dans ce graphe`);
-      button.innerHTML = `<span>${item.type}</span><strong>${item.title}</strong>`;
-      button.addEventListener("pointerenter", () => select(item.id, false));
-      button.addEventListener("focus", () => select(item.id, false));
-      button.addEventListener("click", () => select(item.id, true));
-      buttons.set(item.id, button);
-      list.append(button);
+      items.forEach((item, index) => {
+        const degree = connectionDegree(item);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `exploration-item exploration-item--${index + 1}`;
+        button.dataset.explorationId = item.id;
+        button.dataset.connectionDegree = String(degree);
+        button.setAttribute("aria-pressed", String(index === 0));
+        button.setAttribute("aria-label", `${item.title} — ${degree} relations dans ce graphe`);
+        button.innerHTML = `<span>${item.type}</span><strong>${item.title}</strong>`;
+        button.addEventListener("pointerenter", () => select(item.id, false));
+        button.addEventListener("focus", () => select(item.id, false));
+        button.addEventListener("click", () => select(item.id, true));
+        buttons.set(item.id, button);
+        list.append(button);
+      });
+
+      const drawRelations = (item) => {
+        if (!relationLayer) return;
+        const source = buttons.get(item.id);
+        if (!source) return;
+        const bounds = field.getBoundingClientRect();
+        const origin = source.getBoundingClientRect();
+        const lines = item.relatedIds.map((relatedId) => {
+          const target = buttons.get(relatedId);
+          if (!target) return "";
+          const end = target.getBoundingClientRect();
+          const x1 = origin.left - bounds.left + origin.width / 2;
+          const y1 = origin.top - bounds.top + origin.height / 2;
+          const x2 = end.left - bounds.left + end.width / 2;
+          const y2 = end.top - bounds.top + end.height / 2;
+          return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"></line>`;
+        }).join("");
+        relationLayer.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
+        relationLayer.innerHTML = lines;
+      };
+
+      const select = (id, pinned) => {
+        const item = byId.get(id);
+        if (!item) return;
+        if (pinned) selectedId = id;
+        type.textContent = `${item.type} · fragment de démonstration`;
+        name.textContent = item.title;
+        description.textContent = item.shortDescription;
+        relation.textContent = `${item.relatedIds.length} relations suggérées`;
+        root.dataset.selected = item.id;
+        window.dispatchEvent(new CustomEvent("vestiges:subject-change", { detail: { id: item.id } }));
+        buttons.forEach((button, buttonId) => {
+          const connected = buttonId === item.id || item.relatedIds.includes(buttonId);
+          button.classList.toggle("is-connected", connected);
+          button.setAttribute("aria-pressed", String(buttonId === selectedId));
+        });
+        drawRelations(item);
+      };
+
+      const fitNodeLabels = () => {
+        buttons.forEach((button) => {
+          const label = button.querySelector("strong");
+          if (!label) return;
+          button.classList.remove("is-compact", "is-tight", "is-micro");
+          const safeWidth = button.clientWidth * .7;
+          const exceedsAvailableWidth = () => label.getBoundingClientRect().width > safeWidth;
+          if (exceedsAvailableWidth()) button.classList.add("is-compact");
+          if (exceedsAvailableWidth()) button.classList.add("is-tight");
+          if (exceedsAvailableWidth()) button.classList.add("is-micro");
+        });
+      };
+
+      list.addEventListener("keydown", (event) => {
+        if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) return;
+        const current = items.findIndex((item) => item.id === document.activeElement?.dataset.explorationId);
+        if (current < 0) return;
+        event.preventDefault();
+        const direction = ['ArrowRight', 'ArrowDown'].includes(event.key) ? 1 : -1;
+        const next = (current + direction + items.length) % items.length;
+        buttons.get(items[next].id)?.focus();
+      });
+      window.addEventListener("resize", () => drawRelations(byId.get(selectedId)), { passive: true });
+      if (typeof ResizeObserver === "function") new ResizeObserver(fitNodeLabels).observe(field);
+      select(selectedId, true);
+      fitNodeLabels();
+      window.addEventListener("vestiges:select-subject", (event) => select(event.detail?.id, true));
+      return;
+    }
+
+    const relatedList = root.querySelector("[data-exploration-related-list]");
+    const textList = root.querySelector("[data-exploration-text-list]");
+    const edges = [];
+    const edgeKeys = new Set();
+    const alternativeButtons = new Map();
+    let focusedId = selectedId;
+    let hoverResetTimer = 0;
+    let drawQueued = false;
+    let relationPaths = [];
+
+    const visibleRelatedIds = (item) => item.relatedIds.filter((id) => byId.has(id));
+    const relationSummary = (item) => {
+      const visible = visibleRelatedIds(item).length;
+      const outside = item.relatedIds.length - visible;
+      const label = `${visible} lien${visible > 1 ? "s" : ""} représenté${visible > 1 ? "s" : ""} ici`;
+      return outside ? `${label} · ${outside} référence${outside > 1 ? "s" : ""} hors champ` : label;
+    };
+
+    items.forEach((item) => {
+      for (const relatedId of item.relatedIds) {
+        if (!byId.has(relatedId)) continue;
+        const key = [item.id, relatedId].sort().join("|");
+        if (edgeKeys.has(key)) continue;
+        edgeKeys.add(key);
+        edges.push({ a: item.id, b: relatedId });
+      }
     });
 
-    const drawRelations = (item) => {
+    const makeButton = (item, className, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = className;
+      button.dataset.explorationId = item.id;
+      button.setAttribute("aria-pressed", "false");
+      button.setAttribute("aria-label", `${item.title}, ${item.type.toLocaleLowerCase("fr")}. ${relationSummary(item)}. Activez pour fixer la sélection.`);
+      if (typeof index === "number") button.classList.add(`exploration-item--${index + 1}`);
+
+      const itemType = document.createElement("span");
+      itemType.textContent = item.type;
+      const title = document.createElement("strong");
+      title.textContent = item.title;
+      button.append(itemType, title);
+      button.addEventListener("pointerenter", () => {
+        window.clearTimeout(hoverResetTimer);
+        hoverResetTimer = 0;
+        preview(item.id);
+      });
+      button.addEventListener("pointerleave", (event) => {
+        if (button.matches(":focus") || (event.relatedTarget && field.contains(event.relatedTarget))) return;
+        scheduleHoverReset();
+      });
+      button.addEventListener("focus", () => preview(item.id));
+      button.addEventListener("click", () => select(item.id));
+      return button;
+    };
+
+    items.forEach((item, index) => {
+      const button = makeButton(item, "exploration-item home-atlas-node", index);
+      buttons.set(item.id, button);
+      list.append(button);
+
+      if (textList) {
+        const row = document.createElement("li");
+        const alternativeButton = makeButton(item, "home-graph-text-entry");
+        alternativeButton.replaceChildren(document.createTextNode(item.title));
+        const count = document.createElement("small");
+        count.textContent = relationSummary(item);
+        alternativeButton.append(count);
+        alternativeButtons.set(item.id, alternativeButton);
+        row.append(alternativeButton);
+        textList.append(row);
+      }
+    });
+
+    function drawRelations() {
+      drawQueued = false;
       if (!relationLayer) return;
-      const source = buttons.get(item.id);
-      if (!source) return;
       const bounds = field.getBoundingClientRect();
-      const origin = source.getBoundingClientRect();
-      const lines = item.relatedIds.map((relatedId) => {
-        const target = buttons.get(relatedId);
-        if (!target) return "";
-        const end = target.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+      relationLayer.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
+      if (relationPaths.length !== edges.length) {
+        relationPaths = edges.map((edge) => {
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.dataset.from = edge.a;
+          path.dataset.to = edge.b;
+          relationLayer.append(path);
+          return path;
+        });
+      }
+
+      edges.forEach((edge, index) => {
+        const path = relationPaths[index];
+        const origin = buttons.get(edge.a)?.getBoundingClientRect();
+        const target = buttons.get(edge.b)?.getBoundingClientRect();
+        if (!origin || !target) return;
         const x1 = origin.left - bounds.left + origin.width / 2;
         const y1 = origin.top - bounds.top + origin.height / 2;
-        const x2 = end.left - bounds.left + end.width / 2;
-        const y2 = end.top - bounds.top + end.height / 2;
-        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"></line>`;
-      }).join("");
-      relationLayer.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
-      relationLayer.innerHTML = lines;
-    };
+        const x2 = target.left - bounds.left + target.width / 2;
+        const y2 = target.top - bounds.top + target.height / 2;
+        path.setAttribute("d", `M ${x1} ${y1} L ${x2} ${y2}`);
+        path.classList.toggle("is-related", edge.a === focusedId || edge.b === focusedId);
+      });
+    }
 
-    const select = (id, pinned) => {
-      const item = byId.get(id);
-      if (!item) return;
-      if (pinned) selectedId = id;
-      type.textContent = `${item.type} · fragment de démonstration`;
-      name.textContent = item.title;
-      description.textContent = item.shortDescription;
-      relation.textContent = `${item.relatedIds.length} relations suggérées`;
-      root.dataset.selected = item.id;
-      window.dispatchEvent(new CustomEvent("vestiges:subject-change", { detail: { id: item.id } }));
+    function queueDraw() {
+      if (drawQueued) return;
+      drawQueued = true;
+      window.requestAnimationFrame(drawRelations);
+    }
+
+    function updateDetails(item) {
+      if (type) type.textContent = `Fragment de démonstration · ${item.type}`;
+      if (name) name.textContent = item.title;
+      if (description) description.textContent = item.shortDescription;
+      if (relation) relation.textContent = relationSummary(item);
+      if (!relatedList || relatedList.contains(document.activeElement)) return;
+
+      const relatedItems = visibleRelatedIds(item).map((relatedId) => {
+        const related = byId.get(relatedId);
+        const listItem = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "home-graph-related__button";
+        button.dataset.explorationId = related.id;
+        button.setAttribute("aria-label", `Afficher ${related.title}, ${related.type.toLocaleLowerCase("fr")}`);
+        const title = document.createElement("span");
+        title.textContent = related.title;
+        const kind = document.createElement("small");
+        kind.textContent = related.type;
+        button.append(title, kind);
+        button.addEventListener("focus", () => preview(related.id));
+        button.addEventListener("click", () => {
+          select(related.id);
+          buttons.get(related.id)?.focus();
+        });
+        listItem.append(button);
+        return listItem;
+      });
+      relatedList.replaceChildren(...relatedItems);
+    }
+
+    function applyFocus(id) {
+      focusedId = id;
+      const connectedIds = new Set([id]);
+      edges.forEach((edge) => {
+        if (edge.a === id) connectedIds.add(edge.b);
+        if (edge.b === id) connectedIds.add(edge.a);
+      });
       buttons.forEach((button, buttonId) => {
-        const connected = buttonId === item.id || item.relatedIds.includes(buttonId);
-        button.classList.toggle("is-connected", connected);
+        const connected = connectedIds.has(buttonId);
+        button.classList.toggle("is-related", connected && buttonId !== id);
+        button.classList.toggle("is-selected", buttonId === selectedId);
         button.setAttribute("aria-pressed", String(buttonId === selectedId));
       });
-      drawRelations(item);
-    };
+      alternativeButtons.forEach((button, buttonId) => button.setAttribute("aria-pressed", String(buttonId === selectedId)));
+      root.dataset.selected = id;
+      queueDraw();
+    }
 
-    const fitNodeLabels = () => {
-      buttons.forEach((button) => {
-        const label = button.querySelector("strong");
-        if (!label) return;
-        button.classList.remove("is-compact", "is-tight", "is-micro");
-        const safeWidth = button.clientWidth * .7;
-        const exceedsAvailableWidth = () => label.getBoundingClientRect().width > safeWidth;
-        if (exceedsAvailableWidth()) button.classList.add("is-compact");
-        if (exceedsAvailableWidth()) button.classList.add("is-tight");
-        if (exceedsAvailableWidth()) button.classList.add("is-micro");
-      });
-    };
+    function preview(id) {
+      const item = byId.get(id);
+      if (!item) return;
+      applyFocus(id);
+      updateDetails(item);
+      window.dispatchEvent(new CustomEvent("vestiges:subject-change", { detail: { id: item.id } }));
+    }
+
+    function scheduleHoverReset() {
+      if (root.contains(document.activeElement) && document.activeElement.matches("button, summary")) return;
+      window.clearTimeout(hoverResetTimer);
+      hoverResetTimer = window.setTimeout(() => {
+        hoverResetTimer = 0;
+        if (root.querySelector("button:hover, button:focus, summary:focus")) return;
+        preview(selectedId);
+      }, 180);
+    }
+
+    function select(id) {
+      if (!byId.has(id)) return;
+      window.clearTimeout(hoverResetTimer);
+      hoverResetTimer = 0;
+      selectedId = id;
+      preview(id);
+    }
 
     list.addEventListener("keydown", (event) => {
       if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) return;
@@ -544,11 +747,14 @@
       const next = (current + direction + items.length) % items.length;
       buttons.get(items[next].id)?.focus();
     });
-    window.addEventListener("resize", () => drawRelations(byId.get(selectedId)), { passive: true });
-    if (typeof ResizeObserver === "function") new ResizeObserver(fitNodeLabels).observe(field);
-    select(selectedId, true);
-    fitNodeLabels();
-    window.addEventListener("vestiges:select-subject", (event) => select(event.detail?.id, true));
+    root.addEventListener("pointerleave", scheduleHoverReset);
+    root.addEventListener("focusout", (event) => {
+      if (!root.contains(event.relatedTarget)) scheduleHoverReset();
+    });
+    window.addEventListener("resize", queueDraw, { passive: true });
+    if (typeof ResizeObserver === "function") new ResizeObserver(queueDraw).observe(field);
+    select(selectedId);
+    window.addEventListener("vestiges:select-subject", (event) => select(event.detail?.id));
   }
 
   function initEncyclopediaWorkspace() {

@@ -296,7 +296,7 @@ for (const [route, page] of pages) {
 if (websiteCount !== 1) fail(`Le site doit déclarer exactement un WebSite (trouvé : ${websiteCount}).`);
 
 for (const asset of [
-  "styles.css", "styles.20260718b.css", "script.js", "script.20260923a.js", "theme-init.js", "theme-init.20260718b.js",
+  "styles.css", "styles.20261011a.css", "script.js", "script.20261011a.js", "theme-init.js", "theme-init.20260718b.js",
   "forge-viewer.js", "forge-viewer.20260716g.js", "robots.txt", "sitemap.xml", "assets/logo/vestiges-monogram.svg",
   "assets/logo/vestiges-favicon.png", "assets/logo/vestiges-monogram-og.png", "assets/editorial/atelier-relations-v1.png",
   "assets/editorial/atelier-relations-v1-640.webp", "assets/editorial/atelier-relations-v1-960.webp",

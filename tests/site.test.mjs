@@ -16,16 +16,16 @@ test("les pages publiques chargent une version cohérente des ressources", async
   for (const page of pages) {
     const html = await read(page);
     assert.match(html, /theme-init\.20260718b\.js/);
-    assert.match(html, /styles\.20260718b\.css/);
-    assert.match(html, /script\.20260923a\.js/);
+    assert.match(html, /styles\.20261011a\.css/);
+    assert.match(html, /script\.20261011a\.js/);
   }
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
     ["theme-init.js", "theme-init.20260718b.js"],
-    ["styles.css", "styles.20260718b.css"],
-    ["script.js", "script.20260923a.js"],
+    ["styles.css", "styles.20261011a.css"],
+    ["script.js", "script.20261011a.js"],
     ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20260923b.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
     ["forge-viewer.js", "forge-viewer.20260716g.js"]
@@ -256,15 +256,21 @@ test("l’accueil ouvre par une exploration locale, accessible et explicitement 
     read("index.html"), read("script.js"), read("styles.css"), read("exploration-data.js")
   ]);
   assert.match(html, /data-exploration/);
+  assert.match(html, /role="group" aria-label="Carte des fragments de démonstration"/);
+  assert.match(html, /data-exploration-related-list/);
+  assert.match(html, /data-exploration-text-list/);
   assert.match(html, /[Ff]ragment de démonstration/);
   assert.match(html, /aucune entrée ne représente encore un dossier réel/);
   assert.match(html, /exploration-data\.20260816a\.js/);
   assert.match(script, /function initExploration/);
+  assert.match(script, /relationLayer\.append\(path\)/);
+  assert.match(script, /\}, 180\)/);
   assert.match(script, /ArrowRight/);
   assert.match(script, /aria-pressed/);
   assert.match(script, /!heading\.closest\("\[data-exploration\]"\)/);
   assert.match(styles, /\.exploration-hero/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.exploration-item/s);
+  assert.match(styles, /transition: stroke 1\.45s var\(--atlas-fluid\), opacity 1\.6s var\(--atlas-fluid\)/);
   assert.match(data, /relatedIds/);
   assert.match(data, /window\.VESTIGES_EXPLORATION_ITEMS/);
 });

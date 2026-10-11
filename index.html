@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
   <meta name="description" content="Vestiges explore comment documenter et transmettre les savoir-faire artisanaux en reliant gestes, matières, outils et sources.">
   <meta name="theme-color" content="#ffffff"><meta property="og:title" content="Vestiges — L’artisanat à découvrir et à faire vivre"><meta property="og:description" content="Vestiges explore comment documenter et transmettre les savoir-faire artisanaux en reliant gestes, matières, outils et sources."><meta property="og:type" content="website"><meta property="og:url" content="https://vestiges.world/"><meta property="og:image" content="https://vestiges.world/assets/logo/vestiges-monogram-og.png"><meta name="twitter:card" content="summary_large_image">
-  <link rel="canonical" href="https://vestiges.world/"><link rel="icon" type="image/png" href="/assets/logo/vestiges-favicon.png"><script src="/theme-init.20260718b.js"></script><link rel="stylesheet" href="/styles.20260718b.css"><script src="/exploration-data.20260816a.js" defer></script><script src="/script.20260923a.js" defer></script><title>Vestiges — L’artisanat à découvrir et à faire vivre</title>
+  <link rel="canonical" href="https://vestiges.world/"><link rel="icon" type="image/png" href="/assets/logo/vestiges-favicon.png"><script src="/theme-init.20260718b.js"></script><link rel="stylesheet" href="/styles.20261011a.css"><script src="/exploration-data.20260816a.js" defer></script><script src="/script.20261011a.js" defer></script><title>Vestiges — L’artisanat à découvrir et à faire vivre</title>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -45,14 +45,29 @@
     </section>
     <section class="home-portals" id="portes" aria-labelledby="portals-title"><div class="home-portals__intro"><p class="section-index">Quatre portes · un même écosystème</p><h2 id="portals-title">Entrez par ce qui vous intéresse.</h2></div><div class="portal-grid"><a class="portal-card portal-showcase" href="/artisans/"><span class="portal-number">01</span><span class="portal-label">Découvrir</span><h3>Vitrine artisanale</h3><p>Des artisan·es, des ateliers et des pièces, racontés par celles et ceux qui les font.</p><span class="portal-status">Les premiers portraits se préparent</span><span class="portal-arrow" aria-hidden="true">↗</span></a><a class="portal-card portal-market" href="/marketplace/"><span class="portal-number">02</span><span class="portal-label">Trouver une pièce</span><h3>Marketplace</h3><p>Un futur espace pour découvrir et acheter des créations artisanales.</p><span class="portal-status">Premières offres en préparation</span><span class="portal-arrow" aria-hidden="true">↗</span></a><a class="portal-card portal-encyclopedia" href="/encyclopedie/#graphe"><span class="portal-number">03</span><span class="portal-label">Aller plus loin</span><h3>Encyclopédie</h3><p>Les gestes, matières, outils et histoires qui donnent vie aux pratiques.</p><span class="portal-status">Explorer la démonstration</span><span class="portal-arrow" aria-hidden="true">↗</span></a><a class="portal-card portal-collaboration" href="/collaborations/"><span class="portal-number">04</span><span class="portal-label">Faire ensemble</span><h3>Collaboration</h3><p>Des liens entre artisan·es, associations, institutions et lieux culturels.</p><span class="portal-status">Appel aux premières rencontres</span><span class="portal-arrow" aria-hidden="true">↗</span></a></div></section>
     <section class="exploration-hero home-graph-section" id="relations" aria-labelledby="exploration-title" data-exploration>
-      <div class="exploration-field" data-exploration-field aria-describedby="exploration-instructions">
-        <svg class="exploration-relations" data-exploration-relations aria-hidden="true"></svg>
-        <div class="exploration-items" data-exploration-items></div>
-        <p class="visually-hidden" id="exploration-instructions">Explorez les fragments avec Tab, les flèches ou Entrée. Les relations de l’élément choisi apparaissent dans la composition.</p>
-      </div>
       <div class="exploration-hero__heading"><p class="eyebrow">03 · Encyclopédie · démonstration</p><h2 id="exploration-title">Ce qui se cache derrière une pièce.</h2><p>Parcourez les liens entre gestes, matières et pratiques artisanales. Cette composition montre une piste, pas encore un corpus réel.</p></div>
-      <aside class="exploration-detail" data-exploration-detail aria-live="polite"><p class="meta" data-exploration-type>Fragment de démonstration</p><h2 data-exploration-name>Marqueterie</h2><p data-exploration-description>Assembler des essences de bois pour faire apparaître une image, une surface ou un rythme.</p><p class="exploration-detail__relation" data-exploration-relation>3 relations suggérées</p></aside>
-      <div class="exploration-hero__footer"><p>12 fragments de démonstration · aucune entrée ne représente encore un dossier réel.</p><a class="text-link" href="#proposition">Comprendre Vestiges ↓</a></div>
+      <div class="exploration-field home-graph-map" data-exploration-field role="group" aria-label="Carte des fragments de démonstration" aria-describedby="exploration-instructions">
+        <svg class="exploration-relations" data-exploration-relations aria-hidden="true" focusable="false"></svg>
+        <div class="exploration-items" data-exploration-items></div>
+      </div>
+      <aside class="exploration-detail home-graph-detail" data-exploration-detail aria-live="polite" aria-atomic="true">
+        <p class="meta" data-exploration-type>Fragment de démonstration · Savoir-faire</p>
+        <h2 data-exploration-name>Marqueterie</h2>
+        <p data-exploration-description>Assembler des essences de bois pour faire apparaître une image, une surface ou un rythme.</p>
+        <p class="exploration-detail__relation" data-exploration-relation>3 liens représentés ici</p>
+        <div class="home-graph-related"><h3>Pour suivre une relation</h3><ul data-exploration-related-list></ul></div>
+        <p class="home-graph-disclaimer">Seuls les liens vers une entrée présente sur cette carte sont tracés. Les autres références restent hors champ.</p>
+      </aside>
+      <div class="exploration-hero__footer home-graph-footer">
+        <p id="exploration-instructions">Survolez ou placez le focus sur une entrée pour en lire le contexte. Activez-la pour conserver la sélection. Les flèches déplacent le focus entre les entrées.</p>
+        <p>12 fragments de démonstration · aucune entrée ne représente encore un dossier réel.</p>
+        <a class="text-link" href="#proposition">Comprendre Vestiges ↓</a>
+      </div>
+      <details class="home-graph-alternative">
+        <summary>Ouvrir la liste textuelle des douze fragments</summary>
+        <p>Une alternative de navigation à la carte. Chaque entrée peut être activée au clavier ou au toucher.</p>
+        <ul data-exploration-text-list></ul>
+      </details>
     </section>
     <section class="home-mosaic" id="proposition" aria-labelledby="mosaic-title"><div class="mosaic-panel mosaic-intro"><p class="meta">Dossier en préfiguration</p><h2 id="mosaic-title">Un objet, plusieurs façons de le comprendre.</h2><p>Une même surface accueille ce qui est vu, ce qui est raconté, ce qui est attesté et ce qui reste ouvert.</p></div><div class="mosaic-panel mosaic-object"><span>Objet documenté</span><strong>Bois<br>flotté<br>01.</strong><small>Fragment de démonstration · pas un dossier d’artisan</small></div><figure class="mosaic-panel mosaic-model forge-viewer" data-forge-viewer data-model-src="/assets/works/bois-flotte-01/bois-flotte-01-8k.glb"><div class="forge-viewer-stage" data-viewer-stage></div><div class="forge-viewer-action"><button class="button" type="button" data-load-model>Explorer l’objet 3D · 67 Mo</button><span data-viewer-status aria-live="polite">Vue 3D FORGE · glissez pour tourner</span></div></figure><div class="mosaic-panel mosaic-ledger"><div><span>STATUT</span><strong>Déclaré</strong></div><div><span>MATIÈRE</span><strong>Bois</strong></div><div><span>SOURCE</span><strong>Vidéo</strong></div><div><span>MODÈLE</span><strong>GLB · 8K</strong></div></div><a class="mosaic-panel mosaic-link" href="/explorer/specimen/"><span>Voir l’exemple détaillé</span><strong>Découvrir les preuves et les limites de ce spécimen. ↘</strong></a></section>
     <div class="type-ribbon" aria-hidden="true"><div><span>œuvre</span><span>geste</span><span>matière</span><span>lieu</span><span>source</span><span>mémoire</span><span>relation</span><span>œuvre</span><span>geste</span><span>matière</span><span>lieu</span><span>source</span><span>mémoire</span><span>relation</span></div></div>
