@@ -157,7 +157,7 @@
       }
 
       skip?.focus();
-      const beat = 330;
+      const beat = 420;
       words.forEach((word, index) => {
         timers.push(window.setTimeout(() => {
           words.forEach((item, itemIndex) => {
@@ -297,6 +297,7 @@
 
     const requestFrame = (state) => {
       activeStates.add(state);
+      state.element.classList.add("is-kinetic-active");
       if (!frame) frame = window.requestAnimationFrame(render);
     };
 
@@ -306,57 +307,53 @@
         const length = state.glyphs.length;
         let center = -999;
         let amplitude = 0;
-        let radius = Math.max(2.2, Math.min(6.5, length * .09));
+        let radius = Math.max(5, Math.min(9, length * .14));
         let keepAlive = false;
 
-        if (state.hovered) {
-          center = state.pointerIndex;
-          amplitude = 470 * state.pointerStrength;
-          keepAlive = true;
-        } else if (state.tapStarted) {
-          const progress = Math.min(1, (time - state.tapStarted) / 760);
+        if (state.tapStarted) {
+          const progress = Math.min(1, (time - state.tapStarted) / 920);
           center = state.tapIndex;
-          amplitude = Math.sin(progress * Math.PI) * 430;
-          radius = 2.2 + progress * 5;
+          amplitude = Math.sin(progress * Math.PI) * 68;
+          radius = 5 + progress * 3;
           keepAlive = progress < 1;
           if (!keepAlive) state.tapStarted = 0;
+        } else if (state.hovered) {
+          center = state.pointerIndex;
+          amplitude = 76 * state.pointerStrength;
         } else if (state.revealStarted) {
           const progress = Math.min(1, (time - state.revealStarted) / 1250);
           center = -4 + progress * (length + 8);
-          amplitude = Math.sin(progress * Math.PI) * 330;
-          radius = Math.max(3, length * .11);
+          amplitude = Math.sin(progress * Math.PI) * 48;
           keepAlive = progress < 1;
           if (!keepAlive) state.revealStarted = 0;
-        } else if (state.ambient) {
-          center = ((Math.sin(time * .00042) + 1) / 2) * Math.max(0, length - 1);
-          amplitude = 115;
-          radius = Math.max(4, length * .08);
-          keepAlive = document.visibilityState === "visible";
         }
 
         let unsettled = false;
         state.glyphs.forEach((glyph, index) => {
           const distance = (index - center) / radius;
           const influence = amplitude * Math.exp(-.5 * distance * distance);
-          const target = Math.min(820, state.base + influence);
-          const current = state.weights[index] + (target - state.weights[index]) * .16;
+          const target = Math.min(620, state.base + influence);
+          const current = state.weights[index] + (target - state.weights[index]) * .12;
           state.weights[index] = current;
-          glyph.dataset.kineticLevel = String(Math.max(0, Math.min(8, Math.round((current - 340) / 60))));
-          if (Math.abs(current - target) > .35) unsettled = true;
+          const level = String(Math.max(250, Math.min(620, Math.round(current / 10) * 10)));
+          if (glyph.dataset.kineticLevel !== level) glyph.dataset.kineticLevel = level;
+          if (Math.abs(current - target) > .5) unsettled = true;
         });
 
         if (!keepAlive && !unsettled) {
           state.glyphs.forEach((glyph, index) => {
             state.weights[index] = state.base;
-            glyph.dataset.kineticLevel = "0";
+            const level = String(Math.max(250, Math.min(620, Math.round(state.base / 10) * 10)));
+            if (glyph.dataset.kineticLevel !== level) glyph.dataset.kineticLevel = level;
           });
           activeStates.delete(state);
+          state.element.classList.remove("is-kinetic-active");
         }
       });
       if (activeStates.size) frame = window.requestAnimationFrame(render);
     };
 
-    headings.forEach((heading, headingIndex) => {
+    headings.forEach((heading) => {
       const label = heading.textContent.replace(/\s+/g, " ").trim();
       const computedWeight = Number.parseFloat(window.getComputedStyle(heading).fontWeight);
       const base = Number.isFinite(computedWeight) ? Math.max(250, Math.min(620, computedWeight)) : 360;
@@ -379,7 +376,7 @@
           const glyph = document.createElement("span");
           glyph.className = "kinetic-glyph";
           glyph.textContent = character;
-          glyph.dataset.kineticLevel = "0";
+          glyph.dataset.kineticLevel = String(Math.max(250, Math.min(620, Math.round(base / 10) * 10)));
           word.append(glyph);
           glyphs.push(glyph);
         });
@@ -399,8 +396,7 @@
         pointerStrength: 1,
         tapIndex: 0,
         tapStarted: 0,
-        revealStarted: 0,
-        ambient: heading.tagName === "H1"
+        revealStarted: 0
       };
       states.push(state);
 
@@ -412,8 +408,9 @@
         const bounds = heading.getBoundingClientRect();
         const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / Math.max(1, bounds.width)));
         const verticalDistance = Math.abs(event.clientY - (bounds.top + bounds.height / 2));
+        state.hovered = true;
         state.pointerIndex = ratio * Math.max(0, glyphs.length - 1);
-        state.pointerStrength = Math.max(.35, 1 - verticalDistance / Math.max(90, bounds.height));
+        state.pointerStrength = Math.max(.3, 1 - verticalDistance / Math.max(90, bounds.height));
         requestFrame(state);
       });
       heading.addEventListener("pointerleave", () => {
@@ -444,7 +441,6 @@
       states.forEach((state) => observer.observe(state.element));
     }
 
-    states.filter((state) => state.ambient).forEach(requestFrame);
   }
 
   function initExploration() {
