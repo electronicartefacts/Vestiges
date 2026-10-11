@@ -16,7 +16,7 @@ test("les pages publiques chargent une version cohérente des ressources", async
   for (const page of pages) {
     const html = await read(page);
     assert.match(html, /theme-init\.20260718b\.js/);
-    assert.match(html, /styles\.20261011e\.css/);
+    assert.match(html, /styles\.20261011f\.css/);
     assert.match(html, /script\.20261011c\.js/);
   }
 });
@@ -24,7 +24,7 @@ test("les pages publiques chargent une version cohérente des ressources", async
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
     ["theme-init.js", "theme-init.20260718b.js"],
-    ["styles.css", "styles.20261011e.css"],
+    ["styles.css", "styles.20261011f.css"],
     ["script.js", "script.20261011c.js"],
     ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20260923b.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
@@ -154,7 +154,7 @@ test("le header compose le monogramme avec estiges et conserve seulement le logo
   assert.match(styles, /@media \(max-width: 1120px\)[\s\S]*\.site-header \.brand-word \{ display: none; \}/);
 });
 
-test("l’accueil présente les quatre portes de Vestiges avant ses démonstrations", async () => {
+test("l’accueil présente le projet sans exposer les détails du modèle 3D", async () => {
   const html = await read("index.html");
   assert.match(html, /Vitrine artisanale[\s\S]*Marketplace[\s\S]*Encyclopédie[\s\S]*Collaboration/);
   assert.match(html, /L’artisanat à découvrir et à faire vivre/);
@@ -164,8 +164,9 @@ test("l’accueil présente les quatre portes de Vestiges avant ses démonstrati
   assert.match(html, /focus-banner[\s\S]*L’artisanat à découvrir et à faire vivre/);
   assert.match(html, /Proposer un échange/);
   assert.doesNotMatch(html, /De la découverte à la rencontre|Un dossier, plusieurs profondeurs|Écouter avant de publier/);
-  assert.match(html, /data-forge-viewer[\s\S]*Vue 3D FORGE/);
-  assert.ok(html.indexOf("L’artisanat à découvrir et à faire vivre") < html.indexOf("Vue 3D FORGE"));
+  const mosaic = html.match(/<section class="home-mosaic"[\s\S]*?<\/section>/)?.[0] || "";
+  assert.ok(mosaic, "La section éditoriale doit rester sur l’accueil.");
+  assert.doesNotMatch(mosaic, /data-forge-viewer|data-model-src|\.glb|GLB|FORGE|Vue 3D|67 Mo/i);
 });
 
 test("l’encyclopédie distingue ses cinq vues du prototype actuellement disponible", async () => {
