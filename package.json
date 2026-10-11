@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "node --check script.js && node --check script.20260923a.js && node --check theme-init.js && node --check forge-viewer.js && node --check mosaic-specimen-viewer.js && node --check mosaic-specimen-viewer.20260923b.js && node --check worker/src/index.mjs && node --check worker/src/validation.mjs",
     "build": "node scripts/validate-site.mjs",
-    "test": "node --test tests worker/test",
+    "test": "node --test",
     "validate": "npm run lint && npm run build && npm test"
   }
 }

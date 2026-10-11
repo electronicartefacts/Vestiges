@@ -476,7 +476,7 @@ main p a:not(.button):focus-visible,
 
 /* Home */
 .focus-banner { position: relative; min-height: min(46rem, calc(100svh - var(--header))); display: grid; align-items: end; overflow: hidden; background: #292825; color: #fff; }
-.focus-banner__image { position: absolute; inset: 0; }
+.focus-banner__image { position: absolute; inset: 0; }.focus-banner__image picture { display: block; width: 100%; height: 100%; }
 .focus-banner__image::after { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.74), rgba(0,0,0,.13) 67%, rgba(0,0,0,.32)); content: ""; }
 .focus-banner__image img { width: 100%; height: 100%; object-fit: cover; object-position: 60% center; filter: saturate(.72) contrast(1.04); }
 .focus-banner__copy { position: relative; z-index: 1; max-width: 43rem; padding: clamp(2rem, 6vw, 6rem) var(--gutter) clamp(5rem, 11vw, 9rem); }
@@ -1060,7 +1060,7 @@ main p a:not(.button):focus-visible,
   width: min(calc(100% - 2rem), var(--max)); margin: clamp(1rem, 3vw, 2.5rem) auto 0; padding: clamp(1.25rem, 3vw, 2rem);
   border: 1px solid var(--ink); background: var(--ink); color: var(--inverse);
 }
-.invitation-context h2 { max-width: 18ch; margin: .25rem 0 .6rem; font-family: var(--serif); font-size: clamp(2rem, 4vw, 4rem); font-weight: 350; line-height: .95; }
+.invitation-context p.invitation-context__heading { max-width: 18ch; margin: .25rem 0 .6rem; font-family: var(--serif); font-size: clamp(2rem, 4vw, 4rem); font-weight: 350; line-height: .95; }
 .invitation-context p { max-width: 68rem; }
 .invitation-context .muted { color: currentColor; opacity: .72; }
 body[data-journey-context="guided"] [data-cold-path] { display: none; }

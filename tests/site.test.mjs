@@ -500,3 +500,91 @@ test("la politique de sécurité ne bloque aucun style applicatif", async () => 
   assert.match(home, /style-src 'self'/);
   assert.match(home, /data-progress-step="0"/);
 });
+
+test("les anciennes URL restent accessibles et se consolident vers leur canonique", async () => {
+  const pairs = [
+    ["artistes/index.html", "artisans/index.html", "/artistes/", "/artisans/"],
+    ["methode/index.html", "approche/index.html", "/methode/", "/approche/"]
+  ];
+  const sitemap = await read("sitemap.xml");
+  for (const [aliasFile, canonicalFile, aliasRoute, canonicalRoute] of pairs) {
+    const [alias, canonical] = await Promise.all([read(aliasFile), read(canonicalFile)]);
+    assert.match(alias, new RegExp(`<link rel="canonical" href="https://vestiges\\.world${canonicalRoute.replaceAll("/", "\\/")}">`));
+    assert.match(alias, new RegExp(`<meta property="og:url" content="https://vestiges\\.world${canonicalRoute.replaceAll("/", "\\/")}">`));
+    assert.equal(alias.match(/<title>(.*?)<\/title>/s)?.[1], canonical.match(/<title>(.*?)<\/title>/s)?.[1]);
+    assert.equal(alias.match(/<meta name="description" content="([^"]*)">/)?.[1], canonical.match(/<meta name="description" content="([^"]*)">/)?.[1]);
+    assert.doesNotMatch(alias, new RegExp(`<a\\b[^>]*href="${aliasRoute.replaceAll("/", "\\/")}`));
+    assert.doesNotMatch(sitemap, new RegExp(`https://vestiges\\.world${aliasRoute.replaceAll("/", "\\/")}`));
+  }
+});
+
+test("les titres et descriptions renforcent la sémantique sans modifier le parcours", async () => {
+  const [participer, about, laboratory, transmission] = await Promise.all([
+    read("participer/index.html"), read("a-propos/index.html"), read("laboratoire/index.html"), read("transmission/index.html")
+  ]);
+  const firstHeading = participer.match(/<(h[1-6])\b/i)?.[1];
+  assert.equal(firstHeading, "h1");
+  assert.match(participer, /<p class="invitation-context__heading" id="invitation-title">/);
+  assert.match(about, /<h1[^>]*>Vestiges, un projet de documentation des savoir-faire artisanaux<\/h1>/);
+  assert.match(laboratory, /<title>Reconstruction 3D expérimentale de Bois flotté 01 \| Vestiges<\/title>/);
+  const transmissionDescription = transmission.match(/<meta name="description" content="([^"]*)">/)?.[1] ?? "";
+  for (const term of ["recherche", "sources", "médiation", "enseignement", "transmission"]) {
+    assert.ok(transmissionDescription.toLocaleLowerCase("fr").includes(term), `Terme manquant dans la description : ${term}`);
+  }
+});
+
+test("les données structurées restent reliées au contenu visible et à la canonique", async () => {
+  const pages = [
+    "index.html", "artisans/index.html", "encyclopedie/index.html", "collaborations/index.html", "approche/index.html",
+    "marketplace/index.html", "programme-fondateur/index.html", "pour-qui/index.html", "transmission/index.html",
+    "organisations/index.html", "comment-ca-marche/index.html", "participer/index.html", "a-propos/index.html", "laboratoire/index.html"
+  ];
+  for (const page of pages) {
+    const html = await read(page);
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+    assert.equal(blocks.length, 1, `${page} should have one JSON-LD block`);
+    const data = JSON.parse(blocks[0][1]);
+    assert.equal(data["@context"], "https://schema.org");
+    const entities = data["@graph"];
+    assert.ok(Array.isArray(entities));
+    for (const entity of entities) {
+      assert.equal("@id" in entity, false);
+      assert.equal("identifier" in entity, false);
+    }
+    assert.equal(entities.some((entity) => entity["@type"] === "Organization"), false);
+    const webPage = entities.find((entity) => ["WebPage", "AboutPage"].includes(entity["@type"]));
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
+    const description = html.match(/<meta name="description" content="([^"]*)">/)?.[1];
+    const h1 = html.match(/<h1\b[^>]*>(.*?)<\/h1>/s)?.[1]?.replace(/<[^>]*>/g, "").trim();
+    assert.equal(webPage.url, canonical);
+    assert.equal(webPage.name, h1);
+    assert.equal(webPage.description, description);
+    assert.equal(webPage["@type"], page === "a-propos/index.html" ? "AboutPage" : "WebPage");
+    assert.deepEqual(webPage.isPartOf, { "@type": "WebSite", name: "Vestiges", url: "https://vestiges.world/", inLanguage: "fr" });
+    assert.equal(entities.filter((entity) => entity["@type"] === "WebSite").length, page === "index.html" ? 1 : 0);
+  }
+  for (const page of ["artistes/index.html", "methode/index.html", "explorer/index.html", "explorer/specimen/index.html"]) {
+    assert.doesNotMatch(await read(page), /application\/ld\+json/);
+  }
+});
+
+test("l’image d’accueil propose des variantes WebP sans différer le chargement du visuel principal", async () => {
+  const html = await read("index.html");
+  const hero = html.match(/<div class="focus-banner__image">([\s\S]*?)<\/div>/)?.[1] ?? "";
+  assert.match(hero, /<picture>[\s\S]*type="image\/webp"/);
+  assert.match(hero, /atelier-relations-v1-640\.webp 640w/);
+  assert.match(hero, /atelier-relations-v1-960\.webp 960w/);
+  assert.match(hero, /atelier-relations-v1-1536\.webp 1536w/);
+  assert.match(hero, /sizes="100vw"/);
+  assert.match(hero, /atelier-relations-v1\.png/);
+  assert.match(hero, /fetchpriority="high"/);
+  assert.match(hero, /decoding="async"/);
+  assert.doesNotMatch(hero, /loading="lazy"/);
+  const [original, largest, smallest] = await Promise.all([
+    stat(resolve(root, "assets/editorial/atelier-relations-v1.png")),
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-1536.webp")),
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-640.webp"))
+  ]);
+  assert.ok(largest.size < original.size / 10);
+  assert.ok(smallest.size < original.size / 50);
+});
