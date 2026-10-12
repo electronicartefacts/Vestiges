@@ -16,7 +16,7 @@ test("les pages publiques chargent une version cohérente des ressources", async
   for (const page of pages) {
     const html = await read(page);
     assert.match(html, /theme-init\.20260718b\.js/);
-    assert.match(html, /styles\.20261012b\.css/);
+    assert.match(html, /styles\.20261012c\.css/);
     assert.match(html, /script\.20261012b\.js/);
   }
 });
@@ -24,7 +24,7 @@ test("les pages publiques chargent une version cohérente des ressources", async
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
     ["theme-init.js", "theme-init.20260718b.js"],
-    ["styles.css", "styles.20261012b.css"],
+    ["styles.css", "styles.20261012c.css"],
     ["script.js", "script.20261012b.js"],
     ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20261011a.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
