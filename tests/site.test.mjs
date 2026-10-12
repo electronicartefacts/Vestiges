@@ -16,16 +16,16 @@ test("les pages publiques chargent une version cohérente des ressources", async
   for (const page of pages) {
     const html = await read(page);
     assert.match(html, /theme-init\.20260718b\.js/);
-    assert.match(html, /styles\.20261012a\.css/);
-    assert.match(html, /script\.20261012a\.js/);
+    assert.match(html, /styles\.20261012b\.css/);
+    assert.match(html, /script\.20261012b\.js/);
   }
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
     ["theme-init.js", "theme-init.20260718b.js"],
-    ["styles.css", "styles.20261012a.css"],
-    ["script.js", "script.20261012a.js"],
+    ["styles.css", "styles.20261012b.css"],
+    ["script.js", "script.20261012b.js"],
     ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20261011a.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
     ["forge-viewer.js", "forge-viewer.20260716g.js"]
@@ -121,7 +121,8 @@ test("les boutons d’action sont uniquement en contour et se renforcent sans tr
   assert.match(styles, /\.button-light \{ border-color: currentColor; color: inherit; \}/);
   const hoverRule = styles.match(/\.button:hover,\s*\.button:focus-visible,\s*\.text-button:hover,\s*\.text-button:focus-visible\s*\{([^}]*)\}/)?.[1] ?? "";
   assert.match(hoverRule, /box-shadow: inset 0 0 0 1px currentColor/);
-  assert.doesNotMatch(hoverRule, /font-(?:weight|variation-settings)/);
+  assert.match(hoverRule, /font-variation-settings: "wght" 600/);
+  assert.doesNotMatch(hoverRule, /font-weight/);
   assert.doesNotMatch(styles, /\.button:hover[^}]*transform/s);
   assert.doesNotMatch(styles, /\.button-light:hover[^}]*background/s);
   assert.doesNotMatch(styles, /\.forge-viewer \.button:hover[^}]*background/s);

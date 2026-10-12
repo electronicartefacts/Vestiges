@@ -318,7 +318,7 @@
         if (state.tapStarted) {
           const progress = Math.min(1, (time - state.tapStarted) / 920);
           center = state.tapIndex;
-          amplitude = Math.sin(progress * Math.PI) * 26;
+          amplitude = Math.sin(progress * Math.PI) * 32;
           radius = 5 + progress * 3;
           keepAlive = progress < 1;
           if (!keepAlive) state.tapStarted = 0;
@@ -326,11 +326,11 @@
           state.pointerIndex += (state.pointerTargetIndex - state.pointerIndex) * pointerEase;
           state.pointerStrength += (state.pointerTargetStrength - state.pointerStrength) * pointerEase;
           center = state.pointerIndex;
-          amplitude = 20 * state.pointerStrength;
+          amplitude = 30 * state.pointerStrength;
         } else if (state.revealStarted) {
           const progress = Math.min(1, (time - state.revealStarted) / 1250);
           center = -4 + progress * (length + 8);
-          amplitude = Math.sin(progress * Math.PI) * 18;
+          amplitude = Math.sin(progress * Math.PI) * 24;
           keepAlive = progress < 1;
           if (!keepAlive) state.revealStarted = 0;
         }
