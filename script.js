@@ -294,6 +294,7 @@
     const states = [];
     const activeStates = new Set();
     let frame = 0;
+    let lastRenderTime = 0;
 
     const requestFrame = (state) => {
       activeStates.add(state);
@@ -303,6 +304,10 @@
 
     const render = (time) => {
       frame = 0;
+      const frameDelta = lastRenderTime ? Math.min(32, Math.max(0, time - lastRenderTime)) : 16.667;
+      lastRenderTime = time;
+      const weightEase = 1 - Math.exp(-frameDelta / 220);
+      const pointerEase = 1 - Math.exp(-frameDelta / 110);
       activeStates.forEach((state) => {
         const length = state.glyphs.length;
         let center = -999;
@@ -313,17 +318,19 @@
         if (state.tapStarted) {
           const progress = Math.min(1, (time - state.tapStarted) / 920);
           center = state.tapIndex;
-          amplitude = Math.sin(progress * Math.PI) * 44;
+          amplitude = Math.sin(progress * Math.PI) * 26;
           radius = 5 + progress * 3;
           keepAlive = progress < 1;
           if (!keepAlive) state.tapStarted = 0;
         } else if (state.hovered) {
+          state.pointerIndex += (state.pointerTargetIndex - state.pointerIndex) * pointerEase;
+          state.pointerStrength += (state.pointerTargetStrength - state.pointerStrength) * pointerEase;
           center = state.pointerIndex;
-          amplitude = 48 * state.pointerStrength;
+          amplitude = 20 * state.pointerStrength;
         } else if (state.revealStarted) {
           const progress = Math.min(1, (time - state.revealStarted) / 1250);
           center = -4 + progress * (length + 8);
-          amplitude = Math.sin(progress * Math.PI) * 32;
+          amplitude = Math.sin(progress * Math.PI) * 18;
           keepAlive = progress < 1;
           if (!keepAlive) state.revealStarted = 0;
         }
@@ -333,9 +340,9 @@
           const distance = (index - center) / radius;
           const influence = amplitude * Math.exp(-.5 * distance * distance);
           const target = Math.min(620, state.base + influence);
-          const current = state.weights[index] + (target - state.weights[index]) * .12;
+          const current = state.weights[index] + (target - state.weights[index]) * weightEase;
           state.weights[index] = current;
-          const level = String(Math.max(250, Math.min(620, Math.round(current / 10) * 10)));
+          const level = String(Math.max(250, Math.min(620, Math.round(current / 2) * 2)));
           if (glyph.dataset.kineticLevel !== level) glyph.dataset.kineticLevel = level;
           if (Math.abs(current - target) > .5) unsettled = true;
         });
@@ -344,7 +351,7 @@
           if (!state.hovered) {
             state.glyphs.forEach((glyph, index) => {
               state.weights[index] = state.base;
-              const level = String(Math.max(250, Math.min(620, Math.round(state.base / 10) * 10)));
+              const level = String(Math.max(250, Math.min(620, Math.round(state.base / 2) * 2)));
               if (glyph.dataset.kineticLevel !== level) glyph.dataset.kineticLevel = level;
             });
           }
@@ -378,7 +385,7 @@
           const glyph = document.createElement("span");
           glyph.className = "kinetic-glyph";
           glyph.textContent = character;
-          glyph.dataset.kineticLevel = String(Math.max(250, Math.min(620, Math.round(base / 10) * 10)));
+          glyph.dataset.kineticLevel = String(Math.max(250, Math.min(620, Math.round(base / 2) * 2)));
           word.append(glyph);
           glyphs.push(glyph);
         });
@@ -395,24 +402,37 @@
         base,
         hovered: false,
         pointerIndex: 0,
+        pointerTargetIndex: 0,
         pointerStrength: 1,
+        pointerTargetStrength: 1,
         tapIndex: 0,
         tapStarted: 0,
         revealStarted: 0
       };
       states.push(state);
 
-      heading.addEventListener("pointerenter", () => {
+      const updatePointerTarget = (event, initialize = false) => {
+        const bounds = heading.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / Math.max(1, bounds.width)));
+        const verticalDistance = Math.abs(event.clientY - (bounds.top + bounds.height / 2));
+        const pointerIndex = ratio * Math.max(0, glyphs.length - 1);
+        const pointerStrength = Math.max(.3, 1 - verticalDistance / Math.max(90, bounds.height));
+        state.pointerTargetIndex = pointerIndex;
+        state.pointerTargetStrength = pointerStrength;
+        if (initialize) {
+          state.pointerIndex = pointerIndex;
+          state.pointerStrength = pointerStrength;
+        }
+      };
+
+      heading.addEventListener("pointerenter", (event) => {
+        updatePointerTarget(event, true);
         state.hovered = true;
         requestFrame(state);
       });
       heading.addEventListener("pointermove", (event) => {
-        const bounds = heading.getBoundingClientRect();
-        const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / Math.max(1, bounds.width)));
-        const verticalDistance = Math.abs(event.clientY - (bounds.top + bounds.height / 2));
+        updatePointerTarget(event);
         state.hovered = true;
-        state.pointerIndex = ratio * Math.max(0, glyphs.length - 1);
-        state.pointerStrength = Math.max(.3, 1 - verticalDistance / Math.max(90, bounds.height));
         requestFrame(state);
       });
       heading.addEventListener("pointerleave", () => {

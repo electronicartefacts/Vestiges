@@ -304,7 +304,7 @@ main p a:not(.button):focus-visible,
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  transition: border-color .4s var(--ease), box-shadow .4s var(--ease), color .4s var(--ease), font-weight .72s var(--type-ease), font-variation-settings .72s var(--type-ease);
+  transition: border-color .4s var(--ease), box-shadow .4s var(--ease), color .4s var(--ease);
 }
 .button:hover,
 .button:focus-visible,
@@ -312,8 +312,6 @@ main p a:not(.button):focus-visible,
 .text-button:focus-visible {
   background: transparent;
   box-shadow: inset 0 0 0 1px currentColor;
-  font-weight: 610;
-  font-variation-settings: "wght" 610;
 }
 .role-card { color: inherit; text-decoration: none; transition: transform .7s var(--ease), background .7s var(--ease), color .7s var(--ease); }
 .role-card:hover,
@@ -444,45 +442,192 @@ main p a:not(.button):focus-visible,
   display: inline-block;
   font-variation-settings: "wght" var(--glyph-weight, 360);
   font-weight: var(--glyph-weight, 360);
-  transition: font-variation-settings .4s var(--type-ease);
 }
 .kinetic-glyph[data-kinetic-level="250"] { --glyph-weight: 250; }
+.kinetic-glyph[data-kinetic-level="252"] { --glyph-weight: 252; }
+.kinetic-glyph[data-kinetic-level="254"] { --glyph-weight: 254; }
+.kinetic-glyph[data-kinetic-level="256"] { --glyph-weight: 256; }
+.kinetic-glyph[data-kinetic-level="258"] { --glyph-weight: 258; }
 .kinetic-glyph[data-kinetic-level="260"] { --glyph-weight: 260; }
+.kinetic-glyph[data-kinetic-level="262"] { --glyph-weight: 262; }
+.kinetic-glyph[data-kinetic-level="264"] { --glyph-weight: 264; }
+.kinetic-glyph[data-kinetic-level="266"] { --glyph-weight: 266; }
+.kinetic-glyph[data-kinetic-level="268"] { --glyph-weight: 268; }
 .kinetic-glyph[data-kinetic-level="270"] { --glyph-weight: 270; }
+.kinetic-glyph[data-kinetic-level="272"] { --glyph-weight: 272; }
+.kinetic-glyph[data-kinetic-level="274"] { --glyph-weight: 274; }
+.kinetic-glyph[data-kinetic-level="276"] { --glyph-weight: 276; }
+.kinetic-glyph[data-kinetic-level="278"] { --glyph-weight: 278; }
 .kinetic-glyph[data-kinetic-level="280"] { --glyph-weight: 280; }
+.kinetic-glyph[data-kinetic-level="282"] { --glyph-weight: 282; }
+.kinetic-glyph[data-kinetic-level="284"] { --glyph-weight: 284; }
+.kinetic-glyph[data-kinetic-level="286"] { --glyph-weight: 286; }
+.kinetic-glyph[data-kinetic-level="288"] { --glyph-weight: 288; }
 .kinetic-glyph[data-kinetic-level="290"] { --glyph-weight: 290; }
+.kinetic-glyph[data-kinetic-level="292"] { --glyph-weight: 292; }
+.kinetic-glyph[data-kinetic-level="294"] { --glyph-weight: 294; }
+.kinetic-glyph[data-kinetic-level="296"] { --glyph-weight: 296; }
+.kinetic-glyph[data-kinetic-level="298"] { --glyph-weight: 298; }
 .kinetic-glyph[data-kinetic-level="300"] { --glyph-weight: 300; }
+.kinetic-glyph[data-kinetic-level="302"] { --glyph-weight: 302; }
+.kinetic-glyph[data-kinetic-level="304"] { --glyph-weight: 304; }
+.kinetic-glyph[data-kinetic-level="306"] { --glyph-weight: 306; }
+.kinetic-glyph[data-kinetic-level="308"] { --glyph-weight: 308; }
 .kinetic-glyph[data-kinetic-level="310"] { --glyph-weight: 310; }
+.kinetic-glyph[data-kinetic-level="312"] { --glyph-weight: 312; }
+.kinetic-glyph[data-kinetic-level="314"] { --glyph-weight: 314; }
+.kinetic-glyph[data-kinetic-level="316"] { --glyph-weight: 316; }
+.kinetic-glyph[data-kinetic-level="318"] { --glyph-weight: 318; }
 .kinetic-glyph[data-kinetic-level="320"] { --glyph-weight: 320; }
+.kinetic-glyph[data-kinetic-level="322"] { --glyph-weight: 322; }
+.kinetic-glyph[data-kinetic-level="324"] { --glyph-weight: 324; }
+.kinetic-glyph[data-kinetic-level="326"] { --glyph-weight: 326; }
+.kinetic-glyph[data-kinetic-level="328"] { --glyph-weight: 328; }
 .kinetic-glyph[data-kinetic-level="330"] { --glyph-weight: 330; }
+.kinetic-glyph[data-kinetic-level="332"] { --glyph-weight: 332; }
+.kinetic-glyph[data-kinetic-level="334"] { --glyph-weight: 334; }
+.kinetic-glyph[data-kinetic-level="336"] { --glyph-weight: 336; }
+.kinetic-glyph[data-kinetic-level="338"] { --glyph-weight: 338; }
 .kinetic-glyph[data-kinetic-level="340"] { --glyph-weight: 340; }
+.kinetic-glyph[data-kinetic-level="342"] { --glyph-weight: 342; }
+.kinetic-glyph[data-kinetic-level="344"] { --glyph-weight: 344; }
+.kinetic-glyph[data-kinetic-level="346"] { --glyph-weight: 346; }
+.kinetic-glyph[data-kinetic-level="348"] { --glyph-weight: 348; }
 .kinetic-glyph[data-kinetic-level="350"] { --glyph-weight: 350; }
+.kinetic-glyph[data-kinetic-level="352"] { --glyph-weight: 352; }
+.kinetic-glyph[data-kinetic-level="354"] { --glyph-weight: 354; }
+.kinetic-glyph[data-kinetic-level="356"] { --glyph-weight: 356; }
+.kinetic-glyph[data-kinetic-level="358"] { --glyph-weight: 358; }
 .kinetic-glyph[data-kinetic-level="360"] { --glyph-weight: 360; }
+.kinetic-glyph[data-kinetic-level="362"] { --glyph-weight: 362; }
+.kinetic-glyph[data-kinetic-level="364"] { --glyph-weight: 364; }
+.kinetic-glyph[data-kinetic-level="366"] { --glyph-weight: 366; }
+.kinetic-glyph[data-kinetic-level="368"] { --glyph-weight: 368; }
 .kinetic-glyph[data-kinetic-level="370"] { --glyph-weight: 370; }
+.kinetic-glyph[data-kinetic-level="372"] { --glyph-weight: 372; }
+.kinetic-glyph[data-kinetic-level="374"] { --glyph-weight: 374; }
+.kinetic-glyph[data-kinetic-level="376"] { --glyph-weight: 376; }
+.kinetic-glyph[data-kinetic-level="378"] { --glyph-weight: 378; }
 .kinetic-glyph[data-kinetic-level="380"] { --glyph-weight: 380; }
+.kinetic-glyph[data-kinetic-level="382"] { --glyph-weight: 382; }
+.kinetic-glyph[data-kinetic-level="384"] { --glyph-weight: 384; }
+.kinetic-glyph[data-kinetic-level="386"] { --glyph-weight: 386; }
+.kinetic-glyph[data-kinetic-level="388"] { --glyph-weight: 388; }
 .kinetic-glyph[data-kinetic-level="390"] { --glyph-weight: 390; }
+.kinetic-glyph[data-kinetic-level="392"] { --glyph-weight: 392; }
+.kinetic-glyph[data-kinetic-level="394"] { --glyph-weight: 394; }
+.kinetic-glyph[data-kinetic-level="396"] { --glyph-weight: 396; }
+.kinetic-glyph[data-kinetic-level="398"] { --glyph-weight: 398; }
 .kinetic-glyph[data-kinetic-level="400"] { --glyph-weight: 400; }
+.kinetic-glyph[data-kinetic-level="402"] { --glyph-weight: 402; }
+.kinetic-glyph[data-kinetic-level="404"] { --glyph-weight: 404; }
+.kinetic-glyph[data-kinetic-level="406"] { --glyph-weight: 406; }
+.kinetic-glyph[data-kinetic-level="408"] { --glyph-weight: 408; }
 .kinetic-glyph[data-kinetic-level="410"] { --glyph-weight: 410; }
+.kinetic-glyph[data-kinetic-level="412"] { --glyph-weight: 412; }
+.kinetic-glyph[data-kinetic-level="414"] { --glyph-weight: 414; }
+.kinetic-glyph[data-kinetic-level="416"] { --glyph-weight: 416; }
+.kinetic-glyph[data-kinetic-level="418"] { --glyph-weight: 418; }
 .kinetic-glyph[data-kinetic-level="420"] { --glyph-weight: 420; }
+.kinetic-glyph[data-kinetic-level="422"] { --glyph-weight: 422; }
+.kinetic-glyph[data-kinetic-level="424"] { --glyph-weight: 424; }
+.kinetic-glyph[data-kinetic-level="426"] { --glyph-weight: 426; }
+.kinetic-glyph[data-kinetic-level="428"] { --glyph-weight: 428; }
 .kinetic-glyph[data-kinetic-level="430"] { --glyph-weight: 430; }
+.kinetic-glyph[data-kinetic-level="432"] { --glyph-weight: 432; }
+.kinetic-glyph[data-kinetic-level="434"] { --glyph-weight: 434; }
+.kinetic-glyph[data-kinetic-level="436"] { --glyph-weight: 436; }
+.kinetic-glyph[data-kinetic-level="438"] { --glyph-weight: 438; }
 .kinetic-glyph[data-kinetic-level="440"] { --glyph-weight: 440; }
+.kinetic-glyph[data-kinetic-level="442"] { --glyph-weight: 442; }
+.kinetic-glyph[data-kinetic-level="444"] { --glyph-weight: 444; }
+.kinetic-glyph[data-kinetic-level="446"] { --glyph-weight: 446; }
+.kinetic-glyph[data-kinetic-level="448"] { --glyph-weight: 448; }
 .kinetic-glyph[data-kinetic-level="450"] { --glyph-weight: 450; }
+.kinetic-glyph[data-kinetic-level="452"] { --glyph-weight: 452; }
+.kinetic-glyph[data-kinetic-level="454"] { --glyph-weight: 454; }
+.kinetic-glyph[data-kinetic-level="456"] { --glyph-weight: 456; }
+.kinetic-glyph[data-kinetic-level="458"] { --glyph-weight: 458; }
 .kinetic-glyph[data-kinetic-level="460"] { --glyph-weight: 460; }
+.kinetic-glyph[data-kinetic-level="462"] { --glyph-weight: 462; }
+.kinetic-glyph[data-kinetic-level="464"] { --glyph-weight: 464; }
+.kinetic-glyph[data-kinetic-level="466"] { --glyph-weight: 466; }
+.kinetic-glyph[data-kinetic-level="468"] { --glyph-weight: 468; }
 .kinetic-glyph[data-kinetic-level="470"] { --glyph-weight: 470; }
+.kinetic-glyph[data-kinetic-level="472"] { --glyph-weight: 472; }
+.kinetic-glyph[data-kinetic-level="474"] { --glyph-weight: 474; }
+.kinetic-glyph[data-kinetic-level="476"] { --glyph-weight: 476; }
+.kinetic-glyph[data-kinetic-level="478"] { --glyph-weight: 478; }
 .kinetic-glyph[data-kinetic-level="480"] { --glyph-weight: 480; }
+.kinetic-glyph[data-kinetic-level="482"] { --glyph-weight: 482; }
+.kinetic-glyph[data-kinetic-level="484"] { --glyph-weight: 484; }
+.kinetic-glyph[data-kinetic-level="486"] { --glyph-weight: 486; }
+.kinetic-glyph[data-kinetic-level="488"] { --glyph-weight: 488; }
 .kinetic-glyph[data-kinetic-level="490"] { --glyph-weight: 490; }
+.kinetic-glyph[data-kinetic-level="492"] { --glyph-weight: 492; }
+.kinetic-glyph[data-kinetic-level="494"] { --glyph-weight: 494; }
+.kinetic-glyph[data-kinetic-level="496"] { --glyph-weight: 496; }
+.kinetic-glyph[data-kinetic-level="498"] { --glyph-weight: 498; }
 .kinetic-glyph[data-kinetic-level="500"] { --glyph-weight: 500; }
+.kinetic-glyph[data-kinetic-level="502"] { --glyph-weight: 502; }
+.kinetic-glyph[data-kinetic-level="504"] { --glyph-weight: 504; }
+.kinetic-glyph[data-kinetic-level="506"] { --glyph-weight: 506; }
+.kinetic-glyph[data-kinetic-level="508"] { --glyph-weight: 508; }
 .kinetic-glyph[data-kinetic-level="510"] { --glyph-weight: 510; }
+.kinetic-glyph[data-kinetic-level="512"] { --glyph-weight: 512; }
+.kinetic-glyph[data-kinetic-level="514"] { --glyph-weight: 514; }
+.kinetic-glyph[data-kinetic-level="516"] { --glyph-weight: 516; }
+.kinetic-glyph[data-kinetic-level="518"] { --glyph-weight: 518; }
 .kinetic-glyph[data-kinetic-level="520"] { --glyph-weight: 520; }
+.kinetic-glyph[data-kinetic-level="522"] { --glyph-weight: 522; }
+.kinetic-glyph[data-kinetic-level="524"] { --glyph-weight: 524; }
+.kinetic-glyph[data-kinetic-level="526"] { --glyph-weight: 526; }
+.kinetic-glyph[data-kinetic-level="528"] { --glyph-weight: 528; }
 .kinetic-glyph[data-kinetic-level="530"] { --glyph-weight: 530; }
+.kinetic-glyph[data-kinetic-level="532"] { --glyph-weight: 532; }
+.kinetic-glyph[data-kinetic-level="534"] { --glyph-weight: 534; }
+.kinetic-glyph[data-kinetic-level="536"] { --glyph-weight: 536; }
+.kinetic-glyph[data-kinetic-level="538"] { --glyph-weight: 538; }
 .kinetic-glyph[data-kinetic-level="540"] { --glyph-weight: 540; }
+.kinetic-glyph[data-kinetic-level="542"] { --glyph-weight: 542; }
+.kinetic-glyph[data-kinetic-level="544"] { --glyph-weight: 544; }
+.kinetic-glyph[data-kinetic-level="546"] { --glyph-weight: 546; }
+.kinetic-glyph[data-kinetic-level="548"] { --glyph-weight: 548; }
 .kinetic-glyph[data-kinetic-level="550"] { --glyph-weight: 550; }
+.kinetic-glyph[data-kinetic-level="552"] { --glyph-weight: 552; }
+.kinetic-glyph[data-kinetic-level="554"] { --glyph-weight: 554; }
+.kinetic-glyph[data-kinetic-level="556"] { --glyph-weight: 556; }
+.kinetic-glyph[data-kinetic-level="558"] { --glyph-weight: 558; }
 .kinetic-glyph[data-kinetic-level="560"] { --glyph-weight: 560; }
+.kinetic-glyph[data-kinetic-level="562"] { --glyph-weight: 562; }
+.kinetic-glyph[data-kinetic-level="564"] { --glyph-weight: 564; }
+.kinetic-glyph[data-kinetic-level="566"] { --glyph-weight: 566; }
+.kinetic-glyph[data-kinetic-level="568"] { --glyph-weight: 568; }
 .kinetic-glyph[data-kinetic-level="570"] { --glyph-weight: 570; }
+.kinetic-glyph[data-kinetic-level="572"] { --glyph-weight: 572; }
+.kinetic-glyph[data-kinetic-level="574"] { --glyph-weight: 574; }
+.kinetic-glyph[data-kinetic-level="576"] { --glyph-weight: 576; }
+.kinetic-glyph[data-kinetic-level="578"] { --glyph-weight: 578; }
 .kinetic-glyph[data-kinetic-level="580"] { --glyph-weight: 580; }
+.kinetic-glyph[data-kinetic-level="582"] { --glyph-weight: 582; }
+.kinetic-glyph[data-kinetic-level="584"] { --glyph-weight: 584; }
+.kinetic-glyph[data-kinetic-level="586"] { --glyph-weight: 586; }
+.kinetic-glyph[data-kinetic-level="588"] { --glyph-weight: 588; }
 .kinetic-glyph[data-kinetic-level="590"] { --glyph-weight: 590; }
+.kinetic-glyph[data-kinetic-level="592"] { --glyph-weight: 592; }
+.kinetic-glyph[data-kinetic-level="594"] { --glyph-weight: 594; }
+.kinetic-glyph[data-kinetic-level="596"] { --glyph-weight: 596; }
+.kinetic-glyph[data-kinetic-level="598"] { --glyph-weight: 598; }
 .kinetic-glyph[data-kinetic-level="600"] { --glyph-weight: 600; }
+.kinetic-glyph[data-kinetic-level="602"] { --glyph-weight: 602; }
+.kinetic-glyph[data-kinetic-level="604"] { --glyph-weight: 604; }
+.kinetic-glyph[data-kinetic-level="606"] { --glyph-weight: 606; }
+.kinetic-glyph[data-kinetic-level="608"] { --glyph-weight: 608; }
 .kinetic-glyph[data-kinetic-level="610"] { --glyph-weight: 610; }
+.kinetic-glyph[data-kinetic-level="612"] { --glyph-weight: 612; }
+.kinetic-glyph[data-kinetic-level="614"] { --glyph-weight: 614; }
+.kinetic-glyph[data-kinetic-level="616"] { --glyph-weight: 616; }
+.kinetic-glyph[data-kinetic-level="618"] { --glyph-weight: 618; }
 .kinetic-glyph[data-kinetic-level="620"] { --glyph-weight: 620; }
 .kinetic-type.is-kinetic-active .kinetic-glyph { will-change: font-variation-settings; }
 .orientation-link strong.kinetic-type { cursor: pointer; }
@@ -617,7 +762,7 @@ main p a:not(.button):focus-visible,
 .home-graph-section .exploration-item.home-atlas-node { display: grid; width: max-content; max-width: 10.5rem; height: auto; aspect-ratio: auto; justify-items: center; gap: .25rem; padding: .3rem .45rem; border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; color: var(--ink); text-align: center; transform: translate(-50%, -50%); transition: color 1.45s var(--atlas-fluid), transform 1.6s var(--atlas-fluid), opacity 1.6s var(--atlas-fluid); }
 .home-graph-section .home-atlas-node::before { display: none; }
 .home-graph-section .home-atlas-node span { color: var(--muted); font-size: .53rem; letter-spacing: .09em; line-height: 1.1; text-transform: uppercase; transition: color 1.45s var(--atlas-fluid); }
-.home-graph-section .home-atlas-node strong { max-width: 100%; font-size: clamp(1rem, 1.5vw, 1.4rem); font-weight: 430; letter-spacing: -.035em; line-height: .92; white-space: nowrap; transition: font-size 1.45s var(--atlas-fluid), font-weight 1.45s var(--atlas-fluid); }
+.home-graph-section .home-atlas-node strong { max-width: 100%; font-size: clamp(1rem, 1.5vw, 1.4rem); font-weight: 430; letter-spacing: -.035em; line-height: .92; white-space: nowrap; }
 .home-graph-section .home-atlas-node.exploration-item--1 { left: 50%; top: 49%; }
 .home-graph-section .home-atlas-node.exploration-item--2 { left: 27%; top: 20%; }
 .home-graph-section .home-atlas-node.exploration-item--3 { left: 76%; top: 18%; }
@@ -631,8 +776,6 @@ main p a:not(.button):focus-visible,
 .home-graph-section .home-atlas-node.exploration-item--11 { left: 87%; top: 82%; }
 .home-graph-section .home-atlas-node.exploration-item--12 { left: 54%; top: 67%; }
 .home-graph-section .home-atlas-node.is-related, .home-graph-section .home-atlas-node.is-selected { z-index: 3; border: 0; background: transparent; color: var(--accent); transform: translate(-50%, -50%); }
-.home-graph-section .home-atlas-node.is-related strong { font-weight: 450; }
-.home-graph-section .home-atlas-node.is-selected strong { font-size: clamp(1.05rem, 1.56vw, 1.47rem); font-weight: 470; }
 .home-graph-section .home-atlas-node:hover { border: 0; background: transparent; color: var(--accent); transform: translate(-50%, -50%); }
 .home-graph-section .home-atlas-node:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .home-graph-section[data-selected] .home-atlas-node:not(.is-related):not(.is-selected) { opacity: .92; }
@@ -740,8 +883,8 @@ main p a:not(.button):focus-visible,
 .orientation-links { border-top: 1px solid var(--line); }
 .orientation-link { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding: 1.25rem 0; border-bottom: 1px solid var(--line); text-decoration: none; }
 .orientation-link:hover strong,
-.orientation-link:focus-visible strong { color: var(--accent); font-variation-settings: "wght" 420; }
-.orientation-link strong { font-family: var(--serif); font-size: 1.7rem; font-weight: 370; transition: color .7s var(--ease), font-variation-settings .78s var(--type-ease); }
+.orientation-link:focus-visible strong { color: var(--accent); }
+.orientation-link strong { font-family: var(--serif); font-size: 1.7rem; font-weight: 370; transition: color .7s var(--ease); }
 .orientation-link span { color: var(--muted); }
 
 /* Encyclopedia: navigation modes and composable mosaic concept */
@@ -1101,8 +1244,8 @@ main p a:not(.button):focus-visible,
 .object-graph-map { position: relative; min-height: 35rem; border-right: 1px solid var(--object-line); overflow: hidden; }
 .object-graph-map svg { position: absolute; inset: 7%; width: 86%; height: 86%; overflow: visible; }
 .object-graph-map path { fill: none; stroke: var(--object-line); stroke-width: .35; vector-effect: non-scaling-stroke; }
-.object-graph-node { position: absolute; z-index: 2; display: grid; place-items: center; width: 5.5rem; min-height: 5.5rem; border: 1px solid var(--ink); border-radius: 50%; padding: .55rem; background: var(--object-panel); color: var(--ink); font-size: .68rem; font-weight: 400; font-variation-settings: "wght" 400; line-height: 1.1; text-align: center; cursor: pointer; transition: box-shadow .65s var(--ease), font-variation-settings .78s var(--type-ease); }
-.object-graph-node:hover, .object-graph-node:focus-visible { box-shadow: inset 0 0 0 1px currentColor; font-weight: 450; font-variation-settings: "wght" 450; }
+.object-graph-node { position: absolute; z-index: 2; display: grid; place-items: center; width: 5.5rem; min-height: 5.5rem; border: 1px solid var(--ink); border-radius: 50%; padding: .55rem; background: var(--object-panel); color: var(--ink); font-size: .68rem; font-weight: 400; font-variation-settings: "wght" 400; line-height: 1.1; text-align: center; cursor: pointer; transition: box-shadow .65s var(--ease); }
+.object-graph-node:hover, .object-graph-node:focus-visible { box-shadow: inset 0 0 0 1px currentColor; }
 .object-graph-node[aria-pressed="true"] { background: var(--ink); color: var(--inverse); }
 .object-graph-node.node-main { left: 50%; top: 50%; width: 7.5rem; min-height: 7.5rem; transform: translate(-50%,-50%); font-family: var(--serif); font-size: 1.2rem; }
 .node-north { left: 4%; top: 5%; }.node-artist { right: 4%; top: 5%; }.node-material { left: 3%; bottom: 8%; }.node-capture { right: 3%; bottom: 8%; }.node-forge { left: 50%; top: 1%; transform: translateX(-50%); }.node-model { left: 50%; bottom: 2%; transform: translateX(-50%); }
@@ -1121,9 +1264,8 @@ main p a:not(.button):focus-visible,
 .archive-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
 .archive-grid a { display: flex; min-height: 19rem; flex-direction: column; padding: clamp(1.25rem, 2.5vw, 2.5rem); border-right: 1px solid var(--object-line); color: inherit; text-decoration: none; }
 .archive-grid a:last-child { border-right: 0; }
-.archive-grid a:hover strong { font-variation-settings: "wght" 420; }
 .archive-grid span, .archive-grid small { color: var(--muted); font-size: .68rem; }
-.archive-grid strong { max-width: 14ch; margin: auto 0 1.5rem; font-family: var(--serif); font-size: clamp(2rem, 3.2vw, 3.8rem); font-weight: 360; line-height: .9; transition: font-variation-settings .78s var(--type-ease); }
+.archive-grid strong { max-width: 14ch; margin: auto 0 1.5rem; font-family: var(--serif); font-size: clamp(2rem, 3.2vw, 3.8rem); font-weight: 360; line-height: .9; }
 .object-invitation { grid-column: 1 / -1; padding: clamp(3rem, 7vw, 7rem); background: var(--object-model); }
 .object-invitation h2 { max-width: 13ch; font-size: clamp(4rem, 8vw, 9rem); }
 .object-invitation > p:not(.meta) { max-width: 42rem; margin: 2rem 0; font-size: 1.1rem; }
