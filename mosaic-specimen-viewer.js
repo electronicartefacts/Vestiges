@@ -6,15 +6,17 @@ export function mountSpecimenVolume(stage) {
   if (!stage || stage.dataset.viewerReady === "true" || stage.dataset.viewerLoading === "true") return;
   const source = stage.dataset.modelSrc;
   const message = stage.querySelector(".specimen-3d-loading");
+  const loadButton = stage.querySelector("[data-load-specimen]");
   if (!source) throw new Error("Fichier GLB absent");
 
   let visible = false;
-  let started = false;
   let frame = 0;
   let renderer;
   let camera;
   let scene;
   let controls;
+  let resizeObserver;
+  let visibilityObserver;
   stage.dataset.viewerLoading = "true";
 
   const showStatus = (text, failed = false) => {
@@ -48,16 +50,48 @@ export function mountSpecimenVolume(stage) {
   };
   const start = () => {
     visible = true;
-    if (!started) loadModel();
     if (!frame && stage.dataset.viewerReady === "true") render();
+  };
+  const handleVisibilityChange = () => {
+    if (document.hidden) { stop(); return; }
+    const bounds = stage.getBoundingClientRect();
+    if (bounds.bottom > -180 && bounds.top < window.innerHeight + 180) start();
+  };
+  const resetFailedAttempt = () => {
+    stop();
+    resizeObserver?.disconnect();
+    visibilityObserver?.disconnect();
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    controls?.dispose();
+    if (renderer) {
+      renderer.domElement.remove();
+      renderer.dispose();
+    }
+    controls = null;
+    renderer = null;
+    camera = null;
+    scene = null;
+    stage.dataset.viewerReady = "false";
+    stage.dataset.viewerLoading = "false";
+    stage.dataset.mounted = "false";
+  };
+  const showRetry = (buttonText, status) => {
+    resetFailedAttempt();
+    if (loadButton) {
+      loadButton.disabled = false;
+      loadButton.textContent = buttonText;
+    }
+    showStatus(status, true);
   };
 
   const loadModel = () => {
-    started = true;
+    if (loadButton) {
+      loadButton.disabled = true;
+      loadButton.textContent = "Chargement du modèle 3D…";
+    }
     showStatus("Chargement du modèle 3D…");
     if (!window.WebGLRenderingContext) {
-      stage.dataset.viewerLoading = "false";
-      showStatus("La vue 3D n’est pas disponible dans ce navigateur.", true);
+      showRetry("Réessayer la vue 3D · ≈ 71 Mo", "La vue 3D n’est pas disponible dans ce navigateur.");
       return;
     }
 
@@ -109,32 +143,28 @@ export function mountSpecimenVolume(stage) {
         stage.dataset.viewerReady = "true";
         stage.dataset.viewerLoading = "false";
         if (message) message.hidden = true;
+        if (loadButton) loadButton.hidden = true;
         stage.classList.remove("is-viewer-fallback");
         if (visible) render();
       }, (event) => {
         if (event.total) showStatus(`Chargement du modèle · ${Math.min(99, Math.round(event.loaded / event.total * 100))} %`);
       }, () => {
-        stage.dataset.viewerLoading = "false";
-        showStatus("Le modèle 3D n’a pas pu être chargé.", true);
+        showRetry("Réessayer le chargement · ≈ 71 Mo", "Le modèle 3D n’a pas pu être chargé.");
       });
     } catch (_error) {
-      stage.dataset.viewerLoading = "false";
-      showStatus("La vue 3D n’est pas disponible dans ce navigateur.", true);
+      showRetry("Réessayer la vue 3D · ≈ 71 Mo", "La vue 3D n’est pas disponible dans ce navigateur.");
     }
   };
 
-  const resizeObserver = new ResizeObserver(resize);
+  resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(stage);
   if ("IntersectionObserver" in window) {
-    const visibilityObserver = new IntersectionObserver(([entry]) => {
+    visibilityObserver = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) start();
       else stop();
     }, { rootMargin: "180px 0px", threshold: 0.01 });
     visibilityObserver.observe(stage);
   } else start();
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) { stop(); return; }
-    const bounds = stage.getBoundingClientRect();
-    if (bounds.bottom > -180 && bounds.top < window.innerHeight + 180) start();
-  });
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  loadModel();
 }

@@ -36,7 +36,7 @@
     const guided = window.location.pathname === "/participer/" && (
       ["direct", "joey", "recommendation", "scouting", "programme"].includes(source)
       || /^[a-z0-9_-]{1,48}$/i.test(invitation)
-      || ["artistes", "transmission", "institutions", "organisations"].includes(route)
+      || ["artistes", "transmission", "institutions", "organisations", "acheteurs"].includes(route)
     );
     emitJourneySignal("page_ready", {
       context: guided ? "guided" : "standard"
@@ -313,17 +313,17 @@
         if (state.tapStarted) {
           const progress = Math.min(1, (time - state.tapStarted) / 920);
           center = state.tapIndex;
-          amplitude = Math.sin(progress * Math.PI) * 68;
+          amplitude = Math.sin(progress * Math.PI) * 44;
           radius = 5 + progress * 3;
           keepAlive = progress < 1;
           if (!keepAlive) state.tapStarted = 0;
         } else if (state.hovered) {
           center = state.pointerIndex;
-          amplitude = 76 * state.pointerStrength;
+          amplitude = 48 * state.pointerStrength;
         } else if (state.revealStarted) {
           const progress = Math.min(1, (time - state.revealStarted) / 1250);
           center = -4 + progress * (length + 8);
-          amplitude = Math.sin(progress * Math.PI) * 48;
+          amplitude = Math.sin(progress * Math.PI) * 32;
           keepAlive = progress < 1;
           if (!keepAlive) state.revealStarted = 0;
         }
@@ -341,11 +341,13 @@
         });
 
         if (!keepAlive && !unsettled) {
-          state.glyphs.forEach((glyph, index) => {
-            state.weights[index] = state.base;
-            const level = String(Math.max(250, Math.min(620, Math.round(state.base / 10) * 10)));
-            if (glyph.dataset.kineticLevel !== level) glyph.dataset.kineticLevel = level;
-          });
+          if (!state.hovered) {
+            state.glyphs.forEach((glyph, index) => {
+              state.weights[index] = state.base;
+              const level = String(Math.max(250, Math.min(620, Math.round(state.base / 10) * 10)));
+              if (glyph.dataset.kineticLevel !== level) glyph.dataset.kineticLevel = level;
+            });
+          }
           activeStates.delete(state);
           state.element.classList.remove("is-kinetic-active");
         }
@@ -472,7 +474,7 @@
         button.dataset.explorationId = item.id;
         button.dataset.connectionDegree = String(degree);
         button.setAttribute("aria-pressed", String(index === 0));
-        button.setAttribute("aria-label", `${item.title} — ${degree} relations dans ce graphe`);
+        button.setAttribute("aria-description", `${degree} éléments associés. Appuyez sur Entrée pour les afficher.`);
         button.innerHTML = `<span>${item.type}</span><strong>${item.title}</strong>`;
         button.addEventListener("pointerenter", () => select(item.id, false));
         button.addEventListener("focus", () => select(item.id, false));
@@ -505,10 +507,10 @@
         const item = byId.get(id);
         if (!item) return;
         if (pinned) selectedId = id;
-        type.textContent = `${item.type} · fragment de démonstration`;
+        type.textContent = `${item.type} · exemple`;
         name.textContent = item.title;
         description.textContent = item.shortDescription;
-        relation.textContent = `${item.relatedIds.length} relations suggérées`;
+        relation.textContent = `${item.relatedIds.length} élément${item.relatedIds.length === 1 ? "" : "s"} associé${item.relatedIds.length === 1 ? "" : "s"} dans cet exemple`;
         root.dataset.selected = item.id;
         window.dispatchEvent(new CustomEvent("vestiges:subject-change", { detail: { id: item.id } }));
         buttons.forEach((button, buttonId) => {
@@ -563,8 +565,9 @@
     const relationSummary = (item) => {
       const visible = visibleRelatedIds(item).length;
       const outside = item.relatedIds.length - visible;
-      const label = `${visible} lien${visible > 1 ? "s" : ""} représenté${visible > 1 ? "s" : ""} ici`;
-      return outside ? `${label} · ${outside} référence${outside > 1 ? "s" : ""} hors champ` : label;
+      const plural = visible !== 1;
+      const label = `${visible} élément${plural ? "s" : ""} associé${plural ? "s" : ""} dans cet exemple`;
+      return outside ? `${label} · d’autres liens ne sont pas affichés` : label;
     };
 
     items.forEach((item) => {
@@ -583,7 +586,7 @@
       button.className = className;
       button.dataset.explorationId = item.id;
       button.setAttribute("aria-pressed", "false");
-      button.setAttribute("aria-label", `${item.title}, ${item.type.toLocaleLowerCase("fr")}. ${relationSummary(item)}. Activez pour fixer la sélection.`);
+      button.setAttribute("aria-description", `${relationSummary(item)}. Appuyez sur Entrée pour garder cet élément sélectionné.`);
       if (typeof index === "number") button.classList.add(`exploration-item--${index + 1}`);
 
       const itemType = document.createElement("span");
@@ -660,7 +663,7 @@
     }
 
     function updateDetails(item) {
-      if (type) type.textContent = `Fragment de démonstration · ${item.type}`;
+      if (type) type.textContent = `Exemple · ${item.type}`;
       if (name) name.textContent = item.title;
       if (description) description.textContent = item.shortDescription;
       if (relation) relation.textContent = relationSummary(item);
@@ -673,7 +676,7 @@
         button.type = "button";
         button.className = "home-graph-related__button";
         button.dataset.explorationId = related.id;
-        button.setAttribute("aria-label", `Afficher ${related.title}, ${related.type.toLocaleLowerCase("fr")}`);
+        button.setAttribute("aria-description", "Afficher cet élément sur la carte.");
         const title = document.createElement("span");
         title.textContent = related.title;
         const kind = document.createElement("small");
@@ -782,13 +785,26 @@
       if (name === "graph") requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
       if (name === "mosaic") {
         const stage = mosaic?.querySelector("[data-specimen-3d]");
-        if (stage && stage.dataset.mounted !== "true") {
-          stage.dataset.mounted = "true";
-          const message = stage.querySelector(".specimen-3d-loading");
-          specimenViewerModule ||= import("/mosaic-specimen-viewer.20260923b.js");
-          specimenViewerModule.then(({ mountSpecimenVolume }) => mountSpecimenVolume(stage)).catch(() => {
-            if (message) message.textContent = "Vue interactive indisponible ; l’image du spécimen reste affichée.";
-            stage.classList.add("is-viewer-fallback");
+        const loadButton = stage?.querySelector("[data-load-specimen]");
+        if (stage && loadButton && loadButton.dataset.viewerButtonBound !== "true") {
+          loadButton.dataset.viewerButtonBound = "true";
+          loadButton.addEventListener("click", async () => {
+            if (stage.dataset.mounted === "true") return;
+            stage.dataset.mounted = "true";
+            loadButton.disabled = true;
+            loadButton.textContent = "Préparation du modèle 3D…";
+            const message = stage.querySelector(".specimen-3d-loading");
+            try {
+              specimenViewerModule ||= import("/mosaic-specimen-viewer.20261011a.js");
+              const { mountSpecimenVolume } = await specimenViewerModule;
+              mountSpecimenVolume(stage);
+            } catch (_error) {
+              stage.dataset.mounted = "false";
+              loadButton.disabled = false;
+              loadButton.textContent = "Réessayer l’affichage 3D";
+              if (message) message.textContent = "Vue interactive indisponible ; le dossier reste lisible.";
+              stage.classList.add("is-viewer-fallback");
+            }
           });
         }
       }
@@ -814,12 +830,12 @@
       workspace.querySelectorAll("[data-widget-active-title]").forEach((element) => { element.textContent = item.title; });
       workspace.querySelectorAll("[data-context-subject]").forEach((element) => { element.textContent = item.title; });
       const mosaicRelation = item.relatedIds.map((relatedId) => byId.get(relatedId)).find(Boolean);
-      workspace.querySelectorAll("[data-widget-related-title]").forEach((element) => { element.textContent = mosaicRelation?.title || "Relation à documenter"; });
-      workspace.querySelectorAll("[data-widget-related-description]").forEach((element) => { element.textContent = mosaicRelation?.shortDescription || "Les liens associés seront documentés."; });
+      workspace.querySelectorAll("[data-widget-related-title]").forEach((element) => { element.textContent = mosaicRelation?.title || "Autre information"; });
+      workspace.querySelectorAll("[data-widget-related-description]").forEach((element) => { element.textContent = mosaicRelation?.shortDescription || "D’autres informations seront ajoutées plus tard."; });
       workspace.querySelectorAll("[data-mosaic-related]").forEach((element) => {
         if (!mosaicRelation) return;
         element.dataset.subjectLink = mosaicRelation.id;
-        element.textContent = `Suivre la relation : ${mosaicRelation.title} ↗`;
+        element.textContent = `Voir aussi : ${mosaicRelation.title} ↗`;
       });
 
       const relationContainer = workspace.querySelector("[data-related-links]");
@@ -913,7 +929,7 @@
       const resizeEdges = ["n", "e", "s", "w", "ne", "nw", "se", "sw"];
       mosaic.querySelectorAll("[data-widget]").forEach((widget, index) => {
         widget.tabIndex = 0;
-        widget.setAttribute("aria-roledescription", "fenêtre de mosaïque déplaçable");
+        widget.setAttribute("aria-roledescription", "bloc déplaçable");
         widget.setAttribute("aria-label", `${widget.querySelector(".widget-top span")?.textContent || `Fenêtre ${index + 1}`} — maintenir une zone non interactive pour déplacer`);
         resizeEdges.forEach((edge) => {
           const handle = document.createElement("span");
@@ -1119,13 +1135,13 @@
     const description = graph.querySelector("[data-graph-description]");
     const status = graph.querySelector("[data-graph-status]");
     const records = {
-      oeuvre: ["Bois flotté 01", "Le point de départ relie une matière, une provenance déclarée, des inconnues et une chaîne de production numérique.", "Objet documenté"],
-      norvege: ["Norvège", "Le pays de découverte est déclaré. Le littoral, les coordonnées et la date de collecte restent à documenter.", "Provenance déclarée"],
-      artiste: ["Artiste inconnu", "Aucune attribution artistique n’accompagne le fragment. Cette absence est conservée comme une donnée, pas comblée par une hypothèse.", "Information inconnue"],
-      capture: ["Capture vidéo", "Une séquence orbitale autour du bois fournit les points de vue nécessaires à la reconstruction.", "Source attribuée"],
+      oeuvre: ["Bois flotté 01", "Cet exemple montre un fragment de bois. Son origine et son histoire ne sont pas établies.", "Objet d’exemple"],
+      norvege: ["Norvège", "Les informations disponibles indiquent la Norvège ; le lieu précis et la date restent inconnus.", "Information déclarée"],
+      artiste: ["Auteur non identifié", "Aucune personne n’a été identifiée pour cet objet.", "Information inconnue"],
+      capture: ["Vidéo", "La vidéo montre l’objet sous plusieurs angles et a servi à créer le modèle 3D.", "Source de la démonstration"],
       matiere: ["Bois", "La matière est observée directement. L’essence, l’âge et le lieu de croissance ne sont pas encore identifiés.", "Observation directe"],
-      forge: ["FORGE", "La technologie d’Electronic Artefacts convertit la vidéo en maillage 3D texturé tout en conservant la provenance numérique.", "Traitement attribué"],
-      modele: ["GLB · texture 8K", "Le double numérique associe 404 304 faces à un atlas de texture 8192 × 8192 pixels.", "Production vérifiée"]
+      forge: ["Reconstruction 3D", "La vidéo a été utilisée pour créer une représentation numérique de l’objet.", "Étape de démonstration"],
+      modele: ["Modèle 3D", "Une représentation numérique du fragment. Ses dimensions et son origine restent incertaines.", "Démonstration"]
     };
     nodes.forEach((node) => {
       node.addEventListener("click", () => {
@@ -1165,16 +1181,6 @@
       };
       button.addEventListener("click", load);
 
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      const constrained = connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || "");
-      if (!constrained && "IntersectionObserver" in window) {
-        const observer = new IntersectionObserver(([entry]) => {
-          if (!entry.isIntersecting) return;
-          observer.disconnect();
-          load();
-        }, { rootMargin: "240px 0px", threshold: 0.01 });
-        observer.observe(viewer);
-      }
     });
   }
 
@@ -1200,13 +1206,13 @@
 
     const parameters = new URLSearchParams(window.location.search);
     const routeBySlug = {
-      artistes: "Artistes et ateliers",
-      artisans: "Artistes et ateliers",
+      artistes: "Artisan·es et ateliers",
+      artisans: "Artisan·es et ateliers",
       transmission: "Recherche et transmission",
-      institutions: "Institutions et territoires",
-      organisations: "Institutions et territoires",
-      acheteurs: "Intérêt pour une pièce ou un achat futur",
-      autre: "Autre demande"
+      institutions: "Lieux culturels, associations et institutions",
+      organisations: "Lieux culturels, associations et institutions",
+      acheteurs: "Découvrir une pièce",
+      autre: "Autre raison de nous écrire"
     };
     const routeChoices = form.querySelector(".choice-grid");
     if (routeChoices) {
@@ -1219,8 +1225,8 @@
       buyerInput.required = true;
       const buyerDescription = document.createElement("span");
       const buyerTitle = document.createElement("strong");
-      buyerTitle.textContent = "Intérêt pour une pièce ou un achat futur";
-      buyerDescription.append(buyerTitle, document.createElement("br"), document.createTextNode("Une création que vous aimeriez découvrir, ou une question d’achat."));
+      buyerTitle.textContent = "Découvrir une pièce";
+      buyerDescription.append(buyerTitle, document.createElement("br"), document.createTextNode("La boutique n’est pas ouverte. Ce message ne vaut ni commande, ni réservation, ni inscription à une liste."));
       buyerLabel.append(buyerInput, buyerDescription);
       routeChoices.append(buyerLabel);
       const otherLabel = document.createElement("label");
@@ -1232,17 +1238,17 @@
       otherInput.required = true;
       const otherDescription = document.createElement("span");
       const otherTitle = document.createElement("strong");
-      otherTitle.textContent = "Autre demande";
-      otherDescription.append(otherTitle, document.createElement("br"), document.createTextNode("Une autre raison de découvrir ou de contribuer à Vestiges."));
+      otherTitle.textContent = "Autre raison de nous écrire";
+      otherDescription.append(otherTitle, document.createElement("br"), document.createTextNode("Expliquez simplement ce qui vous amène."));
       otherLabel.append(otherInput, otherDescription);
       routeChoices.append(otherLabel);
     }
     const sourceBySlug = {
-      direct: "Invitation directe de Vestiges",
-      joey: "Invitation directe de l’équipe Vestiges",
-      recommendation: "Invitation transmise par recommandation",
-      scouting: "Invitation issue d’un repérage professionnel",
-      programme: "Parcours du Programme fondateur Vestiges"
+      direct: "Invitation de l’équipe Vestiges",
+      joey: "Invitation de l’équipe Vestiges",
+      recommendation: "Lien transmis par une personne",
+      scouting: "Invitation de l’équipe Vestiges",
+      programme: "Informations sur les premiers dossiers"
     };
     const safeToken = (value, maximum = 48) => {
       const candidate = String(value || "").slice(0, maximum);
@@ -1252,16 +1258,15 @@
     const invitationId = safeToken(parameters.get("inv"));
     const requestedRoute = routeBySlug[parameters.get("parcours")];
     const originLabel = sourceBySlug[sourceSlug] || (invitationId ? "Lien d’invitation Vestiges" : "Accès direct au site");
-    const originReference = invitationId ? `Référence opaque : ${invitationId}` : "Aucune référence d’invitation";
     const invitedSources = new Set(["direct", "joey", "recommendation", "scouting"]);
     const invitedArrival = Boolean(invitationId || invitedSources.has(sourceSlug));
     const guidedArrival = Boolean(invitedArrival || requestedRoute || sourceSlug === "programme");
     const relevanceByRoute = {
-      "Artistes et ateliers": "Le parcours porte sur une pratique, une œuvre, un geste ou une matière. Vous restez libre de corriger ce point de départ.",
-      "Recherche et transmission": "Le parcours porte sur un corpus, une source ou une situation de transmission. Vous restez libre de corriger ce point de départ.",
-      "Institutions et territoires": "Le parcours porte sur un usage, un corpus ou un terrain culturel limité. Vous restez libre de corriger ce point de départ.",
-      "Intérêt pour une pièce ou un achat futur": "Le parcours porte sur une pièce ou l’évolution de l’espace de vente. Cela ne constitue pas une commande ni une inscription à une liste d’e-mails.",
-      "Autre demande": "Votre demande ne correspond pas exactement aux choix proposés. Vous pouvez expliquer votre propre point de départ."
+      "Artisan·es et ateliers": "Le lien propose ce parcours. Vous pouvez le modifier avant d’écrire.",
+      "Recherche et transmission": "Le lien propose ce parcours. Vous pouvez le modifier avant d’écrire.",
+      "Lieux culturels, associations et institutions": "Le lien propose ce parcours. Vous pouvez le modifier avant d’écrire.",
+      "Découvrir une pièce": "Vous souhaitez découvrir une pièce. La boutique n’est pas ouverte. Ce message ne vaut ni commande, ni réservation, ni inscription à une liste.",
+      "Autre raison de nous écrire": "Votre demande ne correspond pas exactement aux choix proposés. Vous pouvez expliquer votre propre point de départ."
     };
 
     document.body.dataset.journeyContext = guidedArrival ? "guided" : "direct";
@@ -1275,7 +1280,7 @@
     if ((sourceSlug || invitationId) && invitationContext) {
       invitationContext.hidden = !invitedArrival;
       if (invitedArrival && invitationCopy) invitationCopy.textContent = sourceBySlug[sourceSlug] || "Votre lien a été préparé pour prolonger une invitation Vestiges sans exposer votre identité dans l’adresse de la page.";
-      if (invitedArrival && invitationRelevance) invitationRelevance.textContent = relevanceByRoute[requestedRoute] || "Le lien reprend uniquement un contexte de parcours. Il ne contient ni votre nom, ni une intention supposée.";
+      if (invitedArrival && invitationRelevance) invitationRelevance.textContent = relevanceByRoute[requestedRoute] || "Le lien indique seulement le parcours proposé. Il ne contient ni votre nom ni une intention supposée.";
     }
     if (requestedRoute) {
       const route = Array.from(form.elements.route || []).find((input) => input.value === requestedRoute);
@@ -1293,15 +1298,15 @@
     const reviewRows = () => {
       const data = new FormData(form);
       return [
-        ["Provenance", `${originLabel} · ${originReference}`],
-        ["Parcours", displayValue(data, "route")],
-        ["Contexte et situation", displayValue(data, "context")],
-        ["Résultat recherché", displayValue(data, "outcome")],
+        ["Comment avez-vous connu Vestiges ?", originLabel],
+        ["Votre point de départ", displayValue(data, "route")],
+        ["Ce qui vous amène", displayValue(data, "context")],
+        ["Ce que vous souhaitez aborder", displayValue(data, "outcome")],
         ["Suite souhaitée", displayValue(data, "nextStep")],
         ["Limite à respecter", displayValue(data, "boundaries")],
-        ["Lien", displayValue(data, "link")],
+        ["Lien utile", displayValue(data, "link")],
         ["Nom d’usage", displayValue(data, "name")],
-        ["Adresse de réponse", displayValue(data, "email")]
+        ["Adresse e-mail", displayValue(data, "email")]
       ];
     };
     const renderReview = () => {
@@ -1385,24 +1390,23 @@
       if (data.get("website")) return;
 
       const route = displayValue(data, "route", "Échange autour de Vestiges");
-      const subject = `Vestiges — échange · ${route}`;
+      const subject = `Vestiges — premier contact · ${route}`;
       const lines = [
-        "DEMANDE DE PREMIER ÉCHANGE",
+        "PREMIER CONTACT",
         "",
-        `Provenance : ${originLabel}`,
-        originReference,
-        `Parcours : ${route}`,
+        `Comment avez-vous connu Vestiges ? : ${originLabel}`,
+        `Point de départ : ${route}`,
         "",
-        `Contexte et situation concrète : ${displayValue(data, "context")}`,
-        `Résultat recherché : ${displayValue(data, "outcome")}`,
+        `Ce qui m’amène : ${displayValue(data, "context")}`,
+        `Ce que je souhaite aborder : ${displayValue(data, "outcome")}`,
         `Suite souhaitée : ${displayValue(data, "nextStep")}`,
         `Limite à respecter : ${displayValue(data, "boundaries")}`,
         `Lien utile : ${displayValue(data, "link")}`,
         "",
         `Nom ou nom d’usage : ${displayValue(data, "name")}`,
-        `Adresse de réponse : ${displayValue(data, "email")}`,
+        `Adresse e-mail où me répondre : ${displayValue(data, "email")}`,
         "",
-        "Ce message a été relu puis envoyé depuis la messagerie de la personne. Il ne constitue ni une autorisation de publication, ni une inscription à une newsletter."
+        "Je choisis moi-même d’envoyer ce message depuis ma messagerie. Il ne vaut ni accord pour publier mes informations, ni inscription à une liste de diffusion."
       ];
       const mailto = `mailto:contact@vestiges.world?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
       const copyText = [`À : contact@vestiges.world`, `Objet : ${subject}`, "", ...lines].join("\n");
@@ -1410,7 +1414,7 @@
       confirmation.className = "form-step";
       confirmation.tabIndex = -1;
       confirmation.setAttribute("role", "status");
-      confirmation.innerHTML = "<p class='eyebrow'>Message préparé</p><h3>Votre messagerie doit maintenant s’ouvrir.</h3><p>Relisez puis envoyez le message depuis votre application. Vestiges n’a rien reçu tant que vous ne l’avez pas envoyé.</p><div class='prepared-message-actions'><a class='button button-dark' data-open-prepared-mail>Ouvrir ma messagerie</a><button class='button' type='button' data-copy-prepared-message>Copier le message complet</button></div><p class='form-note' data-copy-status aria-live='polite'>Si aucune application ne s’ouvre, copiez le message puis écrivez à <a href='mailto:contact@vestiges.world'>contact@vestiges.world</a>.</p><div class='prepared-next-steps'><p class='meta'>Après l’envoi</p><ol><li>L’équipe Vestiges examine personnellement votre message.</li><li>La réponse peut proposer une question, un échange exploratoire ou expliquer honnêtement pourquoi la suite n’est pas adaptée.</li><li>Un entretien, un dossier et une publication restent trois décisions séparées.</li></ol></div>";
+      confirmation.innerHTML = "<p class='eyebrow'>Message préparé</p><h3>Votre message est prêt.</h3><p>Votre messagerie peut s’ouvrir automatiquement. Relisez le message avant de décider de l’envoyer. Vestiges ne le recevra qu’après votre envoi.</p><div class='prepared-message-actions'><a class='button button-dark' data-open-prepared-mail>Ouvrir ma messagerie</a><button class='button' type='button' data-copy-prepared-message>Copier le message complet</button></div><p class='form-note' data-copy-status aria-live='polite'>Si aucune application ne s’ouvre, copiez le message puis écrivez à <a href='mailto:contact@vestiges.world'>contact@vestiges.world</a>.</p><div class='prepared-next-steps'><p class='meta'>Après l’envoi</p><ol><li>L’équipe Vestiges examine personnellement votre message.</li><li>La réponse peut contenir une question, proposer un échange ou expliquer pourquoi nous ne pouvons pas donner suite.</li><li>Un échange, la préparation d’une présentation et sa publication sont trois étapes distinctes ; vous pouvez accepter ou refuser chacune.</li></ol></div>";
       form.replaceChildren(confirmation);
       const openPreparedMail = confirmation.querySelector("[data-open-prepared-mail]");
       const copyPreparedMessage = confirmation.querySelector("[data-copy-prepared-message]");

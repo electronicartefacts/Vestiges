@@ -16,17 +16,17 @@ test("les pages publiques chargent une version cohérente des ressources", async
   for (const page of pages) {
     const html = await read(page);
     assert.match(html, /theme-init\.20260718b\.js/);
-    assert.match(html, /styles\.20261011f\.css/);
-    assert.match(html, /script\.20261011c\.js/);
+    assert.match(html, /styles\.20261011g\.css/);
+    assert.match(html, /script\.20261011d\.js/);
   }
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
     ["theme-init.js", "theme-init.20260718b.js"],
-    ["styles.css", "styles.20261011f.css"],
-    ["script.js", "script.20261011c.js"],
-    ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20260923b.js"],
+    ["styles.css", "styles.20261011g.css"],
+    ["script.js", "script.20261011d.js"],
+    ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20261011a.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
     ["forge-viewer.js", "forge-viewer.20260716g.js"]
   ];
@@ -135,6 +135,8 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(styles, /html\[data-theme="dark"\]/);
   assert.match(styles, /--paper: #fff/);
   assert.match(styles, /--paper: #000/);
+  assert.match(styles, /--accent: #d98579/);
+  assert.match(styles, /--accent-soft: rgba\(217, 133, 121, \.16\)/);
   assert.match(styles, /\.theme-toggle/);
   assert.match(theme, /vestiges:theme:v1/);
   assert.match(theme, /localStorage\.setItem/);
@@ -142,6 +144,46 @@ test("le contraste suit l’appareil et peut être basculé manuellement", async
   assert.match(theme, /aria-label/);
   assert.match(home, /theme-init\.20260718b\.js/);
   assert.match(explorer, /theme-init\.20260718b\.js/);
+});
+
+test("les vues 3D autorisent les URL blob requises pour leurs textures locales", async () => {
+  const pages = await Promise.all([
+    read("encyclopedie/index.html"), read("laboratoire/index.html"), read("explorer/specimen/index.html")
+  ]);
+  for (const html of pages) {
+    assert.match(html, /connect-src 'self' blob:/);
+    assert.match(html, /img-src 'self' data: blob:/);
+  }
+});
+
+test("les anciens libellés de navigation disparaissent sans supprimer les routes historiques", async () => {
+  const pages = [
+    "index.html", "artisans/index.html", "encyclopedie/index.html", "collaborations/index.html", "approche/index.html", "marketplace/index.html",
+    "programme-fondateur/index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html", "organisations/index.html",
+    "comment-ca-marche/index.html", "methode/index.html", "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
+    "explorer/index.html", "explorer/specimen/index.html"
+  ];
+  for (const page of pages) assert.doesNotMatch(await read(page), /href="\/explorer\/">Ancien Explorer/);
+  const [artistes, methode, explorer] = await Promise.all([
+    read("artistes/index.html"), read("methode/index.html"), read("explorer/index.html")
+  ]);
+  assert.match(artistes, /canonical" href="https:\/\/vestiges\.world\/artisans\//);
+  assert.match(methode, /canonical" href="https:\/\/vestiges\.world\/approche\//);
+  assert.match(explorer, /robots" content="noindex, follow"/);
+});
+
+test("la page Artisan·es garde une numérotation continue", async () => {
+  const html = await read("artisans/index.html");
+  const numbers = [...html.matchAll(/<p class="section-index">(\d{2}) —/g)].map((match) => match[1]);
+  assert.deepEqual(numbers, ["01", "02", "03", "04", "05", "06"]);
+});
+
+test("les modes de l’encyclopédie et ses nœuds ont des noms accessibles en français", async () => {
+  const [html, script] = await Promise.all([read("encyclopedie/index.html"), read("script.js")]);
+  assert.match(html, /data-view-button="timeline"[^>]*>Frise chronologique<\/button>/);
+  assert.match(script, /button\.innerHTML = `<span>\$\{item\.type\}<\/span><strong>\$\{item\.title\}<\/strong>`/);
+  assert.match(script, /button\.setAttribute\("aria-description", `\$\{relationSummary\(item\)\}/);
+  assert.match(script, /button\.setAttribute\("aria-description", "Afficher dans le graphe\."\)/);
 });
 
 test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {
@@ -154,19 +196,19 @@ test("le header compose le monogramme avec estiges et conserve seulement le logo
   assert.match(styles, /@media \(max-width: 1120px\)[\s\S]*\.site-header \.brand-word \{ display: none; \}/);
 });
 
-test("l’accueil présente le projet sans exposer les détails du modèle 3D", async () => {
+test("l’accueil présente Vestiges sans détails techniques du modèle 3D", async () => {
   const html = await read("index.html");
-  assert.match(html, /Vitrine artisanale[\s\S]*Marketplace[\s\S]*Encyclopédie[\s\S]*Collaboration/);
+  const portals = html.match(/<section class="home-portals"[\s\S]*?<\/section>/)?.[0] || "";
+  assert.match(portals, /Artisan·es et ateliers[\s\S]*Boutique[\s\S]*Encyclopédie[\s\S]*Collaboration/);
   assert.match(html, /L’artisanat à découvrir et à faire vivre/);
-  assert.match(html, /Marketplace[\s\S]*Premières offres en préparation/);
-  assert.match(html, /Un objet, plusieurs façons de le comprendre/);
+  assert.match(portals, /Boutique[\s\S]*Aucune pièce en vente pour le moment/);
+  assert.match(html, /Une pratique, ses pièces et ses sources/);
   assert.match(html, /href="\/pour-qui\/"/);
   assert.match(html, /focus-banner[\s\S]*L’artisanat à découvrir et à faire vivre/);
+  assert.match(html, /Choisir un point de départ/);
   assert.match(html, /Proposer un échange/);
   assert.doesNotMatch(html, /De la découverte à la rencontre|Un dossier, plusieurs profondeurs|Écouter avant de publier/);
-  const mosaic = html.match(/<section class="home-mosaic"[\s\S]*?<\/section>/)?.[0] || "";
-  assert.ok(mosaic, "La section éditoriale doit rester sur l’accueil.");
-  assert.doesNotMatch(mosaic, /data-forge-viewer|data-model-src|\.glb|GLB|FORGE|Vue 3D|67 Mo/i);
+  assert.doesNotMatch(html, /data-forge-viewer|data-model-src|\.glb|GLB|FORGE|Vue 3D|71 Mo/i);
 });
 
 test("l’encyclopédie distingue ses cinq vues du prototype actuellement disponible", async () => {
@@ -179,12 +221,12 @@ test("l’encyclopédie distingue ses cinq vues du prototype actuellement dispon
   }
   assert.match(html, /data-view-panel="editorial"[^>]*>[\s\S]*?<h2[^>]*>Marqueterie/);
   const mosaic = html.match(/data-view-panel="mosaic"[\s\S]*?<\/section>/)?.[0] || "";
-  assert.match(mosaic, /Bois flotté 01, en blocs recomposables/);
+  assert.match(mosaic, /Un exemple de présentation, section par section/);
   assert.equal((mosaic.match(/data-widget data-cols=/g) || []).length, 8, "Le dossier de référence couvre huit blocs visuels sans dupliquer le visuel du spécimen.");
-  for (const specimenFacet of ["≈ 0,7 kg", "Norvège", "Bois flotté 01", "Auteur·ice", "rel=\"external\"", "/explorer/specimen/"]) {
+  for (const specimenFacet of ["≈ 0,7 kg", "Norvège", "Bois flotté 01", "Auteur", "Non identifié", "rel=\"external\""]) {
     assert.ok(mosaic.includes(specimenFacet), `Élément du spécimen absent de la mosaïque : ${specimenFacet}`);
   }
-  assert.match(mosaic, /Domaine public<\/span><strong>Non revendiqué/);
+  assert.match(mosaic, /Droits de réutilisation<\/span><strong>À vérifier/);
   assert.match(mosaic, /data-specimen-3d data-mosaic-no-drag/);
   assert.match(html, /img-src 'self' data: blob:/);
   assert.match(mosaic, /<h3>Bois flotté 01<\/h3>[\s\S]*data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
@@ -192,15 +234,24 @@ test("l’encyclopédie distingue ses cinq vues du prototype actuellement dispon
   assert.ok(mosaic.indexOf("data-specimen-3d") < mosaic.indexOf("specimen-card--measure"), "Le modèle remplace la première vignette.");
   assert.doesNotMatch(mosaic, /specimen-card-image|specimen-card--portrait/, "La vignette photo remplacée ne doit pas rester en doublon.");
   assert.doesNotMatch(mosaic, /volume · fenêtre 3D interactive|visualisation générative/i);
-  assert.doesNotMatch(mosaic, /FORGE|vidéo orbitale|67 Mo|404 304 faces|texture 8K|SHA-256/);
+  assert.doesNotMatch(mosaic, /FORGE|vidéo orbitale|404 304 faces|texture 8K|SHA-256/);
+  assert.match(mosaic, /data-load-specimen[^>]*>Afficher le modèle 3D/);
+  assert.match(mosaic, /Voir la taille du fichier[\s\S]*Environ 71 Mo/);
+  assert.match(styles, /\.mosaic-widget\.specimen-card--story \{[^}]*background: linear-gradient/);
+  assert.match(styles, /\.mosaic-widget\.specimen-card--invitation \{[^}]*background: var\(--ink\); color: var\(--paper\)/);
+  assert.match(styles, /@container specimen-widget \(max-width: 27rem\) and \(max-height: 20rem\)/);
+  assert.match(styles, /\.specimen-card--views \.specimen-view-list \{ grid-template-columns: 1fr; \}/);
+  assert.match(styles, /\.specimen-card--sources \.specimen-source-list \{ grid-template-columns: 1fr; \}/);
   assert.match(specimenViewer, /GLTFLoader/);
   assert.match(specimenViewer, /new GLTFLoader\(\)\.load\(source/);
   assert.match(specimenViewer, /model\.scale\.setScalar\(scale\)/);
   assert.match(specimenViewer, /new OrbitControls/);
   assert.doesNotMatch(specimenViewer, /makeWeatheredBranch|SphereGeometry|CylinderGeometry/);
-  assert.match(html, /Rechercher un savoir[\s\S]*data-active-subject/);
+  assert.match(html, /Explorer un exemple[\s\S]*data-active-subject/);
   assert.doesNotMatch(html, /data-widget-dimension|data-widget-move|widget-controls/);
   assert.match(script, /function initEncyclopediaWorkspace/);
+  assert.match(script, /viewerButtonBound/);
+  assert.match(script, /Préparation du modèle 3D/);
   assert.match((await read("index.html")), /href="\/encyclopedie\/#graphe"/);
   assert.match(script, /showView\(window\.location\.hash === "#graphe" \? "graph" : "editorial"\)/);
   assert.match(script, /addEventListener\("hashchange", activateViewFromHash\)/);
@@ -208,7 +259,7 @@ test("l’encyclopédie distingue ses cinq vues du prototype actuellement dispon
   assert.match(script, /data-resize-handle/);
   assert.match(script, /setTimeout\([\s\S]*?320\)/);
   assert.match(script, /canvas, \[contenteditable="true"\], \[data-mosaic-no-drag\]/);
-  assert.match(script, /mosaic-specimen-viewer\.20260923b\.js/);
+  assert.match(script, /mosaic-specimen-viewer\.20261011a\.js/);
   assert.match(script, /is-selected.*is-dragging/);
   assert.match(script, /Fenêtre sélectionnée/);
   assert.match(script, /widget\.dataset\.dragX/);
@@ -290,13 +341,13 @@ test("la nouvelle arborescence expose ses six pages et conserve les anciennes co
     read("artisans/index.html"), read("encyclopedie/index.html"), read("marketplace/index.html"),
     read("participer/index.html"), read("script.js")
   ]);
-  assert.match(artisans, /au moins deux cas réels/);
+  assert.match(artisans, /au moins deux dossiers réels/);
   assert.match(encyclopedia, /data-exploration/);
-  assert.match(encyclopedia, /corpus vérifié/);
-  assert.match(marketplace, /n’est pas encore ouverte/);
-  assert.match(marketplace, /ni panier ni paiement intégré/);
+  assert.match(encyclopedia, /ne sont pas encore des dossiers documentés/);
+  assert.match(marketplace, /La boutique n’est pas ouverte/);
+  assert.match(marketplace, /ne prendra ni paiement ni livraison en charge/);
   assert.match(marketplace, /parcours=acheteurs/);
-  assert.match(script, /acheteurs: "Intérêt pour une pièce ou un achat futur"/);
+  assert.match(script, /acheteurs: "Découvrir une pièce"/);
   assert.match(participation, /data-contact-form/);
 });
 
@@ -316,7 +367,7 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   ]);
   assert.match(hub, /Artisan·es et ateliers/);
   assert.match(hub, /Recherche et transmission/);
-  assert.match(hub, /Institutions et territoires/);
+  assert.match(hub, /Institutions et associations/);
   assert.match(artistes, /Votre savoir-faire mérite plus qu’une image/);
   assert.match(artistes, /v=20260718b&amp;parcours=artistes#conversation/);
   assert.match(transmission, /Construire l’encyclopédie sans effacer les nuances/);
@@ -382,7 +433,9 @@ test("le modèle FORGE est local, transparent et chargé à la demande", async (
   assert.match(lab, /data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
   assert.match(lab, /data-load-model/);
   assert.match(script, /await import\("\/forge-viewer\.20260716g\.js"\)/);
-  assert.match(script, /connection\?\.saveData/);
+  const viewerInit = script.split("function initForgeViewer()")[1]?.split("function initContactForm()")[0] || "";
+  assert.match(viewerInit, /button\.addEventListener\("click", load\)/);
+  assert.doesNotMatch(viewerInit, /IntersectionObserver|navigator\.connection/);
   assert.match(viewer, /alpha: true/);
   assert.match(viewer, /setClearColor\(0x000000, 0\)/);
   assert.match(viewer, /data-model-projection/);
@@ -393,23 +446,28 @@ test("le modèle FORGE est local, transparent et chargé à la demande", async (
 test("la participation prépare un contact direct sans prétendre transmettre", async () => {
   const [html, script] = await Promise.all([read("participer/index.html"), read("script.js")]);
   assert.match(html, /action="mailto:contact@vestiges\.world"/);
-  assert.match(html, /Aucune (?:donnée|réponse) n’est transmise au site/);
-  assert.match(script, /Vestiges n’a rien reçu tant que vous ne l’avez pas envoyé/);
-  assert.match(html, /data-route-choice="Artistes et ateliers"/);
+  assert.match(html, /Le site prépare un e-mail[\s\S]*Votre message ne sera envoyé qu’après votre clic sur « Envoyer »/);
+  assert.match(html, /Vestiges ne le recevra qu’après votre envoi/);
+  assert.match(html, /data-route-choice="Artisan·es et ateliers"/);
+  assert.match(html, /name="route" value="Artisan·es et ateliers"[\s\S]*<strong>Artisan·es et ateliers<\/strong>/);
+  assert.doesNotMatch(html, /Artistes et ateliers/);
   assert.match(html, /data-route-choice="Recherche et transmission"/);
-  assert.match(html, /data-route-choice="Institutions et territoires"/);
+  assert.match(html, /data-route-choice="Lieux culturels, associations et institutions"/);
   assert.match(script, /parcours/);
-  assert.match(script, /institutions: "Institutions et territoires"/);
+  assert.match(script, /institutions: "Lieux culturels, associations et institutions"/);
+  assert.match(script, /artistes: "Artisan·es et ateliers"/);
+  assert.match(script, /artisans: "Artisan·es et ateliers"/);
+  assert.match(await read("artisans/index.html"), /parcours=artistes/);
   assert.match(script, /route\.checked = true/);
   assert.match(script, /scrollIntoView/);
   assert.match(html, /01 \/ 04[\s\S]*02 \/ 04[\s\S]*03 \/ 04[\s\S]*04 \/ 04/);
-  assert.match(html, /Votre contexte et la situation qui vous amène aujourd’hui/);
+  assert.match(html, /Qu’est-ce qui vous amène aujourd’hui/);
   assert.doesNotMatch(html, /name="practice"|name="situation"|name="territory"/);
   assert.match(html, /data-cold-path/);
   assert.match(html, /data-form-review/);
   assert.match(script, /originLabel/);
   assert.match(script, /invitationId/);
-  assert.match(script, /Résultat recherché/);
+  assert.match(script, /Ce que vous souhaitez aborder/);
   assert.match(script, /displayValue\(data, "context"\)/);
   assert.match(script, /data-copy-prepared-message/);
   assert.match(script, /navigator\.clipboard\.writeText/);
@@ -575,23 +633,44 @@ test("les données structurées restent reliées au contenu visible et à la can
   }
 });
 
-test("l’image d’accueil propose des variantes WebP sans différer le chargement du visuel principal", async () => {
+test("l’image d’accueil charge ses variantes WebP optimisées sans différer le visuel principal", async () => {
   const html = await read("index.html");
   const hero = html.match(/<div class="focus-banner__image">([\s\S]*?)<\/div>/)?.[1] ?? "";
   assert.match(hero, /<picture>[\s\S]*type="image\/webp"/);
-  assert.match(hero, /atelier-relations-v1-640\.webp 640w/);
-  assert.match(hero, /atelier-relations-v1-960\.webp 960w/);
-  assert.match(hero, /atelier-relations-v1-1536\.webp 1536w/);
+  assert.match(hero, /atelier-relations-v1-640-20261011a\.webp 640w/);
+  assert.match(hero, /atelier-relations-v1-960-20261011a\.webp 960w/);
+  assert.match(hero, /atelier-relations-v1-1536-20261011a\.webp 1536w/);
   assert.match(hero, /sizes="100vw"/);
   assert.match(hero, /atelier-relations-v1\.png/);
   assert.match(hero, /fetchpriority="high"/);
   assert.match(hero, /decoding="async"/);
   assert.doesNotMatch(hero, /loading="lazy"/);
+  const [previous640, previous960, previous1536, optimized640, optimized960, optimized1536] = await Promise.all([
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-640.webp")),
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-960.webp")),
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-1536.webp")),
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-640-20261011a.webp")),
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-960-20261011a.webp")),
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-1536-20261011a.webp"))
+  ]);
+  assert.ok(optimized640.size < previous640.size * .7);
+  assert.ok(optimized960.size < previous960.size * .7);
+  assert.ok(optimized1536.size < previous1536.size * .7);
   const [original, largest, smallest] = await Promise.all([
     stat(resolve(root, "assets/editorial/atelier-relations-v1.png")),
-    stat(resolve(root, "assets/editorial/atelier-relations-v1-1536.webp")),
-    stat(resolve(root, "assets/editorial/atelier-relations-v1-640.webp"))
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-1536-20261011a.webp")),
+    stat(resolve(root, "assets/editorial/atelier-relations-v1-640-20261011a.webp"))
   ]);
   assert.ok(largest.size < original.size / 10);
   assert.ok(smallest.size < original.size / 50);
+});
+
+test("la texture bois privilégie WebP avec un repli JPEG plus léger", async () => {
+  const styles = await read("styles.css");
+  assert.match(styles, /image-set\(url\(['"]\/assets\/textures\/wood-20261011a\.webp['"]\) type\(['"]image\/webp['"]\), url\(['"]\/assets\/textures\/wood\.jpg['"]\) type\(['"]image\/jpeg['"]\)\)/);
+  const [original, optimized] = await Promise.all([
+    stat(resolve(root, "assets/textures/wood.jpg")),
+    stat(resolve(root, "assets/textures/wood-20261011a.webp"))
+  ]);
+  assert.ok(optimized.size < original.size * .8);
 });
