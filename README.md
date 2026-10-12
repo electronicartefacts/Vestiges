@@ -56,7 +56,7 @@ La page `Comment ça marche` contient une anatomie de dossier explicitement pré
 - aucune dépendance distante, aucun analytics ;
 - Three.js est archivé localement sous licence MIT pour la vue 3D à la demande ;
 - modèle GLB FORGE et manifeste de provenance conservés dans `assets/works/bois-flotte-01/` ;
-- site statique compatible avec GitHub Pages ; le mode et l’état du déploiement distant restent à vérifier dans les réglages GitHub ;
+- GitHub Pages publie la racine de la branche `main` sur `vestiges.world`, avec HTTPS forcé ;
 - URLs en répertoires pour des pages indexables ;
 - contenu essentiel présent dans le HTML.
 
