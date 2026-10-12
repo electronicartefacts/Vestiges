@@ -16,8 +16,8 @@ test("les pages publiques chargent une version cohérente des ressources", async
   for (const page of pages) {
     const html = await read(page);
     assert.match(html, /theme-init\.20260718b\.js/);
-    assert.match(html, /styles\.20261011g\.css/);
-    assert.match(html, /script\.20261011d\.js/);
+    assert.match(html, /styles\.20261012a\.css/);
+    assert.match(html, /script\.20261012a\.js/);
   }
 });
 
