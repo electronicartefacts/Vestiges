@@ -119,8 +119,9 @@ test("les boutons d’action sont uniquement en contour et se renforcent sans tr
   const styles = await read("styles.css");
   assert.match(styles, /\.button-dark \{ background: transparent; color: var\(--ink\); \}/);
   assert.match(styles, /\.button-light \{ border-color: currentColor; color: inherit; \}/);
-  assert.match(styles, /box-shadow: inset 0 0 0 1px currentColor/);
-  assert.match(styles, /font-variation-settings: "wght" 610/);
+  const hoverRule = styles.match(/\.button:hover,\s*\.button:focus-visible,\s*\.text-button:hover,\s*\.text-button:focus-visible\s*\{([^}]*)\}/)?.[1] ?? "";
+  assert.match(hoverRule, /box-shadow: inset 0 0 0 1px currentColor/);
+  assert.doesNotMatch(hoverRule, /font-(?:weight|variation-settings)/);
   assert.doesNotMatch(styles, /\.button:hover[^}]*transform/s);
   assert.doesNotMatch(styles, /\.button-light:hover[^}]*background/s);
   assert.doesNotMatch(styles, /\.forge-viewer \.button:hover[^}]*background/s);
