@@ -816,26 +816,27 @@ main p a:not(.button):focus-visible,
   .home-graph-section .exploration-hero__heading { display: block; padding-block: 2.5rem 1.5rem; }
   .home-graph-section .exploration-hero__heading .eyebrow { margin-bottom: .8rem; }
   .home-graph-section .exploration-hero__heading h2 { margin-bottom: 1.2rem; font-size: clamp(3.2rem, 15vw, 5.3rem); }
-  .home-graph-section .home-graph-map { position: relative; display: block; min-height: clamp(38rem, 125vw, 45rem); padding: 0; overflow: hidden; border-inline: 0; }
-  .home-graph-section .home-graph-map::before { display: block; background-size: 20% 16.66%; }
+  .home-graph-section .home-graph-map { position: relative; display: block; min-height: clamp(29rem, 112vw, 34rem); padding: 0; overflow: hidden; border-inline: 0; perspective: 620px; perspective-origin: 50% 48%; transform-style: preserve-3d; }
+  .home-graph-section .home-graph-map::before { display: block; background-size: 20% 20%; }
   .home-graph-section .exploration-relations { display: block; }
-  .home-graph-section .exploration-items { position: absolute; inset: 0; display: block; }
-  .home-graph-section .exploration-item.home-atlas-node { position: absolute; display: grid; width: clamp(5.6rem, 27vw, 7rem); max-width: none; min-height: 0; aspect-ratio: auto; justify-items: center; gap: .22rem; padding: .5rem .4rem; border: 0; border-radius: .3rem; background: color-mix(in srgb, var(--paper) 91%, transparent); box-shadow: none; backdrop-filter: blur(.35rem); text-align: center; transform: translate(-50%, -50%); }
-  .home-graph-section .home-atlas-node.exploration-item--1 { left: 21%; top: 8%; }
-  .home-graph-section .home-atlas-node.exploration-item--2 { left: 79%; top: 8%; }
-  .home-graph-section .home-atlas-node.exploration-item--3 { left: 21%; top: 24%; }
-  .home-graph-section .home-atlas-node.exploration-item--4 { left: 79%; top: 24%; }
-  .home-graph-section .home-atlas-node.exploration-item--5 { left: 21%; top: 40%; }
-  .home-graph-section .home-atlas-node.exploration-item--6 { left: 79%; top: 40%; }
-  .home-graph-section .home-atlas-node.exploration-item--7 { left: 21%; top: 56%; }
-  .home-graph-section .home-atlas-node.exploration-item--8 { left: 79%; top: 56%; }
-  .home-graph-section .home-atlas-node.exploration-item--9 { left: 21%; top: 72%; }
-  .home-graph-section .home-atlas-node.exploration-item--10 { left: 79%; top: 72%; }
-  .home-graph-section .home-atlas-node.exploration-item--11 { left: 21%; top: 88%; }
-  .home-graph-section .home-atlas-node.exploration-item--12 { left: 79%; top: 88%; }
-  .home-graph-section .exploration-item.home-atlas-node:hover, .home-graph-section .exploration-item.home-atlas-node:focus-visible, .home-graph-section .exploration-item.home-atlas-node.is-related, .home-graph-section .exploration-item.home-atlas-node.is-selected { transform: translate(-50%, -50%); }
-  .home-graph-section .home-atlas-node span { font-size: .43rem; }
-  .home-graph-section .home-atlas-node strong, .home-graph-section .home-atlas-node.is-selected strong { width: 100%; font-size: clamp(.78rem, 3.5vw, .95rem); line-height: .98; white-space: normal; overflow-wrap: anywhere; }
+  .home-graph-section .exploration-items { position: absolute; inset: 0; display: block; transform-style: preserve-3d; }
+  .home-graph-section .exploration-item.home-atlas-node { --atlas-depth: 0px; --atlas-node-scale: .94; --atlas-tilt-x: 0deg; --atlas-tilt-y: 0deg; position: absolute; display: grid; width: clamp(4.35rem, 18vw, 5rem); max-width: none; min-height: 0; aspect-ratio: 1; justify-items: center; gap: .14rem; padding: .38rem; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); border-radius: 50%; background: color-mix(in srgb, var(--paper) 82%, transparent); box-shadow: 0 .55rem 1.35rem rgba(0, 0, 0, .1); backdrop-filter: blur(.45rem); text-align: center; transform: translate3d(-50%, -50%, var(--atlas-depth)) rotateX(var(--atlas-tilt-x)) rotateY(var(--atlas-tilt-y)) scale(var(--atlas-node-scale)); transform-origin: center; transform-style: preserve-3d; transition: border-color 1s var(--atlas-fluid), color 1s var(--atlas-fluid), background 1s var(--atlas-fluid), box-shadow 1s var(--atlas-fluid), transform 1.1s var(--atlas-fluid); }
+  .home-graph-section .home-atlas-node.exploration-item--1 { left: 20%; top: 19%; --atlas-depth: 30px; --atlas-node-scale: .95; --atlas-tilt-x: 5deg; --atlas-tilt-y: -4deg; }
+  .home-graph-section .home-atlas-node.exploration-item--2 { left: 54%; top: 15%; --atlas-depth: 68px; --atlas-node-scale: .9; --atlas-tilt-x: -6deg; --atlas-tilt-y: 3deg; }
+  .home-graph-section .home-atlas-node.exploration-item--3 { left: 83%; top: 21%; --atlas-depth: 12px; --atlas-node-scale: .93; --atlas-tilt-x: 4deg; --atlas-tilt-y: 6deg; }
+  .home-graph-section .home-atlas-node.exploration-item--4 { left: 65%; top: 39%; --atlas-depth: 54px; --atlas-node-scale: 1; --atlas-tilt-x: -4deg; --atlas-tilt-y: -5deg; }
+  .home-graph-section .home-atlas-node.exploration-item--5 { left: 35%; top: 30%; --atlas-depth: -16px; --atlas-node-scale: .9; --atlas-tilt-x: 3deg; --atlas-tilt-y: -4deg; }
+  .home-graph-section .home-atlas-node.exploration-item--6 { left: 20%; top: 50%; --atlas-depth: 38px; --atlas-node-scale: .97; --atlas-tilt-x: -5deg; --atlas-tilt-y: 4deg; }
+  .home-graph-section .home-atlas-node.exploration-item--7 { left: 51%; top: 54%; --atlas-depth: 76px; --atlas-node-scale: .92; --atlas-tilt-x: 6deg; --atlas-tilt-y: -3deg; }
+  .home-graph-section .home-atlas-node.exploration-item--8 { left: 84%; top: 57%; --atlas-depth: -24px; --atlas-node-scale: .9; --atlas-tilt-x: -3deg; --atlas-tilt-y: -5deg; }
+  .home-graph-section .home-atlas-node.exploration-item--9 { left: 30%; top: 70%; --atlas-depth: 42px; --atlas-node-scale: .98; --atlas-tilt-x: 5deg; --atlas-tilt-y: 5deg; }
+  .home-graph-section .home-atlas-node.exploration-item--10 { left: 67%; top: 73%; --atlas-depth: -14px; --atlas-node-scale: .9; --atlas-tilt-x: -6deg; --atlas-tilt-y: 3deg; }
+  .home-graph-section .home-atlas-node.exploration-item--11 { left: 18%; top: 89%; --atlas-depth: 4px; --atlas-node-scale: .93; --atlas-tilt-x: 2deg; --atlas-tilt-y: -5deg; }
+  .home-graph-section .home-atlas-node.exploration-item--12 { left: 82%; top: 86%; --atlas-depth: 62px; --atlas-node-scale: .98; --atlas-tilt-x: -4deg; --atlas-tilt-y: 6deg; }
+  .home-graph-section .home-atlas-node.is-related { --atlas-node-scale: 1.02; border-color: color-mix(in srgb, var(--accent) 58%, transparent); background: color-mix(in srgb, var(--paper) 94%, transparent); box-shadow: 0 .9rem 1.8rem rgba(0, 0, 0, .13); }
+  .home-graph-section .home-atlas-node.is-selected, .home-graph-section .home-atlas-node:hover, .home-graph-section .home-atlas-node:focus-visible { --atlas-node-scale: 1.08; border-color: var(--accent); background: color-mix(in srgb, var(--paper) 96%, transparent); box-shadow: 0 1rem 2rem rgba(0, 0, 0, .16); }
+  .home-graph-section .home-atlas-node span { font-size: .38rem; }
+  .home-graph-section .home-atlas-node strong, .home-graph-section .home-atlas-node.is-selected strong { width: 100%; font-size: .62rem; letter-spacing: -.055em; line-height: .96; white-space: normal; overflow-wrap: anywhere; }
   .home-graph-section .home-graph-detail { min-height: 0; padding: 1.5rem 1rem; border-top: 1px solid var(--line); border-right: 0; border-left: 0; }
   .home-graph-section .home-graph-detail h2 { font-size: clamp(2.6rem, 13vw, 4rem); }
   .home-graph-section .home-graph-related { margin-top: 1.5rem; }
@@ -1762,7 +1763,7 @@ body[data-journey-context="guided"] [data-cold-path] { display: none; }
 
 @media (max-width: 680px) {
   .home-graph-section .exploration-hero__heading h2 { font-size: clamp(3.2rem, 15vw, 5.3rem); }
-  .home-graph-section .home-graph-map { min-height: clamp(38rem, 125vw, 45rem); margin-top: 0; border-top: 0; border-bottom: 1px solid var(--line); }
+  .home-graph-section .home-graph-map { min-height: clamp(29rem, 112vw, 34rem); margin-top: 0; border-top: 0; border-bottom: 1px solid var(--line); }
   .home-graph-section .home-graph-detail { padding: 1.5rem 1rem; border-top: 1px solid var(--line); border-right: 0; border-left: 0; }
   .home-graph-section .home-graph-footer { display: grid; grid-template-columns: 1fr; gap: .6rem; padding: 1.25rem 1rem; border-left: 0; }
 }
