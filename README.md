@@ -14,7 +14,7 @@ Mini-site statique de [Vestiges](https://vestiges.world), projet culturel et éd
 
 - `/` — accueil et présentation des quatre piliers ;
 - `/artisans/` — vitrine artisanale et invitation à co-produire au moins deux cas réels ;
-- `/encyclopedie/` — démonstrateur à cinq vues partageant une recherche et un sujet actif, avec une mosaïque recomposable ; les exemples ne constituent pas un corpus vérifié ;
+- `/encyclopedie/` — démonstrateur à sept vues partageant une recherche et un sujet actif, avec une mosaïque recomposable ; les exemples ne constituent pas un corpus vérifié ;
 - `/collaborations/` — point d’entrée pour les artisan·es, la recherche/transmission, les futurs clients et les organismes ;
 - `/approche/` — principes de co-construction, de sources, de relecture et de visibilité ;
 - `/marketplace/` — présentation de l’espace de vente à venir, sans produits tant que les offres réelles ne sont pas prêtes.
@@ -39,17 +39,19 @@ La direction visuelle associe noir, ivoire et un accent minéral rouge à des tr
 
 Le laboratoire révèle la chaîne vidéo → FORGE → modèle 3D après la compréhension du produit. Le GLB d’environ 71 Mo ne se charge qu’après activation explicite de la commande 3D. La scène s’arrête hors écran, et le dossier HTML détaillé demeure disponible sans WebGL.
 
-## Les cinq vues de l’encyclopédie
+## Les sept vues de l’encyclopédie
 
-La page `/encyclopedie/` conserve une entrée sélectionnée entre cinq vues : **Texte**, **Grille**, **Frise chronologique**, **Relations** et **Composition**. L’URL contient le mode et l’identifiant de l’entrée ; elle peut être rechargée ou partagée sans contenir de renseignement personnel.
+La page `/encyclopedie/` conserve une entrée sélectionnée entre sept vues : **Texte**, **Grille**, **Frise chronologique**, **Monde**, **Relations**, **Comparer** et **Composition**. L’URL contient le mode, l’identifiant de l’entrée, les filtres appliqués et les identifiants comparés. Les critères de recherche sont locaux ; aucune API de collecte n’est appelée.
 
 - Texte : couverture, lecture éditoriale, questions d’observation, relations et références.
 - Grille : huit images locales, avec visionneuse, navigation clavier et notices. Le lecteur prend aussi en charge les médias vidéo ; aucun fichier vidéo n’est présent dans cette sélection.
-- Frise : tous les repères datés associés aux entrées du graphe, triables et filtrables autour de l’entrée. Quatre repères sont sourcés ; les huit entrées restantes gardent explicitement une date non renseignée. Les dates situent un objet ou un événement, jamais une origine supposée d’une pratique.
-- Relations : même carte et mêmes interactions que l’accueil, dans une composition pleine largeur.
-- Composition : six familles de widgets et un modèle 3D optionnel associé à Bois, avec bibliothèque, presets, déplacement, redimensionnement et commandes clavier. Le modèle reste chargé à la demande et ses ressources sont libérées lorsque le widget est retiré.
+- Frise : tous les repères datés associés aux entrées du graphe, triables et filtrables autour de l’entrée. Les occurrences d’un même document sont regroupées sans perdre les entrées associées ; cinq repères uniques sont sourcés dans le catalogue actuel. Les dates situent un objet ou un événement, jamais une origine supposée d’une pratique.
+- Monde : carte SVG locale de Natural Earth, zoom et sélection des pays, lieux documentés ou rapportés explicitement qualifiés. Les points sont des repères de pays, sans localisation précise inventée.
+- Relations : langage visuel de la carte d’accueil, étendu aux entrées filtrées du catalogue.
+- Comparer : deux ou trois entrées, critères partagés, informations manquantes visibles et option pour ne lire que les différences.
+- Composition : bibliothèque de widgets incluant la carte et la comparaison, ainsi qu’un modèle 3D optionnel associé à Bois, avec bibliothèque, presets, déplacement, redimensionnement et commandes clavier. Le modèle reste chargé à la demande et ses ressources sont libérées lorsque le widget est retiré.
 
-Les notices et repères sont séparés du rendu dans `encyclopedia-records.js`. Les trois images de collection sont issues du Met Open Access, déclarées dans le domaine public, avec attribution, URL et provenance locale dans `assets/encyclopedia/provenance.json`. Les autres médias sont qualifiés comme textures ou démonstrations. La composition conserve son ordre et ses formats pendant la visite ; elle n’est pas enregistrée après rechargement.
+Les notices et repères sont séparés du rendu dans `encyclopedia-records.js` et `encyclopedia-catalog.js`. Le catalogue comporte vingt entrées, séparées par nature : pratiques, matières, œuvres/objets, artistes historiques, mouvements et articles. Les produits disposent d’un état vide ; aucune offre n’est inventée. Les facettes nature, pratique, période, lieu, matière et style sont partagées par toutes les vues, avec résultats regroupés et état vide explicite. La carte et la comparaison peuvent aussi être ajoutées à une composition. Les filtres géographiques portent sur le rôle du lieu associé à une référence, jamais sur une origine universelle attribuée à un savoir-faire. Les trois images de collection sont issues du Met Open Access, déclarées dans le domaine public, avec attribution, URL et provenance locale dans `assets/encyclopedia/provenance.json`. Les autres médias sont qualifiés comme textures ou démonstrations. Le fond de carte, ses coordonnées de repérage et ses conditions de réutilisation sont documentés dans `assets/encyclopedia/world-map-provenance.json`. Aucun service de tuiles distant ni géolocalisation de l’appareil n’est utilisé. La composition conserve son ordre et ses formats pendant la visite ; elle n’est pas enregistrée après rechargement.
 
 ## Participation
 

@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' blob:; img-src 'self' data: blob:; font-src 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
   <meta name="description" content="Exemple de navigation dans l’encyclopédie envisagée par Vestiges. Les pratiques présentées ne sont pas encore des dossiers documentés.">
   <meta name="theme-color" content="#ffffff"><meta property="og:title" content="Encyclopédie des savoir-faire — Vestiges"><meta property="og:description" content="Découvrir comment Vestiges relie gestes, matières, outils et pratiques artisanales."><meta property="og:type" content="website"><meta property="og:url" content="https://vestiges.world/encyclopedie/"><meta property="og:image" content="https://vestiges.world/assets/logo/vestiges-monogram-og.png"><meta name="twitter:card" content="summary_large_image">
-  <link rel="canonical" href="https://vestiges.world/encyclopedie/"><link rel="icon" type="image/png" href="/assets/logo/vestiges-favicon.png"><script src="/theme-init.20260718b.js"></script><link rel="stylesheet" href="/styles.20261013a.css?v=20261013a"><script src="/exploration-data.20260816a.js" defer></script><script src="/script.20261013b.js?v=20261013a" defer></script>
+  <link rel="canonical" href="https://vestiges.world/encyclopedie/"><link rel="icon" type="image/png" href="/assets/logo/vestiges-favicon.png"><script src="/theme-init.20260718b.js"></script><link rel="stylesheet" href="/styles.20261013a.css?v=20261013a"><script src="/exploration-data.20260816a.js" defer></script><script src="/script.20261013c.js?v=20261013a" defer></script>
   <title>Encyclopédie des savoir-faire — Vestiges</title>
 <script type="application/ld+json">
 {
@@ -27,27 +27,40 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="/encyclopedia.20261013a.css"><script type="module" src="/encyclopedia.20261013a.js"></script>
+<link rel="stylesheet" href="/encyclopedia.20261013b.css"><script type="module" src="/encyclopedia.20261013b.js"></script>
 </head>
 <body class="encyclopedia-page">
   <a class="skip-link" href="#main">Aller au contenu</a>
   <header class="site-header"><a class="brand" href="/" aria-label="Vestiges, accueil"><img src="/assets/logo/vestiges-monogram.svg" alt="" width="32" height="23"><span class="brand-word" aria-hidden="true">estiges</span></a><nav class="main-nav" id="main-navigation" data-main-nav aria-label="Navigation principale"><a href="/">Accueil</a><a href="/artisans/">Artisan·es</a><a href="/encyclopedie/" aria-current="page">Encyclopédie</a><a href="/collaborations/">Collaborations</a><a href="/approche/">Approche</a><a href="/marketplace/">Boutique</a></nav><div class="header-actions"><a class="button button-dark" href="/participer/?parcours=transmission#conversation" aria-label="Prendre contact">Prendre contact</a><button class="button menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation" data-menu-toggle>Menu</button></div></header>
   <main id="main" class="page-main">
     <section class="encyclopedia-workspace encyclopedia-atlas" id="explorer" data-encyclopedia-workspace data-premium-encyclopedia aria-labelledby="page-title">
-      <header class="atlas-heading"><div><p class="eyebrow">Lire · regarder · situer · relier</p><h1 id="page-title">Encyclopédie vivante des savoir-faire</h1></div><p class="atlas-edition">Carnet de découverte <span>12 entrées de démonstration</span></p></header>
+      <header class="atlas-heading"><div><p class="eyebrow">Lire · regarder · situer · relier</p><h1 id="page-title">Encyclopédie vivante des savoir-faire</h1></div><p class="atlas-edition">Carnet de découverte <span data-catalog-count>Références et exemples éditoriaux</span></p></header>
       <div class="workspace-controls">
-        <form class="knowledge-search" role="search" data-knowledge-search><label for="knowledge-query">Rechercher une entrée</label><div class="search-field"><input id="knowledge-query" type="search" placeholder="Une matière, un geste, un objet…" autocomplete="off" aria-controls="knowledge-results" aria-expanded="false" data-knowledge-query><button type="button" class="search-clear" aria-label="Effacer la recherche" data-search-clear>×</button></div><ul class="knowledge-results" id="knowledge-results" data-knowledge-results hidden></ul><span class="search-status">Entrée sélectionnée : <strong data-active-subject>Marqueterie</strong></span></form>
+        <form class="knowledge-search" role="search" data-knowledge-search><label for="knowledge-query">Rechercher une entrée</label><div class="search-field"><input id="knowledge-query" type="search" placeholder="Une matière, un geste, un objet…" autocomplete="off" aria-controls="knowledge-results" aria-expanded="false" data-knowledge-query><button type="submit" class="apply-search" aria-label="Appliquer la recherche">↗</button><button type="button" class="search-clear" aria-label="Effacer la recherche" data-search-clear>×</button></div><ul class="knowledge-results" id="knowledge-results" data-knowledge-results hidden></ul><span class="search-status">Entrée sélectionnée : <strong data-active-subject>Marqueterie</strong></span></form>
         <nav class="view-switcher" role="tablist" aria-label="Modes d’affichage" data-view-switcher>
           <button id="tab-editorial" type="button" role="tab" data-view-button="editorial" aria-controls="panel-editorial" aria-selected="true" aria-pressed="true">Texte</button>
           <button id="tab-grid" type="button" role="tab" data-view-button="grid" aria-controls="panel-grid" aria-selected="false" aria-pressed="false" tabindex="-1">Grille</button>
           <button id="tab-timeline" type="button" role="tab" data-view-button="timeline" aria-controls="panel-timeline" aria-selected="false" aria-pressed="false" tabindex="-1">Frise chronologique</button>
+          <button id="tab-world" type="button" role="tab" data-view-button="world" aria-controls="panel-world" aria-selected="false" aria-pressed="false" tabindex="-1">Monde</button>
           <button id="tab-graph" type="button" role="tab" data-view-button="graph" aria-controls="panel-graph" aria-selected="false" aria-pressed="false" tabindex="-1">Relations</button>
+          <button id="tab-compare" type="button" role="tab" data-view-button="compare" aria-controls="panel-compare" aria-selected="false" aria-pressed="false" tabindex="-1">Comparer</button>
           <button id="tab-mosaic" type="button" role="tab" data-view-button="mosaic" aria-controls="panel-mosaic" aria-selected="false" aria-pressed="false" tabindex="-1">Composition</button>
         </nav>
+        <details class="atlas-filters" data-atlas-filters open><summary>Filtrer les entrées <span data-active-filter-count></span></summary><div class="filter-fields">
+          <label>Nature<select data-facet="family" aria-label="Filtrer par nature"></select></label>
+          <label>Pratique<select data-facet="practice" aria-label="Filtrer par pratique"></select></label>
+          <label>Période<select data-facet="period" aria-label="Filtrer par période"></select></label>
+          <label>Lieu<select data-facet="country" aria-label="Filtrer par lieu"></select></label>
+          <label>Matière liée<select data-facet="material" aria-label="Filtrer par matière"></select></label>
+          <label>Style / mouvement lié<select data-facet="style" aria-label="Filtrer par style ou mouvement"></select></label>
+        </div></details>
+        <div class="filter-summary"><span data-filter-result-count role="status">Entrées disponibles</span><div data-filter-chips></div><button type="button" class="quiet-button" data-clear-filters>Tout réinitialiser</button></div>
       </div>
       <p class="visually-hidden" role="status" data-atlas-status></p>
       <noscript><p class="prototype-note">La lecture ci-dessous reste disponible. Activez JavaScript pour rechercher une entrée et explorer les autres vues.</p></noscript>
       <div class="workspace-content">
+        <details class="catalog-results"><summary>Parcourir les résultats <span data-result-total></span></summary><div data-grouped-results></div></details>
+        <section class="catalog-empty" data-catalog-empty hidden><h2>Aucun résultat dans cette sélection.</h2><p data-empty-explanation>Essayez une autre combinaison de filtres.</p><button class="button" type="button" data-clear-filters>Réinitialiser les filtres</button><a class="text-link" href="/marketplace/">Voir où en est la boutique ↗</a></section>
         <section id="panel-editorial" class="workspace-view editorial-view" role="tabpanel" tabindex="0" data-view-panel="editorial" aria-labelledby="tab-editorial">
           <article class="atlas-article" data-editorial-article><div class="article-cover"><div class="article-cover-copy"><p class="section-index">Savoir-faire · fiche de démonstration</p><h2>Marqueterie</h2><p class="article-deck">Assembler de fines pièces de bois pour créer une image ou un motif.</p></div><figure><img src="/assets/textures/wood-20261011a.webp" alt="Texture illustrative de bois"><figcaption>Étude de matière · illustration</figcaption></figure></div><div class="article-reading"><div><p class="article-kicker">Assembler · choisir · composer</p><p>Une image peut naître d’une suite de fragments. Le sens des fibres, la découpe et les contrastes participent ensemble à la composition.</p><p>Chaque dossier pourra relier observations, gestes expliqués et sources consultables.</p></div><aside><p class="section-index">Une fiche à explorer</p><p>Cette entrée présente un exemple de lecture. Elle ne décrit pas un dossier co-construit avec un artisan.</p></aside></div></article>
         </section>
@@ -60,6 +73,12 @@
           <div class="atlas-view-tools timeline-tools"><div class="tool-group" role="group" aria-label="Périmètre chronologique"><button type="button" data-time-scope="all" aria-pressed="true">Toutes les entrées</button><button type="button" data-time-scope="related" aria-pressed="false">Autour de cette entrée</button></div><label>Ordre <select data-time-order><option value="asc">Ancien → récent</option><option value="desc">Récent → ancien</option></select></label><span data-time-count></span></div>
           <div class="timeline-overview" data-time-overview aria-label="Vue d’ensemble des repères datés"></div><ol class="atlas-timeline" data-time-list></ol><p class="timeline-empty" data-time-empty hidden>Aucun repère daté n’est renseigné autour de cette entrée. Vous pouvez revenir à toutes les entrées pour parcourir la chronologie disponible.</p>
           <details class="undated-entries"><summary data-undated-count></summary><p>Ces entrées restent accessibles dans les autres vues. Une date sera ajoutée lorsqu’une source permet de l’établir.</p><div data-undated-list></div></details>
+        </section>
+        <section id="panel-world" class="workspace-view world-view" role="tabpanel" tabindex="0" data-view-panel="world" aria-labelledby="tab-world" hidden>
+          <div class="world-heading"><div><p class="section-index">Repères de lieux · références associées</p><h2>Les savoir-faire se situent.</h2></div><p>La carte situe les pays liés aux références. Le rôle du lieu et sa source restent visibles ; les origines non établies ne sont pas déduites.</p></div>
+          <div class="world-layout"><div data-world-canvas></div><aside class="world-aside"><p class="section-index" data-world-count></p><div data-world-locations></div></aside></div>
+          <details class="world-unknown"><summary data-world-unknown-count></summary><div data-world-unknown-list></div></details>
+          <p class="prototype-note world-source">Fond géographique actuel : <a href="https://www.naturalearthdata.com/downloads/110m-cultural-vectors/110m-admin-0-countries/">Natural Earth</a>. Les points représentent les pays, sans précision de site ni reconstitution de frontières historiques.</p>
         </section>
         <section id="panel-graph" class="workspace-view graph-view" role="tabpanel" tabindex="0" data-view-panel="graph" aria-labelledby="tab-graph" hidden>
     <section class="exploration-hero home-graph-section" id="graphe" aria-labelledby="exploration-title" data-exploration>
@@ -78,16 +97,20 @@
       </aside>
       <div class="exploration-hero__footer home-graph-footer">
         <p id="exploration-instructions">Pointez ou choisissez un élément pour en lire le contexte. Au clavier, utilisez les flèches pour passer d’un élément à l’autre ; appuyez sur Entrée pour garder votre choix affiché.</p>
-        <p>12 éléments d’exemple · aucun ne représente un dossier réel.</p>
+        <p><span data-graph-count>Entrées de la sélection</span> · références et exemples, aucun dossier d’artisan publié.</p>
         <a class="text-link" href="#texte" data-view-button-proxy="editorial">Lire cette entrée ↗</a>
       </div>
       <details class="home-graph-alternative">
-        <summary>Parcourir les 12 exemples en liste</summary>
+        <summary>Parcourir les entrées en liste</summary>
         <p>Vous pouvez aussi parcourir ces exemples dans une liste, au clavier ou sur écran tactile.</p>
         <ul data-exploration-text-list></ul>
       </details>
     </section>
 
+        </section>
+        <section id="panel-compare" class="workspace-view compare-view" role="tabpanel" tabindex="0" data-view-panel="compare" aria-labelledby="tab-compare" hidden>
+          <div class="comparison-heading"><div><p class="section-index">Comparaison · deux ou trois entrées</p><h2>Mettre les détails en regard.</h2></div><p>Rapprochez les pratiques, œuvres, personnes et mouvements. Les informations absentes restent indiquées.</p></div>
+          <div class="comparison-controls" data-comparison-controls></div><label class="comparison-differences"><input type="checkbox" data-only-differences> Ne montrer que les différences</label><div data-comparison-table></div>
         </section>
         <section id="panel-mosaic" class="workspace-view mosaic-view" role="tabpanel" tabindex="0" data-view-panel="mosaic" aria-labelledby="tab-mosaic" hidden>
           <div class="composition-heading"><div><p class="section-index">Composition · atelier de lecture</p><h2>Composez votre regard.</h2><p>Réunissez les détails de <strong data-context-subject>Marqueterie</strong>. Ajoutez un bloc, changez son format ou son ordre.</p></div><details class="widget-library"><summary>Choisir les widgets <span data-widget-count></span></summary><div data-widget-library></div></details></div>

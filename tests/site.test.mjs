@@ -41,10 +41,13 @@ test("les ressources versionnées correspondent aux sources validées", async ()
     ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20261013a.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
     ["forge-viewer.js", "forge-viewer.20261013a.js"],
-    ["encyclopedia.js", "encyclopedia.20261013a.js"],
-    ["encyclopedia.css", "encyclopedia.20261013a.css"],
-    ["encyclopedia-records.js", "encyclopedia-records.20261013a.js"],
-    ["composition-engine.js", "composition-engine.20261013a.js"]
+    ["encyclopedia.js", "encyclopedia.20261013b.js"],
+    ["encyclopedia.css", "encyclopedia.20261013b.css"],
+    ["encyclopedia-records.js", "encyclopedia-records.20261013b.js"],
+    ["composition-engine.js", "composition-engine.20261013a.js"],
+    ["encyclopedia-catalog.js", "encyclopedia-catalog.20261013a.js"],
+    ["encyclopedia-spatial.js", "encyclopedia-spatial.20261013a.js"],
+    ["world-geometry.js", "world-geometry.20261013a.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
 });
@@ -229,11 +232,11 @@ test("l’accueil présente Vestiges sans détails techniques du modèle 3D", as
   assert.doesNotMatch(html, /data-forge-viewer|data-model-src|\.glb|GLB|FORGE|Vue 3D|71 Mo/i);
 });
 
-test("l’encyclopédie expose cinq vues accessibles partageant une entrée", async () => {
+test("l’encyclopédie expose sept vues accessibles partageant une entrée", async () => {
   const [html, controller, engine] = await Promise.all([
     read("encyclopedie/index.html"), read("encyclopedia.js"), read("composition-engine.js")
   ]);
-  for (const mode of ["editorial", "grid", "timeline", "graph", "mosaic"]) {
+  for (const mode of ["editorial", "grid", "timeline", "world", "graph", "compare", "mosaic"]) {
     assert.match(html, new RegExp(`id="tab-${mode}"[^>]*role="tab"[^>]*aria-controls="panel-${mode}"`));
     assert.match(html, new RegExp(`id="panel-${mode}"[^>]*role="tabpanel"`));
   }
@@ -259,7 +262,7 @@ test("les widgets de composition gardent une lecture adaptée à leur taille", a
   assert.match(styles, /@container specimen-widget \(max-height: 17rem\)/);
   assert.match(shared, /\.mosaic-widget\[data-cols="48"\]/);
   assert.match(shared, /\.mosaic-widget\[data-rows="60"\]/);
-  assert.match(controller, /const defaults = \['notice', 'media', 'relations', 'dates', 'sources', 'status'\]/);
+  assert.match(controller, /const defaults = \['notice', 'media', 'relations', 'dates', 'sources', 'status', 'world'\]/);
 });
 
 test("l’accueil contient une exploration locale, accessible et explicitement provisoire", async () => {
@@ -302,7 +305,7 @@ test("la nouvelle arborescence expose ses six pages et conserve les anciennes co
   ]);
   assert.match(artisans, /au moins deux dossiers réels/);
   assert.match(encyclopedia, /data-exploration/);
-  assert.match(encyclopedia, /aucun ne représente un dossier réel/);
+  assert.match(encyclopedia, /aucun dossier d’artisan publié/);
   assert.match(marketplace, /La boutique n’est pas ouverte/);
   assert.match(marketplace, /ne prendra ni paiement ni livraison en charge/);
   assert.match(marketplace, /parcours=acheteurs/);

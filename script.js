@@ -492,6 +492,7 @@
 
   function initExploration() {
     const root = document.querySelector("[data-exploration]");
+    if (root?.closest("[data-premium-encyclopedia]")) return;
     const items = window.VESTIGES_EXPLORATION_ITEMS;
     if (!root || !Array.isArray(items) || !items.length) return;
 

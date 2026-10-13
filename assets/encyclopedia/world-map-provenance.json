@@ -1,0 +1,9 @@
+{
+  "dataset": "Natural Earth · Admin 0 Countries · 1:110m",
+  "source": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson",
+  "license": "Public domain",
+  "terms": "https://www.naturalearthdata.com/about/terms-of-use/",
+  "consulted": "2026-10-13",
+  "projection": "Équirectangulaire",
+  "use": "Fond géographique contemporain, positions indicatives des pays ; aucune frontière historique reconstituée."
+}
