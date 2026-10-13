@@ -9,6 +9,7 @@
   initEditorialRhythm();
   initKineticType();
   initExploration();
+  initPortalCarousel();
   initEncyclopediaWorkspace();
   initGraph();
   initForgeViewer();
@@ -217,7 +218,7 @@
 
     const wordSegmenter = new Intl.Segmenter("fr", { granularity: "word" });
     const paragraphs = Array.from(document.querySelectorAll("main p")).filter((paragraph) => {
-      if (paragraph.closest("[data-brand-intro]")) return false;
+      if (paragraph.closest("[data-brand-intro], [data-exploration], [data-home-photo-preview]")) return false;
       if (paragraph.matches(".eyebrow, .section-index, .meta, .status-label, .object-truth, .visually-hidden")) return false;
       if (paragraph.children.length || paragraph.textContent.trim().length < 80) return false;
       return Array.from(wordSegmenter.segment(paragraph.textContent.trim())).some((part) => part.isWordLike);
@@ -490,6 +491,60 @@
 
   }
 
+  function initPortalCarousel() {
+    const track = document.querySelector("[data-portal-track]");
+    const controls = document.querySelector("[data-portal-controls]");
+    if (!track || !controls) return;
+    const cards = [...track.querySelectorAll(".portal-card")];
+    const dots = [...controls.querySelectorAll("[data-portal-index]")];
+    const position = controls.querySelector("[data-portal-position]");
+    const previous = controls.querySelector('[data-portal-step="-1"]');
+    const next = controls.querySelector('[data-portal-step="1"]');
+    const mobile = window.matchMedia("(max-width: 680px)");
+    let index = 0;
+    let frame = 0;
+    function update() {
+      frame = 0;
+      const bounds = track.getBoundingClientRect();
+      index = cards.reduce((best, card, candidate) => Math.abs(card.getBoundingClientRect().left - bounds.left) < Math.abs(cards[best].getBoundingClientRect().left - bounds.left) ? candidate : best, 0);
+      dots.forEach((dot, candidate) => {
+        if (candidate === index) dot.setAttribute("aria-current", "true");
+        else dot.removeAttribute("aria-current");
+      });
+      position.textContent = `${String(index + 1).padStart(2, "0")} / 04`;
+      previous.disabled = index === 0;
+      next.disabled = index === cards.length - 1;
+    }
+    function show(candidate) {
+      const card = cards[Math.max(0, Math.min(cards.length - 1, candidate))];
+      const left = track.scrollLeft + card.getBoundingClientRect().left - track.getBoundingClientRect().left;
+      track.scrollTo({ left, behavior: reduceMotion.matches ? "instant" : "smooth" });
+    }
+    dots.forEach((dot, candidate) => dot.addEventListener("click", () => show(candidate)));
+    controls.querySelectorAll("[data-portal-step]").forEach(button => button.addEventListener("click", () => show(index + Number(button.dataset.portalStep))));
+    track.addEventListener("scroll", () => { if (!frame) frame = requestAnimationFrame(update); }, { passive: true });
+    // Moving keyboard focus to a card reveals it without moving the page vertically.
+    track.addEventListener("focusin", event => {
+      const candidate = cards.indexOf(event.target.closest(".portal-card"));
+      if (mobile.matches && candidate >= 0) show(candidate);
+    });
+    track.addEventListener("keydown", event => {
+      if (!mobile.matches || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      event.preventDefault();
+      const candidate = Math.max(0, Math.min(cards.length - 1, index + (event.key === "ArrowRight" ? 1 : -1)));
+      cards[candidate].focus({ preventScroll: true });
+      show(candidate);
+    });
+    function sync() {
+      controls.hidden = !mobile.matches;
+      if (!mobile.matches) track.scrollTo({ left: 0, behavior: "instant" });
+      update();
+    }
+    mobile.addEventListener("change", sync);
+    window.addEventListener("resize", sync, { passive: true });
+    sync();
+  }
+
   function initExploration() {
     const root = document.querySelector("[data-exploration]");
     if (root?.closest("[data-premium-encyclopedia]")) return;
@@ -606,6 +661,8 @@
     let hoverResetTimer = 0;
     let drawQueued = false;
     let relationPaths = [];
+    const selectionLabel = root.querySelector("[data-home-graph-selection]");
+    let detailId = null;
 
     const visibleRelatedIds = (item) => item.relatedIds.filter((id) => byId.has(id));
     const relationSummary = (item) => {
@@ -640,16 +697,20 @@
       const title = document.createElement("strong");
       title.textContent = item.title;
       button.append(itemType, title);
-      button.addEventListener("pointerenter", () => {
+      button.addEventListener("pointerenter", (event) => {
+        if (event.pointerType !== "mouse") return;
         window.clearTimeout(hoverResetTimer);
         hoverResetTimer = 0;
         preview(item.id);
       });
       button.addEventListener("pointerleave", (event) => {
+        if (event.pointerType !== "mouse") return;
         if (button.matches(":focus") || (event.relatedTarget && field.contains(event.relatedTarget))) return;
         scheduleHoverReset();
       });
-      button.addEventListener("focus", () => preview(item.id));
+      button.addEventListener("focus", () => {
+        if (button.matches(":focus-visible")) preview(item.id);
+      });
       button.addEventListener("click", () => select(item.id));
       return button;
     };
@@ -688,10 +749,12 @@
         });
       }
 
+      // Read each node once on layout changes; selection only changes path classes.
+      const positions = new Map([...buttons].map(([id, button]) => [id, button.getBoundingClientRect()]));
       edges.forEach((edge, index) => {
         const path = relationPaths[index];
-        const origin = buttons.get(edge.a)?.getBoundingClientRect();
-        const target = buttons.get(edge.b)?.getBoundingClientRect();
+        const origin = positions.get(edge.a);
+        const target = positions.get(edge.b);
         if (!origin || !target) return;
         const x1 = origin.left - bounds.left + origin.width / 2;
         const y1 = origin.top - bounds.top + origin.height / 2;
@@ -709,6 +772,8 @@
     }
 
     function updateDetails(item) {
+      if (selectionLabel) selectionLabel.textContent = `${item.title} · ${visibleRelatedIds(item).length} liens`;
+      if (detailId === item.id) return;
       if (type) type.textContent = `Exemple · ${item.type}`;
       if (name) name.textContent = item.title;
       if (description) description.textContent = item.shortDescription;
@@ -728,15 +793,15 @@
         const kind = document.createElement("small");
         kind.textContent = related.type;
         button.append(title, kind);
-        button.addEventListener("focus", () => preview(related.id));
         button.addEventListener("click", () => {
+          buttons.get(related.id)?.focus({ preventScroll: true });
           select(related.id);
-          buttons.get(related.id)?.focus();
         });
         listItem.append(button);
         return listItem;
       });
       relatedList.replaceChildren(...relatedItems);
+      detailId = item.id;
     }
 
     function applyFocus(id) {
@@ -754,7 +819,7 @@
       });
       alternativeButtons.forEach((button, buttonId) => button.setAttribute("aria-pressed", String(buttonId === selectedId)));
       root.dataset.selected = id;
-      queueDraw();
+      relationPaths.forEach((path) => path.classList.toggle("is-related", path.dataset.from === id || path.dataset.to === id));
     }
 
     function preview(id) {
@@ -792,13 +857,17 @@
       const next = (current + direction + items.length) % items.length;
       buttons.get(items[next].id)?.focus();
     });
-    root.addEventListener("pointerleave", scheduleHoverReset);
+    root.addEventListener("pointerleave", (event) => {
+      if (event.pointerType === "mouse") scheduleHoverReset();
+    });
     root.addEventListener("focusout", (event) => {
       if (!root.contains(event.relatedTarget)) scheduleHoverReset();
     });
     window.addEventListener("resize", queueDraw, { passive: true });
     if (typeof ResizeObserver === "function") new ResizeObserver(queueDraw).observe(field);
     select(selectedId);
+    queueDraw();
+    document.fonts?.ready.then(queueDraw);
     window.addEventListener("vestiges:select-subject", (event) => select(event.detail?.id));
   }
 

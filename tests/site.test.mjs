@@ -223,7 +223,7 @@ test("l’accueil présente Vestiges sans détails techniques du modèle 3D", as
   assert.match(portals, /Artisan·es et ateliers[\s\S]*Boutique[\s\S]*Encyclopédie[\s\S]*Collaboration/);
   assert.match(html, /L’artisanat à découvrir et à faire vivre/);
   assert.match(portals, /Boutique[\s\S]*Aucune pièce en vente pour le moment/);
-  assert.match(html, /Une pratique, ses pièces et ses sources/);
+  assert.match(html, /Explorer les inspirations/);
   assert.match(html, /href="\/pour-qui\/"/);
   assert.match(html, /focus-banner[\s\S]*L’artisanat à découvrir et à faire vivre/);
   assert.match(html, /Choisir un point de départ/);
@@ -284,7 +284,7 @@ test("l’accueil contient une exploration locale, accessible et explicitement p
   assert.match(script, /!heading\.closest\("\[data-exploration\]"\)/);
   assert.match(styles, /\.exploration-hero/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.exploration-item/s);
-  assert.match(styles, /transition: stroke 1\.45s var\(--atlas-fluid\), opacity 1\.6s var\(--atlas-fluid\)/);
+  assert.match(styles, /transition: stroke \.18s ease-out, opacity \.18s ease-out/);
   assert.match(data, /relatedIds/);
   assert.match(data, /window\.VESTIGES_EXPLORATION_ITEMS/);
 });
