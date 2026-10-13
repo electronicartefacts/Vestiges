@@ -3,12 +3,14 @@ import { GLTFLoader } from "/assets/vendor/three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "/assets/vendor/three/addons/controls/OrbitControls.js";
 
 export function mountSpecimenVolume(stage) {
-  if (!stage || stage.dataset.viewerReady === "true" || stage.dataset.viewerLoading === "true") return;
+  if (!stage || !stage.isConnected || stage.dataset.viewerReady === "true" || stage.dataset.viewerLoading === "true") return;
   const source = stage.dataset.modelSrc;
   const message = stage.querySelector(".specimen-3d-loading");
   const loadButton = stage.querySelector("[data-load-specimen]");
   if (!source) throw new Error("Fichier GLB absent");
 
+  let disposed = false;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let visible = false;
   let frame = 0;
   let renderer;
@@ -29,7 +31,7 @@ export function mountSpecimenVolume(stage) {
 
   const render = () => {
     frame = 0;
-    if (!visible || document.hidden || !renderer || !controls) return;
+    if (disposed || !stage.isConnected || !visible || document.hidden || !renderer || !controls) return;
     frame = window.requestAnimationFrame(render);
     controls.update();
     renderer.render(scene, camera);
@@ -49,13 +51,29 @@ export function mountSpecimenVolume(stage) {
     if (visible) renderer.render(scene, camera);
   };
   const start = () => {
+    if (disposed || !stage.isConnected || !stage.getClientRects().length) return;
     visible = true;
     if (!frame && stage.dataset.viewerReady === "true") render();
   };
   const handleVisibilityChange = () => {
-    if (document.hidden) { stop(); return; }
+    if (disposed || document.hidden || !stage.isConnected || !stage.getClientRects().length) { stop(); return; }
     const bounds = stage.getBoundingClientRect();
     if (bounds.bottom > -180 && bounds.top < window.innerHeight + 180) start();
+  };
+  const disposeScene = (root) => {
+    const geometries = new Set();
+    const materials = new Set();
+    const textures = new Set();
+    root?.traverse((object) => {
+      if (object.geometry) geometries.add(object.geometry);
+      for (const material of Array.isArray(object.material) ? object.material : object.material ? [object.material] : []) {
+        materials.add(material);
+        for (const value of Object.values(material)) if (value?.isTexture) textures.add(value);
+      }
+    });
+    geometries.forEach(geometry => geometry.dispose());
+    materials.forEach(material => material.dispose());
+    textures.forEach(texture => texture.dispose());
   };
   const resetFailedAttempt = () => {
     stop();
@@ -63,6 +81,7 @@ export function mountSpecimenVolume(stage) {
     visibilityObserver?.disconnect();
     document.removeEventListener("visibilitychange", handleVisibilityChange);
     controls?.dispose();
+    disposeScene(scene);
     if (renderer) {
       renderer.domElement.remove();
       renderer.dispose();
@@ -75,8 +94,17 @@ export function mountSpecimenVolume(stage) {
     stage.dataset.viewerLoading = "false";
     stage.dataset.mounted = "false";
   };
-  const showRetry = (buttonText, status) => {
+  const handleMotionChange = () => { if (controls) controls.autoRotate = !reduceMotion.matches; };
+  const dispose = () => {
+    disposed = true;
     resetFailedAttempt();
+    reduceMotion.removeEventListener("change", handleMotionChange);
+    stage.removeEventListener("vestiges:dispose-viewer", dispose);
+  };
+  stage.addEventListener("vestiges:dispose-viewer", dispose, { once: true });
+  reduceMotion.addEventListener("change", handleMotionChange);
+  const showRetry = (buttonText, status) => {
+    dispose();
     if (loadButton) {
       loadButton.disabled = false;
       loadButton.textContent = buttonText;
@@ -123,10 +151,11 @@ export function mountSpecimenVolume(stage) {
       controls.enablePan = false;
       controls.minDistance = 2.2;
       controls.maxDistance = 7;
-      controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      controls.autoRotate = !reduceMotion.matches;
       controls.autoRotateSpeed = 0.34;
 
       new GLTFLoader().load(source, (gltf) => {
+        if (disposed) { disposeScene(gltf.scene); return; }
         const model = gltf.scene;
         const bounds = new THREE.Box3().setFromObject(model);
         const size = bounds.getSize(new THREE.Vector3());
@@ -147,8 +176,9 @@ export function mountSpecimenVolume(stage) {
         stage.classList.remove("is-viewer-fallback");
         if (visible) render();
       }, (event) => {
-        if (event.total) showStatus(`Chargement du modèle · ${Math.min(99, Math.round(event.loaded / event.total * 100))} %`);
+        if (!disposed && event.total) showStatus(`Chargement du modèle · ${Math.min(99, Math.round(event.loaded / event.total * 100))} %`);
       }, () => {
+        if (disposed) return;
         showRetry("Réessayer le chargement · ≈ 71 Mo", "Le modèle 3D n’a pas pu être chargé.");
       });
     } catch (_error) {

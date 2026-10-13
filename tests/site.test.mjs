@@ -38,9 +38,13 @@ test("les ressources versionnées correspondent aux sources validées", async ()
     ["theme-init.js", await activeResource("theme-init", "js")],
     ["styles.css", await activeResource("styles", "css")],
     ["script.js", await activeResource("script", "js")],
-    ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20261011a.js"],
+    ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20261013a.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
-    ["forge-viewer.js", "forge-viewer.20261013a.js"]
+    ["forge-viewer.js", "forge-viewer.20261013a.js"],
+    ["encyclopedia.js", "encyclopedia.20261013a.js"],
+    ["encyclopedia.css", "encyclopedia.20261013a.css"],
+    ["encyclopedia-records.js", "encyclopedia-records.20261013a.js"],
+    ["composition-engine.js", "composition-engine.20261013a.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
 });
@@ -225,96 +229,37 @@ test("l’accueil présente Vestiges sans détails techniques du modèle 3D", as
   assert.doesNotMatch(html, /data-forge-viewer|data-model-src|\.glb|GLB|FORGE|Vue 3D|71 Mo/i);
 });
 
-test("l’encyclopédie distingue ses cinq vues du prototype actuellement disponible", async () => {
-  const [html, script, styles, specimenViewer] = await Promise.all([
-    read("encyclopedie/index.html"), read("script.js"), read("styles.css"), read("mosaic-specimen-viewer.js")
+test("l’encyclopédie expose cinq vues accessibles partageant une entrée", async () => {
+  const [html, controller, engine] = await Promise.all([
+    read("encyclopedie/index.html"), read("encyclopedia.js"), read("composition-engine.js")
   ]);
   for (const mode of ["editorial", "grid", "timeline", "graph", "mosaic"]) {
-    assert.match(html, new RegExp(`data-view-button="${mode}"`), `Sélecteur manquant : ${mode}`);
-    assert.match(html, new RegExp(`data-view-panel="${mode}"`), `Vue manquante : ${mode}`);
+    assert.match(html, new RegExp(`id="tab-${mode}"[^>]*role="tab"[^>]*aria-controls="panel-${mode}"`));
+    assert.match(html, new RegExp(`id="panel-${mode}"[^>]*role="tabpanel"`));
   }
-  assert.match(html, /data-view-panel="editorial"[^>]*>[\s\S]*?<h2[^>]*>Marqueterie/);
-  const mosaic = html.match(/data-view-panel="mosaic"[\s\S]*?<\/section>/)?.[0] || "";
-  assert.match(mosaic, /Un exemple de présentation, section par section/);
-  assert.equal((mosaic.match(/data-widget data-cols=/g) || []).length, 8, "Le dossier de référence couvre huit blocs visuels sans dupliquer le visuel du spécimen.");
-  for (const specimenFacet of ["≈ 0,7 kg", "Norvège", "Bois flotté 01", "Auteur", "Non identifié", "rel=\"external\""]) {
-    assert.ok(mosaic.includes(specimenFacet), `Élément du spécimen absent de la mosaïque : ${specimenFacet}`);
-  }
-  assert.match(mosaic, /Droits de réutilisation<\/span><strong>À vérifier/);
-  assert.match(mosaic, /data-specimen-3d data-mosaic-no-drag/);
-  assert.match(html, /img-src 'self' data: blob:/);
-  assert.match(mosaic, /<h3>Bois flotté 01<\/h3>[\s\S]*data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
-  assert.equal((mosaic.match(/data-specimen-3d/g) || []).length, 1, "Le modèle 3D ne doit apparaître qu’une fois.");
-  assert.ok(mosaic.indexOf("data-specimen-3d") < mosaic.indexOf("specimen-card--measure"), "Le modèle remplace la première vignette.");
-  assert.doesNotMatch(mosaic, /specimen-card-image|specimen-card--portrait/, "La vignette photo remplacée ne doit pas rester en doublon.");
-  assert.doesNotMatch(mosaic, /volume · fenêtre 3D interactive|visualisation générative/i);
-  assert.doesNotMatch(mosaic, /FORGE|vidéo orbitale|404 304 faces|texture 8K|SHA-256/);
-  assert.match(mosaic, /data-load-specimen[^>]*>Afficher le modèle 3D/);
-  assert.match(mosaic, /Voir la taille du fichier[\s\S]*Environ 71 Mo/);
-  assert.match(styles, /\.mosaic-widget\.specimen-card--story \{[^}]*background: linear-gradient/);
-  assert.match(styles, /\.mosaic-widget\.specimen-card--invitation \{[^}]*background: var\(--ink\); color: var\(--paper\)/);
-  assert.match(styles, /@container specimen-widget \(max-width: 27rem\) and \(max-height: 20rem\)/);
-  assert.match(styles, /\.specimen-card--views \.specimen-view-list \{ grid-template-columns: 1fr; \}/);
-  assert.match(styles, /\.specimen-card--sources \.specimen-source-list \{ grid-template-columns: 1fr; \}/);
-  assert.match(specimenViewer, /GLTFLoader/);
-  assert.match(specimenViewer, /new GLTFLoader\(\)\.load\(source/);
-  assert.match(specimenViewer, /model\.scale\.setScalar\(scale\)/);
-  assert.match(specimenViewer, /new OrbitControls/);
-  assert.doesNotMatch(specimenViewer, /makeWeatheredBranch|SphereGeometry|CylinderGeometry/);
-  assert.match(html, /Explorer un exemple[\s\S]*data-active-subject/);
-  assert.doesNotMatch(html, /data-widget-dimension|data-widget-move|widget-controls/);
-  assert.match(script, /function initEncyclopediaWorkspace/);
-  assert.match(script, /viewerButtonBound/);
-  assert.match(script, /Préparation du modèle 3D/);
-  assert.match((await read("index.html")), /href="\/encyclopedie\/#graphe"/);
-  assert.match(script, /showView\(window\.location\.hash === "#graphe" \? "graph" : "editorial"\)/);
-  assert.match(script, /addEventListener\("hashchange", activateViewFromHash\)/);
-  assert.match(script, /const installMosaicInteractions = \(\) =>/);
-  assert.match(script, /data-resize-handle/);
-  assert.match(script, /setTimeout\([\s\S]*?320\)/);
-  assert.match(script, /canvas, \[contenteditable="true"\], \[data-mosaic-no-drag\]/);
-  assert.match(script, /mosaic-specimen-viewer\.20261011a\.js/);
-  assert.match(script, /is-selected.*is-dragging/);
-  assert.match(script, /Fenêtre sélectionnée/);
-  assert.match(script, /widget\.dataset\.dragX/);
-  assert.match(script, /setPointerCapture/);
-  assert.match(script, /gridTrackCount/);
-  assert.match(script, /renderMosaicRows/);
-  assert.match(script, /const rowHeight = Math\.max\(8, \.\.\.pair\.map/);
-  assert.match(script, /const pair = firstWidth >= tracks \? \[widgets\[index\]\] : widgets\.slice\(index, index \+ 2\)/);
-  assert.match(script, /index \+= pair\.length/);
-  assert.match(script, /row\?\.querySelectorAll\("\[data-widget\]"\)\.forEach\(\(item\) => \{ item\.dataset\.rows = rowHeight; \}\)/);
-  assert.match(script, /neighbor\.dataset\.cols = String\(tracks - requestedCols\)/);
-  assert.match(script, /\[widgets\[from\], widgets\[to\]\] = \[widgets\[to\], widgets\[from\]\]/);
-  assert.match(script, /positioned\.find\(\(\{ rect \}\) => x >= rect\.left && x <= rect\.right && y >= rect\.top && y <= rect\.bottom\)/);
-  assert.match(script, /nearest\.distance <= 32 \? nearest : null/);
-  assert.match(script, /aria-pressed/);
-  assert.match(script, /vestiges:subject-change/);
-  assert.match(script, /vestiges:select-subject/);
-  assert.match(styles, /\.mosaic-widget\[data-cols="48"\]/);
-  assert.match(styles, /\.mosaic-widget\[data-rows="60"\]/);
-  assert.match(styles, /\.mosaic-widget\[data-resize-edge="ne"\]/);
-  assert.match(styles, /\.mosaic-widget\.is-selected \{ z-index: 10/);
-  assert.match(styles, /\.mosaic-widget\.is-dragging \{ z-index: 20/);
-  assert.match(styles, /translate: attr\(data-drag-x px/);
-  assert.match(styles, /\.mosaic-row \{ display: grid/);
-  assert.match(styles, /\.specimen-3d-stage \{[^}]*background: transparent/);
-  assert.match(styles, /\.widget-resize-handle:hover, \.widget-resize-handle\.is-active \{ opacity: 0; background: transparent; \}/);
-  assert.doesNotMatch(styles, /\.mosaic-widget\[data-drop-position=/);
+  assert.match(html, /Composition<\/button>/);
+  assert.doesNotMatch(html, /Dossier exemple|Origines et contexte|texture d’ambiance · à documenter/);
+  assert.match(html, /home-graph-section[\s\S]*data-exploration-related-list/);
+  assert.match(html, /data-widget-library/);
+  assert.match(controller, /vestiges:select-subject/);
+  assert.match(controller, /dialog\.showModal/);
+  assert.match(controller, /state\.entry !== 'bois'/);
+  assert.match(controller, /data-load-specimen[^>]*>Afficher le modèle 3D/);
+  assert.match(controller, /Environ 71 Mo/);
+  assert.match(engine, /setPointerCapture/);
+  assert.match(engine, /event\.shiftKey/);
 });
 
-test("les widgets de la mosaïque adaptent densité, contenu et interactions à leur propre taille", async () => {
-  const [html, styles] = await Promise.all([read("encyclopedie/index.html"), read("styles.css")]);
-  const mosaic = html.match(/data-view-panel="mosaic"[\s\S]*?<\/section>/)?.[0] || "";
-  assert.match(styles, /\.mosaic-widget\s*\{[^}]*container:\s*specimen-widget\s*\/\s*size/);
+test("les widgets de composition gardent une lecture adaptée à leur taille", async () => {
+  const [styles, shared, controller] = await Promise.all([
+    read("encyclopedia.css"), read("styles.css"), read("encyclopedia.js")
+  ]);
+  assert.match(styles, /container: specimen-widget \/ size/);
   assert.match(styles, /@container specimen-widget \(max-width: 27rem\)/);
-  assert.match(styles, /@container specimen-widget \(max-height: 20rem\)/);
-  assert.match(styles, /@container specimen-widget \(max-height: 12rem\)/);
-  assert.match(styles, /@container specimen-widget \(min-width: 30rem\) and \(min-height: 26rem\)/);
-  assert.match(styles, /\.specimen-card--measure \.widget-compact \{ display: block/);
-  assert.match(styles, /\.specimen-card--sources \.specimen-source-list small \{ display: none/);
-  assert.ok((mosaic.match(/class="widget-detail"/g) || []).length >= 4, "Les formats spacieux proposent des détails éditoriaux complémentaires.");
-  assert.match(mosaic, /class="widget-compact"/);
+  assert.match(styles, /@container specimen-widget \(max-height: 17rem\)/);
+  assert.match(shared, /\.mosaic-widget\[data-cols="48"\]/);
+  assert.match(shared, /\.mosaic-widget\[data-rows="60"\]/);
+  assert.match(controller, /const defaults = \['notice', 'media', 'relations', 'dates', 'sources', 'status'\]/);
 });
 
 test("l’accueil contient une exploration locale, accessible et explicitement provisoire", async () => {
@@ -357,7 +302,7 @@ test("la nouvelle arborescence expose ses six pages et conserve les anciennes co
   ]);
   assert.match(artisans, /au moins deux dossiers réels/);
   assert.match(encyclopedia, /data-exploration/);
-  assert.match(encyclopedia, /ne sont pas encore des dossiers documentés/);
+  assert.match(encyclopedia, /aucun ne représente un dossier réel/);
   assert.match(marketplace, /La boutique n’est pas ouverte/);
   assert.match(marketplace, /ne prendra ni paiement ni livraison en charge/);
   assert.match(marketplace, /parcours=acheteurs/);

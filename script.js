@@ -804,7 +804,7 @@
   function initEncyclopediaWorkspace() {
     const workspace = document.querySelector("[data-encyclopedia-workspace]");
     const items = window.VESTIGES_EXPLORATION_ITEMS;
-    if (!workspace || !Array.isArray(items) || !items.length) return;
+    if (!workspace || workspace.hasAttribute("data-premium-encyclopedia") || !Array.isArray(items) || !items.length) return;
 
     const query = workspace.querySelector("[data-knowledge-query]");
     const suggestions = workspace.querySelector("#knowledge-suggestions");
@@ -840,7 +840,7 @@
             loadButton.textContent = "Préparation du modèle 3D…";
             const message = stage.querySelector(".specimen-3d-loading");
             try {
-              specimenViewerModule ||= import("/mosaic-specimen-viewer.20261011a.js");
+              specimenViewerModule ||= import("/mosaic-specimen-viewer.20261013a.js");
               const { mountSpecimenVolume } = await specimenViewerModule;
               mountSpecimenVolume(stage);
             } catch (_error) {

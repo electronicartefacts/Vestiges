@@ -39,6 +39,18 @@ La direction visuelle associe noir, ivoire et un accent minéral rouge à des tr
 
 Le laboratoire révèle la chaîne vidéo → FORGE → modèle 3D après la compréhension du produit. Le GLB d’environ 71 Mo ne se charge qu’après activation explicite de la commande 3D. La scène s’arrête hors écran, et le dossier HTML détaillé demeure disponible sans WebGL.
 
+## Les cinq vues de l’encyclopédie
+
+La page `/encyclopedie/` conserve une entrée sélectionnée entre cinq vues : **Texte**, **Grille**, **Frise chronologique**, **Relations** et **Composition**. L’URL contient le mode et l’identifiant de l’entrée ; elle peut être rechargée ou partagée sans contenir de renseignement personnel.
+
+- Texte : couverture, lecture éditoriale, questions d’observation, relations et références.
+- Grille : huit images locales, avec visionneuse, navigation clavier et notices. Le lecteur prend aussi en charge les médias vidéo ; aucun fichier vidéo n’est présent dans cette sélection.
+- Frise : tous les repères datés associés aux entrées du graphe, triables et filtrables autour de l’entrée. Quatre repères sont sourcés ; les huit entrées restantes gardent explicitement une date non renseignée. Les dates situent un objet ou un événement, jamais une origine supposée d’une pratique.
+- Relations : même carte et mêmes interactions que l’accueil, dans une composition pleine largeur.
+- Composition : six familles de widgets et un modèle 3D optionnel associé à Bois, avec bibliothèque, presets, déplacement, redimensionnement et commandes clavier. Le modèle reste chargé à la demande et ses ressources sont libérées lorsque le widget est retiré.
+
+Les notices et repères sont séparés du rendu dans `encyclopedia-records.js`. Les trois images de collection sont issues du Met Open Access, déclarées dans le domaine public, avec attribution, URL et provenance locale dans `assets/encyclopedia/provenance.json`. Les autres médias sont qualifiés comme textures ou démonstrations. La composition conserve son ordre et ses formats pendant la visite ; elle n’est pas enregistrée après rechargement.
+
 ## Participation
 
 Le Worker Cloudflare et sa base chiffrée restent dans `worker/`, mais leur mode public n’est pas encore ouvert. Le site ne doit jamais exposer le code du test propriétaire.
