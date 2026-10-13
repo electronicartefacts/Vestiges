@@ -33,8 +33,14 @@ export function collectDatedEntries(entries, records = details) {
     .sort((a, b) => a.start - b.start || a.end - b.end || a.key.localeCompare(b.key));
 }
 
+export function normalizeSearch(value) {
+  return String(value).toLocaleLowerCase('fr').normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').replace(/œ/g, 'oe').replace(/æ/g, 'ae')
+    .replace(/[‘’]/g, "'").replace(/[-‐‑–—]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 export function searchEntries(entries, query, records = details) {
-  const normalize = value => String(value).toLocaleLowerCase('fr').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const normalize = normalizeSearch;
   const needle = normalize(query);
   if (!needle) return [];
   const words = needle.split(/\s+/);

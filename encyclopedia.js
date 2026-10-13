@@ -1,7 +1,7 @@
-import { details, media, collectDatedEntries, searchEntries } from './encyclopedia-records.20261013b.js';
+import { details, media, collectDatedEntries, searchEntries, normalizeSearch } from './encyclopedia-records.20261014a.js';
 import { initComposition } from './composition-engine.20261013a.js';
 
-import { buildCatalog, records, filterEntries, collectCatalogDates, mediaForEntries, groupLocations, searchCatalog, families, practices, materials, styles, periods, places } from './encyclopedia-catalog.20261013b.js';
+import { buildCatalog, records, filterEntries, collectCatalogDates, mediaForEntries, groupLocations, searchCatalog, families, practices, materials, styles, periods, places } from './encyclopedia-catalog.20261014a.js';
 import { worldMapMarkup, comparisonMarkup, initCatalogGraph } from './encyclopedia-spatial.20261013a.js';
 
 const workspace = document.querySelector('[data-premium-encyclopedia]');
@@ -32,7 +32,7 @@ if (workspace) {
   let layout = [...defaults];
   let imageOpener;
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-  const normalize = value => value.toLocaleLowerCase('fr').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const normalize = normalizeSearch;
   const record = () => records[state.entry] || {};
   const related = () => (byId.get(state.entry)?.relatedIds || []).map(id => byId.get(id)).filter(entry => entry && visibleEntries.some(item => item.id === entry.id));
   const entryMedia = () => mediaForEntries(media, [byId.get(state.entry)]);

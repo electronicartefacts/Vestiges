@@ -41,11 +41,11 @@ test("les ressources versionnées correspondent aux sources validées", async ()
     ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20261013a.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
     ["forge-viewer.js", "forge-viewer.20261013b.js"],
-    ["encyclopedia.js", "encyclopedia.20261013c.js"],
+    ["encyclopedia.js", "encyclopedia.20261014a.js"],
     ["encyclopedia.css", "encyclopedia.20261013b.css"],
-    ["encyclopedia-records.js", "encyclopedia-records.20261013b.js"],
+    ["encyclopedia-records.js", "encyclopedia-records.20261014a.js"],
     ["composition-engine.js", "composition-engine.20261013a.js"],
-    ["encyclopedia-catalog.js", "encyclopedia-catalog.20261013b.js"],
+    ["encyclopedia-catalog.js", "encyclopedia-catalog.20261014a.js"],
     ["encyclopedia-spatial.js", "encyclopedia-spatial.20261013a.js"],
     ["world-geometry.js", "world-geometry.20261013a.js"]
   ];

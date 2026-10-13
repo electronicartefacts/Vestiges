@@ -1,4 +1,4 @@
-import { details, collectDatedEntries, searchEntries } from './encyclopedia-records.20261013b.js';
+import { details, collectDatedEntries, searchEntries } from './encyclopedia-records.20261014a.js';
 
 const met = (id, label) => ({ label, url: `https://www.metmuseum.org/art/collection/search/${id}`, institution: 'The Metropolitan Museum of Art' });
 export const families = [
