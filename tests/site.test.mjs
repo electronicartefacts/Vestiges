@@ -73,7 +73,7 @@ test("l’introduction est courte, évitable, déterministe et mémorisée", asy
   const [html, script] = await Promise.all([read("index.html"), read("script.js")]);
   assert.match(html, /data-intro-skip/);
   assert.match(html, /data-brand-intro[^>]*role="dialog" aria-modal="true"/);
-  assert.match(html, /matière[\s\S]*geste[\s\S]*œuvre[\s\S]*mémoire[\s\S]*relation[\s\S]*Vestiges/);
+  assert.match(html, /matière[\s\S]*geste[\s\S]*pièce[\s\S]*mémoire[\s\S]*rencontre[\s\S]*Vestiges/);
   assert.doesNotMatch(script, /Math\.random/);
   assert.match(script, /localStorage\.setItem/);
   assert.match(script, /prefers-reduced-motion/);
@@ -130,7 +130,7 @@ test("tous les titres utilisent une vague de graisse déterministe et réversibl
   assert.match(script, /pointerdown/);
   assert.match(styles, /font-variation-settings: "wght" var\(--glyph-weight/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(html, /class="type-ribbon"/);
+  assert.match(html, /class="focus-ribbon"/);
   assert.doesNotMatch(script, /Math\.random/);
 });
 
