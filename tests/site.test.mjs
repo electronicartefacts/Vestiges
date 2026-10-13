@@ -6,29 +6,41 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const read = (path) => readFile(resolve(root, path), "utf8");
 
+const publicPages = [
+  "index.html", "artisans/index.html", "encyclopedie/index.html", "collaborations/index.html",
+  "approche/index.html", "marketplace/index.html", "programme-fondateur/index.html", "pour-qui/index.html",
+  "artistes/index.html", "transmission/index.html", "organisations/index.html", "comment-ca-marche/index.html",
+  "methode/index.html", "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
+  "explorer/index.html", "explorer/specimen/index.html"
+];
+const activeResource = async (name, extension) => {
+  const home = await read("index.html");
+  const match = home.match(new RegExp(`(?:href|src)="/(${name}\\.[0-9a-z]+\\.${extension})(?:\\?[^" ]*)?"`));
+  assert.ok(match, `Ressource active absente : ${name}`);
+  return match[1];
+};
+
 test("les pages publiques chargent une version cohérente des ressources", async () => {
-  const pages = [
-    "index.html", "programme-fondateur/index.html", "pour-qui/index.html", "artistes/index.html", "transmission/index.html",
-    "organisations/index.html", "comment-ca-marche/index.html", "methode/index.html",
-    "participer/index.html", "a-propos/index.html", "laboratoire/index.html",
-    "explorer/index.html", "explorer/specimen/index.html"
-  ];
-  for (const page of pages) {
+  const resources = await Promise.all([
+    activeResource("theme-init", "js"), activeResource("styles", "css"), activeResource("script", "js")
+  ]);
+  for (const page of publicPages) {
     const html = await read(page);
-    assert.match(html, /theme-init\.20260718b\.js/);
-    assert.match(html, /styles\.20261012d\.css/);
-    assert.match(html, /script\.20261012b\.js/);
+    for (const resource of resources) {
+      assert.ok(html.includes(`/${resource}`), `${page} : ressource incohérente ${resource}`);
+    }
   }
+  assert.ok((await read("404.html")).includes(`/${resources[1]}`));
 });
 
 test("les ressources versionnées correspondent aux sources validées", async () => {
   const pairs = [
-    ["theme-init.js", "theme-init.20260718b.js"],
-    ["styles.css", "styles.20261012d.css"],
-    ["script.js", "script.20261012b.js"],
+    ["theme-init.js", await activeResource("theme-init", "js")],
+    ["styles.css", await activeResource("styles", "css")],
+    ["script.js", await activeResource("script", "js")],
     ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20261011a.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
-    ["forge-viewer.js", "forge-viewer.20260716g.js"]
+    ["forge-viewer.js", "forge-viewer.20261013a.js"]
   ];
   for (const [source, versioned] of pairs) assert.equal(await read(versioned), await read(source));
 });
@@ -185,7 +197,7 @@ test("les modes de l’encyclopédie et ses nœuds ont des noms accessibles en f
   assert.match(html, /data-view-button="timeline"[^>]*>Frise chronologique<\/button>/);
   assert.match(script, /button\.innerHTML = `<span>\$\{item\.type\}<\/span><strong>\$\{item\.title\}<\/strong>`/);
   assert.match(script, /button\.setAttribute\("aria-description", `\$\{relationSummary\(item\)\}/);
-  assert.match(script, /button\.setAttribute\("aria-description", "Afficher dans le graphe\."\)/);
+  assert.match(script, /button\.setAttribute\("aria-description", "Afficher cet élément sur la carte\."\)/);
 });
 
 test("le header compose le monogramme avec estiges et conserve seulement le logo sur mobile", async () => {
@@ -305,16 +317,16 @@ test("les widgets de la mosaïque adaptent densité, contenu et interactions à 
   assert.match(mosaic, /class="widget-compact"/);
 });
 
-test("l’accueil ouvre par une exploration locale, accessible et explicitement provisoire", async () => {
+test("l’accueil contient une exploration locale, accessible et explicitement provisoire", async () => {
   const [html, script, styles, data] = await Promise.all([
     read("index.html"), read("script.js"), read("styles.css"), read("exploration-data.js")
   ]);
   assert.match(html, /data-exploration/);
-  assert.match(html, /role="group" aria-label="Carte des fragments de démonstration"/);
+  assert.match(html, /role="group" aria-label="Carte des exemples"/);
   assert.match(html, /data-exploration-related-list/);
   assert.match(html, /data-exploration-text-list/);
-  assert.match(html, /[Ff]ragment de démonstration/);
-  assert.match(html, /aucune entrée ne représente encore un dossier réel/);
+  assert.match(html, /Encyclopédie · démonstration/i);
+  assert.match(html, /aucun ne représente un dossier réel/);
   assert.match(html, /exploration-data\.20260816a\.js/);
   assert.match(script, /function initExploration/);
   assert.match(script, /relationLayer\.append\(path\)/);
@@ -337,7 +349,7 @@ test("la nouvelle arborescence expose ses six pages et conserve les anciennes co
       assert.ok(html.includes(href), `${page} should link to ${href}`);
     }
     assert.match(html, /Ressources complémentaires/);
-    assert.match(html, /Programme fondateur/);
+    assert.match(html, /Premiers dossiers/);
   }
   const [artisans, encyclopedia, marketplace, participation, script] = await Promise.all([
     read("artisans/index.html"), read("encyclopedie/index.html"), read("marketplace/index.html"),
@@ -356,8 +368,8 @@ test("la nouvelle arborescence expose ses six pages et conserve les anciennes co
 test("Comment ça marche montre une anatomie de dossier sans fabriquer de cas réel", async () => {
   const [html, styles] = await Promise.all([read("comment-ca-marche/index.html"), read("styles.css")]);
   assert.match(html, /Prototype de structure/);
-  assert.match(html, /ne représente ni un (?:artiste|artisan) réel, ni un dossier déjà produit/);
-  assert.match(html, /Récit de pratique[\s\S]*Éléments reliés[\s\S]*Registre vérifiable[\s\S]*Droits praticables/);
+  assert.match(html, /ne décrit ni un·e artisan·e réel·le ni un dossier déjà publié/);
+  assert.match(html, /Récit de pratique[\s\S]*Éléments reliés[\s\S]*D’où viennent les informations[\s\S]*Vos choix de publication/);
   assert.match(html, /30 à 45 minutes d’échange initial/);
   assert.match(styles, /\.dossier-blueprint/);
   assert.match(styles, /\.effort-strip/);
@@ -371,12 +383,12 @@ test("les trois cibles disposent d’une route dédiée", async () => {
   assert.match(hub, /Recherche et transmission/);
   assert.match(hub, /Institutions et associations/);
   assert.match(artistes, /Votre savoir-faire mérite plus qu’une image/);
-  assert.match(artistes, /v=20260718b&amp;parcours=artistes#conversation/);
+  assert.match(artistes, /v=20260718b&amp;parcours=artisans#conversation/);
   assert.match(transmission, /Construire l’encyclopédie sans effacer les nuances/);
   assert.match(transmission, /Partir d’un usage réel/);
   assert.match(transmission, /v=20260718b&amp;parcours=transmission#conversation/);
-  assert.match(organisations, /Construire l’encyclopédie avec les lieux/);
-  assert.match(organisations, /Quatre décisions avant toute production/);
+  assert.match(organisations, /Documenter des savoir-faire avec un lieu culturel/);
+  assert.match(organisations, /Quatre questions avant de commencer/);
   assert.match(organisations, /v=20260718b&amp;parcours=institutions#conversation/);
 });
 
@@ -397,8 +409,8 @@ test("Explorer annonce le futur corpus au lieu d’ouvrir un artefact", async ()
   const [explorer, specimen, sitemap] = await Promise.all([
     read("explorer/index.html"), read("explorer/specimen/index.html"), read("sitemap.xml")
   ]);
-  assert.match(explorer, /corpus à venir/);
-  assert.match(explorer, /plusieurs dossiers consentis/);
+  assert.match(explorer, /dossiers à venir/);
+  assert.match(explorer, /plusieurs dossiers réels[\s\S]*avec l’accord des personnes concernées/);
   assert.match(explorer, /<meta name="robots" content="noindex, follow">/);
   assert.match(specimen, /<meta name="robots" content="noindex, follow">/);
   assert.doesNotMatch(sitemap, /\/explorer\//);
@@ -409,10 +421,10 @@ test("Bois flotté 01 distingue les faits, estimations, inconnues et productions
   const [lab, dossier, provenance] = await Promise.all([
     read("laboratoire/index.html"), read("explorer/specimen/index.html"), read("assets/works/bois-flotte-01/provenance.json")
   ]);
-  assert.match(lab, /Laboratoire · preuve technique/);
-  assert.match(lab, /pas encore l’expérience complète d’un dossier d’artiste/);
-  assert.match(dossier, /Artiste inconnu/);
-  assert.match(dossier, /Les informations non vérifiées restent explicitement signalées/);
+  assert.match(lab, /Démonstration · modèle 3D/);
+  assert.match(lab, /ce n’est pas encore un dossier réalisé avec un·e artisan·e/i);
+  assert.match(dossier, /Auteur[\s\S]*Non identifié/);
+  assert.match(dossier, /Son origine et ses mesures exactes restent inconnues ou à vérifier/);
   assert.match(dossier, /20 × 20 × 25/);
   assert.match(dossier, /≈ 0,7 kg/);
   assert.match(dossier, /data-model-projection="front"[\s\S]*data-model-projection="side"[\s\S]*data-model-projection="top"/);
@@ -434,7 +446,7 @@ test("le modèle FORGE est local, transparent et chargé à la demande", async (
   ]);
   assert.match(lab, /data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
   assert.match(lab, /data-load-model/);
-  assert.match(script, /await import\("\/forge-viewer\.20260716g\.js"\)/);
+  assert.match(script, /await import\("\/forge-viewer\.20261013a\.js"\)/);
   const viewerInit = script.split("function initForgeViewer()")[1]?.split("function initContactForm()")[0] || "";
   assert.match(viewerInit, /button\.addEventListener\("click", load\)/);
   assert.doesNotMatch(viewerInit, /IntersectionObserver|navigator\.connection/);
@@ -459,7 +471,7 @@ test("la participation prépare un contact direct sans prétendre transmettre", 
   assert.match(script, /institutions: "Lieux culturels, associations et institutions"/);
   assert.match(script, /artistes: "Artisan·es et ateliers"/);
   assert.match(script, /artisans: "Artisan·es et ateliers"/);
-  assert.match(await read("artisans/index.html"), /parcours=artistes/);
+  assert.match(await read("artisans/index.html"), /parcours=artisans/);
   assert.match(script, /route\.checked = true/);
   assert.match(script, /scrollIntoView/);
   assert.match(html, /01 \/ 04[\s\S]*02 \/ 04[\s\S]*03 \/ 04[\s\S]*04 \/ 04/);
@@ -515,12 +527,12 @@ test("le programme fondateur rend la proposition et ses limites décidables", as
     read("programme-fondateur/index.html"), read("index.html"), read("artistes/index.html"), read("a-propos/index.html")
   ]);
   assert.match(program, /30 à 45 minutes/);
-  assert.match(program, /production initiale non facturés/i);
-  assert.match(program, /Aucun frais futur ni gratuité à vie/);
-  assert.match(program, /Ni capital, ni emploi, ni mandat/);
-  assert.match(home, /Programme fondateur/);
+  assert.match(program, /production initiale[\s\S]*n’est pas facturée/i);
+  assert.match(program, /Aucun tarif ni avantage futur n’est fixé aujourd’hui/);
+  assert.match(program, /Vous restez libre de poursuivre ou d’arrêter à chaque étape/);
+  assert.match(home, /Premiers dossiers/);
   assert.match(artistes, /Premiers praticiens/);
-  assert.match(about, /L’équipe Vestiges, portée par Electronic Artefacts/);
+  assert.match(about, /Electronic Artefacts/);
   assert.doesNotMatch(about, /Joey-Néot Marquet/);
 });
 
@@ -528,16 +540,20 @@ test("chaque page de rôle propose une action intermédiaire contextualisée", a
   const [artistes, transmission, organisations] = await Promise.all([
     read("artistes/index.html"), read("transmission/index.html"), read("organisations/index.html")
   ]);
-  assert.match(artistes, /micro-conversion[\s\S]*parcours=artistes/);
+  assert.match(artistes, /micro-conversion[\s\S]*parcours=artisans/);
   assert.match(transmission, /micro-conversion[\s\S]*parcours=transmission/);
   assert.match(organisations, /micro-conversion[\s\S]*parcours=institutions/);
 });
 
-test("la navigation privilégie le programme réel au dossier témoin", async () => {
+test("la navigation principale privilégie les pages de compréhension", async () => {
   const pages = ["index.html", "artistes/index.html", "participer/index.html", "methode/index.html"];
   for (const page of pages) {
     const html = await read(page);
-    assert.match(html, /<nav class="main-nav"[\s\S]*href="\/programme-fondateur\/">Programme fondateur<\/a>/);
+    const navigation = html.match(/<nav class="main-nav"[\s\S]*?<\/nav>/)?.[0] || "";
+    for (const route of ["artisans", "encyclopedie", "collaborations", "approche", "marketplace"]) {
+      assert.ok(navigation.includes(`href="/${route}/"`), `${page} : route principale absente ${route}`);
+    }
+    assert.doesNotMatch(navigation, /href="\/explorer\/specimen\/"/);
     assert.doesNotMatch(html, /<nav class="main-nav"[\s\S]*>Voir un dossier<\/a>/);
   }
 });
@@ -593,9 +609,9 @@ test("les titres et descriptions renforcent la sémantique sans modifier le parc
   assert.equal(firstHeading, "h1");
   assert.match(participer, /<p class="invitation-context__heading" id="invitation-title">/);
   assert.match(about, /<h1[^>]*>Vestiges, un projet de documentation des savoir-faire artisanaux<\/h1>/);
-  assert.match(laboratory, /<title>Reconstruction 3D expérimentale de Bois flotté 01 \| Vestiges<\/title>/);
+  assert.match(laboratory, /<title>Bois flotté 01 · démonstration 3D \| Vestiges<\/title>/);
   const transmissionDescription = transmission.match(/<meta name="description" content="([^"]*)">/)?.[1] ?? "";
-  for (const term of ["recherche", "sources", "médiation", "enseignement", "transmission"]) {
+  for (const term of ["document", "mot de métier", "question", "dossiers"]) {
     assert.ok(transmissionDescription.toLocaleLowerCase("fr").includes(term), `Terme manquant dans la description : ${term}`);
   }
 });

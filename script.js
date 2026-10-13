@@ -36,7 +36,7 @@
     const guided = window.location.pathname === "/participer/" && (
       ["direct", "joey", "recommendation", "scouting", "programme"].includes(source)
       || /^[a-z0-9_-]{1,48}$/i.test(invitation)
-      || ["artistes", "transmission", "institutions", "organisations", "acheteurs"].includes(route)
+      || ["artistes", "artisans", "transmission", "institutions", "organisations", "acheteurs", "autre"].includes(route)
     );
     emitJourneySignal("page_ready", {
       context: guided ? "guided" : "standard"
@@ -297,6 +297,7 @@
     let lastRenderTime = 0;
 
     const requestFrame = (state) => {
+      if (reduceMotion.matches || document.hidden) return;
       activeStates.add(state);
       state.element.classList.add("is-kinetic-active");
       if (!frame) frame = window.requestAnimationFrame(render);
@@ -304,6 +305,7 @@
 
     const render = (time) => {
       frame = 0;
+      if (reduceMotion.matches || document.hidden) return;
       const frameDelta = lastRenderTime ? Math.min(32, Math.max(0, time - lastRenderTime)) : 16.667;
       lastRenderTime = time;
       const weightEase = 1 - Math.exp(-frameDelta / 220);
@@ -462,6 +464,29 @@
       }, { rootMargin: "0px 0px -12%", threshold: .25 });
       states.forEach((state) => observer.observe(state.element));
     }
+
+    const settleType = () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = 0;
+      lastRenderTime = 0;
+      activeStates.clear();
+      states.forEach((state) => {
+        state.hovered = false;
+        state.tapStarted = 0;
+        state.revealStarted = 0;
+        state.element.classList.remove("is-kinetic-active");
+        state.glyphs.forEach((glyph, index) => {
+          state.weights[index] = state.base;
+          glyph.dataset.kineticLevel = String(Math.max(250, Math.min(620, Math.round(state.base / 2) * 2)));
+        });
+      });
+    };
+    reduceMotion.addEventListener("change", () => {
+      if (reduceMotion.matches) settleType();
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) settleType();
+    });
 
   }
 
@@ -1187,7 +1212,7 @@
         button.disabled = true;
         button.textContent = "Préparation de la vue 3D…";
         try {
-          const { mountForgeViewer } = await import("/forge-viewer.20260716g.js");
+          const { mountForgeViewer } = await import("/forge-viewer.20261013a.js");
           mountForgeViewer(viewer);
           button.hidden = true;
         } catch (_error) {

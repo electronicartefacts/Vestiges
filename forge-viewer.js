@@ -167,7 +167,7 @@ export function mountForgeViewer(root) {
       return;
     }
     const percent = Math.min(99, Math.round((event.loaded / event.total) * 100));
-    status.textContent = `Chargement du modèle 8K — ${percent} %`;
+    status.textContent = `Chargement du modèle 3D — ${percent} %`;
   }, () => {
     status.textContent = "Le modèle n’a pas pu être chargé. L’image et le dossier restent disponibles.";
     root.classList.add("has-viewer-error");

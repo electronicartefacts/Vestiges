@@ -21,7 +21,7 @@ Mini-site statique de [Vestiges](https://vestiges.world), projet culturel et éd
 
 Les pages historiques restent accessibles en liens secondaires dans le pied de page : `/programme-fondateur/`, `/pour-qui/`, `/comment-ca-marche/`, `/transmission/`, `/organisations/`, `/artistes/`, `/methode/`, `/participer/`, `/a-propos/`, `/laboratoire/`, `/explorer/` et `/explorer/specimen/`. Aucune route historique n’a été supprimée ou redirigée dans cette première version.
 
-L’accueil commence par une **constellation éditoriale** de douze fragments de démonstration. Son jeu de données est isolé dans `exploration-data.js` ; il ne décrit aucun dossier réel et pourra être remplacé par une projection de VAST sans réécrire la couche d’interaction.
+L’accueil commence par une présentation visuelle et quatre portes de découverte, puis propose une **constellation éditoriale** de douze exemples de démonstration. Son jeu de données est isolé dans `exploration-data.js` ; il ne décrit aucun dossier réel et pourra être remplacé par une projection de VAST sans réécrire la couche d’interaction.
 
 Le site correspond à l’état de maturité **premier prototype public**. Les premiers portraits et dossiers sont à construire avec des artisan·es. La marketplace n’est pas encore ouverte. Bois flotté 01 est un sujet naturel sans praticien attribué. La capture, la reconstruction et les médias numériques sont attribués à Electronic Artefacts et ne sont pas déclarés dans le domaine public.
 
@@ -29,9 +29,9 @@ Le site correspond à l’état de maturité **premier prototype public**. Les p
 
 Les règles transversales de composition, typographie, couleur, interaction et responsive sont formalisées dans [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md).
 
-L’introduction typographique est déterministe, courte, immédiatement évitable, mémorisée localement et rejouable. La réduction de mouvement donne accès à un état stable. La séquence publique utilise `matière → geste → œuvre → mémoire → relation → Vestiges` afin d’éviter de limiter le projet à la sculpture ou au monument.
+L’introduction typographique est déterministe, courte, immédiatement évitable, mémorisée localement et rejouable. La réduction de mouvement donne accès à un état stable. La séquence publique utilise `matière → geste → pièce → mémoire → rencontre → Vestiges` afin d’éviter de limiter le projet à la sculpture ou au monument.
 
-Les titres éditoriaux utilisent un système typographique variable déterministe. Chaque mot conserve ses retours de ligne naturels ; une vague gaussienne de graisse suit le pointeur, réagit au toucher et accompagne la première apparition dans le viewport. Seul le `h1` conserve une respiration ambiante très légère. En réduction de mouvement, les titres restent entièrement statiques et ne sont pas découpés en glyphes.
+Les titres éditoriaux utilisent un système typographique variable déterministe. Chaque mot conserve ses retours de ligne naturels ; une vague gaussienne de graisse suit le pointeur, réagit au toucher et accompagne la première apparition dans le viewport. Les variations se stabilisent après leur apparition ou leur interaction ; elles s’arrêtent lorsque l’onglet est masqué. En réduction de mouvement, les titres restent entièrement statiques ; une activation de cette préférence en cours de session stabilise aussi les glyphes déjà créés.
 
 Le contraste suit `prefers-color-scheme` : fond blanc et texte noir en mode clair, fond noir et texte blanc en mode sombre. Un contrôle circulaire présent dans chaque en-tête permet de basculer manuellement ; ce choix est mémorisé localement et prend priorité sur le réglage de l’appareil.
 
