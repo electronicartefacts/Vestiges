@@ -394,7 +394,7 @@ test("le modèle FORGE est local, transparent et chargé à la demande", async (
   ]);
   assert.match(lab, /data-model-src="\/assets\/works\/bois-flotte-01\/bois-flotte-01-8k\.glb"/);
   assert.match(lab, /data-load-model/);
-  assert.match(script, /await import\("\/forge-viewer\.20261013a\.js"\)/);
+  assert.match(script, /await import\("\/forge-viewer\.20261013b\.js"\)/);
   const viewerInit = script.split("function initForgeViewer()")[1]?.split("function initContactForm()")[0] || "";
   assert.match(viewerInit, /button\.addEventListener\("click", load\)/);
   assert.doesNotMatch(viewerInit, /IntersectionObserver|navigator\.connection/);
