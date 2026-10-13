@@ -104,7 +104,8 @@ export function mountForgeViewer(root) {
   controls.enablePan = false;
   controls.minDistance = 2.2;
   controls.maxDistance = 7;
-  controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  controls.autoRotate = !reduceMotion.matches;
   controls.autoRotateSpeed = 0.42;
 
   scene.add(new THREE.HemisphereLight(0xf3efe4, 0x30394a, 2.7));
@@ -117,59 +118,94 @@ export function mountForgeViewer(root) {
 
   let visible = true;
   let loaded = false;
+  let frame = 0;
+  let rendering = false;
+  let pageActive = true;
   const resize = () => {
     const width = Math.max(1, stage.clientWidth);
     const height = Math.max(1, stage.clientHeight);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    if (loaded) start();
   };
   const observer = new ResizeObserver(resize);
   observer.observe(stage);
   resize();
 
   if ("IntersectionObserver" in window) {
-    const visibilityObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }, { threshold: 0.01 });
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) start(); else stop();
+    }, { threshold: 0.01 });
     visibilityObserver.observe(root);
   }
 
-  const render = () => {
-    window.requestAnimationFrame(render);
-    if (!loaded || !visible || document.hidden) return;
-    controls.update();
+  function stop() {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+  }
+  function start() {
+    if (frame || rendering || !loaded || !visible || !pageActive || document.hidden) return;
+    frame = requestAnimationFrame(render);
+  }
+  function render() {
+    frame = 0;
+    if (!loaded || !visible || !pageActive || document.hidden) return;
+    rendering = true;
+    const changed = controls.update();
     renderer.render(scene, camera);
-  };
-  render();
+    rendering = false;
+    if (controls.autoRotate || changed) start();
+  }
+  controls.addEventListener("change", start);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) stop(); else start(); });
+  window.addEventListener("pagehide", () => { pageActive = false; stop(); });
+  window.addEventListener("pageshow", () => { pageActive = true; start(); });
+  reduceMotion.addEventListener("change", () => { controls.autoRotate = !reduceMotion.matches; start(); });
+  const loadButton = root.querySelector("[data-load-model]");
+  function loadModel() {
+    root.classList.remove("has-viewer-error");
+    if (loadButton) loadButton.disabled = true;
+    status.textContent = "Chargement du modèle 3D · ≈ 71 Mo…";
+    new GLTFLoader().load(modelUrl, (gltf) => {
+      const model = gltf.scene;
+      const bounds = new THREE.Box3().setFromObject(model);
+      const size = bounds.getSize(new THREE.Vector3());
+      const center = bounds.getCenter(new THREE.Vector3());
+      const scale = 2.8 / Math.max(size.x, size.y, size.z);
+      model.position.sub(center);
+      model.scale.setScalar(scale);
+      model.rotation.y = -0.45;
+      scene.add(model);
+      mountModelProjections(model);
 
-  new GLTFLoader().load(modelUrl, (gltf) => {
-    const model = gltf.scene;
-    const bounds = new THREE.Box3().setFromObject(model);
-    const size = bounds.getSize(new THREE.Vector3());
-    const center = bounds.getCenter(new THREE.Vector3());
-    const scale = 2.8 / Math.max(size.x, size.y, size.z);
-    model.position.sub(center);
-    model.scale.setScalar(scale);
-    model.rotation.y = -0.45;
-    scene.add(model);
-    mountModelProjections(model);
-
-    const framedBounds = new THREE.Box3().setFromObject(model);
-    controls.target.copy(framedBounds.getCenter(new THREE.Vector3()));
-    controls.update();
-    loaded = true;
-    root.classList.add("is-model-loaded");
-    if (poster) poster.hidden = true;
-    status.textContent = "Objet chargé — glissez pour tourner, molette ou pincement pour zoomer.";
-    renderer.render(scene, camera);
-  }, (event) => {
-    if (!event.total) {
-      status.textContent = "Chargement de l’objet 3D haute définition…";
-      return;
-    }
-    const percent = Math.min(99, Math.round((event.loaded / event.total) * 100));
-    status.textContent = `Chargement du modèle 3D — ${percent} %`;
-  }, () => {
-    status.textContent = "Le modèle n’a pas pu être chargé. L’image et le dossier restent disponibles.";
-    root.classList.add("has-viewer-error");
-  });
+      const framedBounds = new THREE.Box3().setFromObject(model);
+      controls.target.copy(framedBounds.getCenter(new THREE.Vector3()));
+      controls.update();
+      loaded = true;
+      root.classList.add("is-model-loaded");
+      if (poster) poster.hidden = true;
+      status.textContent = "Objet chargé — glissez pour tourner, molette ou pincement pour zoomer.";
+      if (loadButton) loadButton.hidden = true;
+      start();
+    }, (event) => {
+      if (!event.total) {
+        status.textContent = "Chargement de l’objet 3D haute définition…";
+        return;
+      }
+      const percent = Math.min(99, Math.round((event.loaded / event.total) * 100));
+      status.textContent = `Chargement du modèle 3D — ${percent} %`;
+    }, () => {
+      status.textContent = "Le modèle n’a pas pu être chargé. L’image et le dossier restent disponibles.";
+      root.classList.add("has-viewer-error");
+      if (loadButton) {
+        loadButton.hidden = false;
+        loadButton.disabled = false;
+        loadButton.textContent = "Réessayer le modèle 3D · ≈ 71 Mo";
+      }
+    });
+  }
+  loadButton?.addEventListener("click", () => { if (root.classList.contains("has-viewer-error")) loadModel(); });
+  loadModel();
 }

@@ -1,5 +1,5 @@
 import { media } from './encyclopedia-records.20261013b.js';
-import { buildCatalog, filterEntries, mediaForEntries } from './encyclopedia-catalog.20261013a.js';
+import { buildCatalog, filterEntries, mediaForEntries } from './encyclopedia-catalog.20261013b.js';
 
 function initPhotoPreview() {
   const root = document.querySelector('[data-home-photo-preview]');

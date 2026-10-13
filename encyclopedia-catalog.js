@@ -56,10 +56,14 @@ export function buildCatalog(base) {
   return [...Array.from(base).map(entry => ({ ...entry, family: entry.family || (entry.type === 'Matière' ? 'material' : entry.type === 'Style' ? 'movement' : 'practice'), ...metadata[entry.id] })), ...extras]
     .map(entry => ({ practices: [], materials: [], styles: [], locations: [], ...entry }));
 }
+export function searchCatalog(entries, query) {
+  const searchable = entries.map(entry=>({...entry,shortDescription: `${entry.shortDescription} ${entry.locations.map(place=>place.label).join(' ')} ${[...entry.practices,...entry.materials,...entry.styles].map(id=>[...practices,...materials,...styles].find(([key])=>key===id)?.[1]||id).join(' ')}`}));
+  const byId = new Map(entries.map(entry => [entry.id, entry]));
+  return searchEntries(searchable, query, records).map(entry => byId.get(entry.id));
+}
 export function filterEntries(entries, filters = {}) {
   const period = periods.find(([key]) => key === filters.period);
-  const searchable = entries.map(entry=>({...entry,shortDescription: `${entry.shortDescription} ${entry.locations.map(place=>place.label).join(' ')} ${[...entry.practices,...entry.materials,...entry.styles].map(id=>[...practices,...materials,...styles].find(([key])=>key===id)?.[1]||id).join(' ')}`}));
-  const matching = new Set(searchEntries(searchable, filters.query || '', records).map(entry => entry.id));
+  const matching = new Set(searchCatalog(entries, filters.query || '').map(entry => entry.id));
   return entries.filter(entry => {
     if (filters.query?.trim() && !matching.has(entry.id)) return false;
     if (filters.family && entry.family !== filters.family) return false;

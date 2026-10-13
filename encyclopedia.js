@@ -1,7 +1,7 @@
 import { details, media, collectDatedEntries, searchEntries } from './encyclopedia-records.20261013b.js';
 import { initComposition } from './composition-engine.20261013a.js';
 
-import { buildCatalog, records, filterEntries, collectCatalogDates, mediaForEntries, groupLocations, families, practices, materials, styles, periods, places } from './encyclopedia-catalog.20261013a.js';
+import { buildCatalog, records, filterEntries, collectCatalogDates, mediaForEntries, groupLocations, searchCatalog, families, practices, materials, styles, periods, places } from './encyclopedia-catalog.20261013b.js';
 import { worldMapMarkup, comparisonMarkup, initCatalogGraph } from './encyclopedia-spatial.20261013a.js';
 
 const workspace = document.querySelector('[data-premium-encyclopedia]');
@@ -353,7 +353,7 @@ if (workspace) {
   query.addEventListener('input', () => {
     const needle = normalize(query.value.trim());
     if (!needle) { closeResults(); return; }
-    const matches = searchEntries(filterEntries(entries,{...state.filters,query:""}), query.value, records);
+    const matches = searchCatalog(filterEntries(entries,{...state.filters,query:""}), query.value);
     results.innerHTML = matches.length ? matches.map(entry => `<li><button type="button" data-subject-link="${entry.id}"><span>${escape(entry.title)}</span><small>${escape(entry.type)}</small></button></li>`).join('') : '<li class="search-empty">Aucune entrée ne correspond. Essayez « bois », « textile » ou « gravure ».</li>';
     results.hidden = false;
     query.setAttribute('aria-expanded', 'true');
@@ -389,12 +389,16 @@ if (workspace) {
     const comparison=(url.searchParams.get('comparer')||'').split(',').filter(id=>byId.has(id));
     if(comparison.length)state.compare=[...new Set(comparison)].slice(0,3);else state.compare=[state.pinned,...state.compare.filter(key=>key!==state.pinned)].slice(0,2);
     applyFilters(false);
-    showView(alias[url.hash.slice(1)] || 'editorial', false);
+    const hash = url.hash.slice(1);
+    showView(alias[hash] || (hash === 'references' ? state.view : 'editorial'), false);
+    if (hash === 'references') requestAnimationFrame(() => document.getElementById('references')?.scrollIntoView({ block: 'start', behavior: 'instant' }));
   }
   graph=initCatalogGraph(workspace.querySelector('[data-exploration]'),id=>selectEntry(id));
   renderGrid();
   renderEntry(state.entry);
   composition = initComposition(workspace);
+  workspace.querySelector(".workspace-controls").hidden = false;
+  workspace.querySelector(".catalog-results").hidden = false;
   restoreLocation();
   window.addEventListener('hashchange', restoreLocation);
   window.addEventListener('popstate', restoreLocation);

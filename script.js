@@ -69,8 +69,12 @@
       button.setAttribute("aria-expanded", String(open));
       button.textContent = open ? "Fermer" : "Menu";
       navigation.classList.toggle("is-open", open);
+      if (open) navigation.querySelector("a")?.focus({ preventScroll: true });
     });
     navigation.addEventListener("click", () => close());
+    navigation.addEventListener("focusout", (event) => {
+      if (!navigation.contains(event.relatedTarget) && event.relatedTarget !== button) close();
+    });
     document.addEventListener("pointerdown", (event) => {
       if (button.getAttribute("aria-expanded") !== "true") return;
       if (navigation.contains(event.target) || button.contains(event.target)) return;
@@ -1282,12 +1286,13 @@
         button.disabled = true;
         button.textContent = "Préparation de la vue 3D…";
         try {
-          const { mountForgeViewer } = await import("/forge-viewer.20261013a.js");
+          const { mountForgeViewer } = await import("/forge-viewer.20261013b.js");
           mountForgeViewer(viewer);
           button.hidden = true;
         } catch (_error) {
           loading = false;
           viewer.classList.remove("is-model-loading");
+          delete viewer.dataset.viewerMounted;
           button.disabled = false;
           button.textContent = "Réessayer d’ouvrir l’objet 3D";
           const status = viewer.querySelector("[data-viewer-status]");
@@ -1318,6 +1323,11 @@
     const directAction = document.querySelector("[data-direct-action]");
     const routePrefill = form.querySelector("[data-route-prefill]");
     let current = 0;
+    let confirmation;
+    const actions = form.querySelector(".form-actions");
+    const previewText = form.querySelector("[data-message-text]");
+    const reviewCopy = form.querySelector("[data-copy-review-message]");
+    const reviewCopyStatus = form.querySelector("[data-review-copy-status]");
 
     const parameters = new URLSearchParams(window.location.search);
     const routeBySlug = {
@@ -1437,8 +1447,12 @@
         fragment.append(group);
       });
       review.replaceChildren(fragment);
+      if (previewText) previewText.value = prepareMessage().copyText;
     };
     const update = () => {
+      confirmation?.remove();
+      confirmation = null;
+      if (actions) actions.hidden = false;
       steps.forEach((step, index) => { step.hidden = index !== current; });
       progress.forEach((item, index) => item.classList.toggle("is-active", index <= current));
       progressMeter?.setAttribute("aria-valuenow", String(current + 1));
@@ -1447,7 +1461,12 @@
       if (next) next.hidden = current === steps.length - 1;
       if (submit) submit.hidden = current !== steps.length - 1;
       if (current === steps.length - 1) renderReview();
-      steps[current]?.querySelector("input, select, textarea")?.focus({ preventScroll: true });
+      if (current === steps.length - 1) {
+        steps[current].tabIndex = -1;
+        steps[current].focus({ preventScroll: true });
+      } else {
+        (steps[current]?.querySelector('input[type="radio"]:checked') || steps[current]?.querySelector("input, select, textarea"))?.focus({ preventScroll: true });
+      }
       emitJourneySignal(current === steps.length - 1 ? "contact_review" : "contact_step", {
         context: guidedArrival ? "guided" : "direct",
         step: current + 1,
@@ -1457,8 +1476,22 @@
     const validate = () => {
       clearError();
       const controls = Array.from(steps[current].querySelectorAll("input, select, textarea")).filter((control) => !control.disabled);
+      controls.forEach(control => {
+        control.setCustomValidity("");
+        if (control.required && ["context", "outcome", "name"].includes(control.name) && !control.value.trim()) {
+          control.setCustomValidity("Écrivez quelques mots avant de continuer.");
+        }
+      });
       const invalid = controls.find((control) => !control.checkValidity());
-      controls.forEach((control) => control.setAttribute("aria-invalid", String(!control.checkValidity())));
+      controls.forEach(control => {
+        const invalid = !control.checkValidity();
+        control.setAttribute("aria-invalid", String(invalid));
+        const descriptions = new Set((control.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean));
+        if (invalid) descriptions.add("contact-form-error");
+        else descriptions.delete("contact-form-error");
+        if (descriptions.size) control.setAttribute("aria-describedby", [...descriptions].join(" "));
+        else control.removeAttribute("aria-describedby");
+      });
       if (!invalid) return true;
       const label = invalid.closest("fieldset")?.querySelector("legend")?.textContent.trim()
         || form.querySelector(`label[for="${invalid.id}"]`)?.textContent.trim()
@@ -1481,7 +1514,10 @@
       update();
     });
     form.addEventListener("input", (event) => {
+      if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement)) return;
+      event.target.setCustomValidity("");
       event.target.removeAttribute("aria-invalid");
+      if (event.target.name === "route") form.querySelectorAll('[name="route"]').forEach(control => control.removeAttribute("aria-invalid"));
       clearError();
     });
     routeLinks.forEach((link) => {
@@ -1498,11 +1534,8 @@
         window.setTimeout(() => form.querySelector("#context")?.focus({ preventScroll: true }), reduceMotion.matches ? 0 : 420);
       });
     });
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (!validate()) return;
+    function prepareMessage() {
       const data = new FormData(form);
-      if (data.get("website")) return;
 
       const route = displayValue(data, "route", "Échange autour de Vestiges");
       const subject = `Vestiges — premier contact · ${route}`;
@@ -1525,12 +1558,60 @@
       ];
       const mailto = `mailto:contact@vestiges.world?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
       const copyText = [`À : contact@vestiges.world`, `Objet : ${subject}`, "", ...lines].join("\n");
-      const confirmation = document.createElement("section");
+      return { mailto, copyText };
+    }
+    async function copyMessage(status) {
+      try {
+        await navigator.clipboard.writeText(prepareMessage().copyText);
+        if (status) status.textContent = "Message copié. Collez-le dans un e-mail adressé à contact@vestiges.world.";
+        emitJourneySignal("message_copied", { destination: "email" });
+      } catch (_error) {
+        if (status) status.textContent = "Sélectionnez le texte du message ci-dessous, puis copiez-le avec les commandes de votre appareil.";
+        previewText?.focus({ preventScroll: true });
+        previewText?.select();
+        emitJourneySignal("message_copy_failed", { destination: "email" });
+      }
+    }
+    reviewCopy?.addEventListener("click", () => copyMessage(reviewCopyStatus));
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!validate()) return;
+      if (current < steps.length - 1) {
+        current += 1;
+        update();
+        return;
+      }
+      if (new FormData(form).get("website")) return;
+      const { mailto, copyText } = prepareMessage();
+      confirmation?.remove();
+      confirmation = document.createElement("section");
       confirmation.className = "form-step";
       confirmation.tabIndex = -1;
-      confirmation.setAttribute("role", "status");
+      confirmation.setAttribute("role", "region");
+      confirmation.setAttribute("aria-label", "Message préparé");
       confirmation.innerHTML = "<p class='eyebrow'>Message préparé</p><h3>Votre message est prêt.</h3><p>Votre messagerie peut s’ouvrir automatiquement. Relisez le message avant de décider de l’envoyer. Vestiges ne le recevra qu’après votre envoi.</p><div class='prepared-message-actions'><a class='button button-dark' data-open-prepared-mail>Ouvrir ma messagerie</a><button class='button' type='button' data-copy-prepared-message>Copier le message complet</button></div><p class='form-note' data-copy-status aria-live='polite'>Si aucune application ne s’ouvre, copiez le message puis écrivez à <a href='mailto:contact@vestiges.world'>contact@vestiges.world</a>.</p><div class='prepared-next-steps'><p class='meta'>Après l’envoi</p><ol><li>L’équipe Vestiges examine personnellement votre message.</li><li>La réponse peut contenir une question, proposer un échange ou expliquer pourquoi nous ne pouvons pas donner suite.</li><li>Un échange, la préparation d’une présentation et sa publication sont trois étapes distinctes ; vous pouvez accepter ou refuser chacune.</li></ol></div>";
-      form.replaceChildren(confirmation);
+      steps.forEach(step => { step.hidden = true; });
+      if (actions) actions.hidden = true;
+      form.append(confirmation);
+      const manualLabel = document.createElement("label");
+      manualLabel.htmlFor = "prepared-message-text";
+      manualLabel.textContent = "Votre message, prêt à copier";
+      const manualText = document.createElement("textarea");
+      manualText.id = "prepared-message-text";
+      manualText.className = "message-text";
+      manualText.readOnly = true;
+      manualText.rows = 10;
+      manualText.value = copyText;
+      const manual = document.createElement("div");
+      manual.className = "field prepared-manual-copy";
+      manual.append(manualLabel, manualText);
+      confirmation.querySelector(".prepared-next-steps").before(manual);
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.className = "button";
+      edit.textContent = "Modifier mes réponses";
+      edit.addEventListener("click", () => { current = steps.length - 1; update(); });
+      confirmation.querySelector(".prepared-message-actions").append(edit);
       const openPreparedMail = confirmation.querySelector("[data-open-prepared-mail]");
       const copyPreparedMessage = confirmation.querySelector("[data-copy-prepared-message]");
       const copyStatus = confirmation.querySelector("[data-copy-status]");
@@ -1541,7 +1622,9 @@
           if (copyStatus) copyStatus.textContent = "Message copié. Collez-le dans un e-mail adressé à contact@vestiges.world.";
           emitJourneySignal("message_copied", { destination: "email" });
         } catch (_error) {
-          if (copyStatus) copyStatus.textContent = "La copie automatique n’est pas disponible. Écrivez directement à contact@vestiges.world.";
+          if (copyStatus) copyStatus.textContent = "Sélectionnez le texte ci-dessous et copiez-le avec les commandes de votre appareil.";
+          manualText.focus({ preventScroll: true });
+          manualText.select();
           emitJourneySignal("message_copy_failed", { destination: "email" });
         }
       });

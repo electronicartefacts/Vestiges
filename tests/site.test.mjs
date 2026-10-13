@@ -40,12 +40,12 @@ test("les ressources versionnées correspondent aux sources validées", async ()
     ["script.js", await activeResource("script", "js")],
     ["mosaic-specimen-viewer.js", "mosaic-specimen-viewer.20261013a.js"],
     ["exploration-data.js", "exploration-data.20260816a.js"],
-    ["forge-viewer.js", "forge-viewer.20261013a.js"],
-    ["encyclopedia.js", "encyclopedia.20261013b.js"],
+    ["forge-viewer.js", "forge-viewer.20261013b.js"],
+    ["encyclopedia.js", "encyclopedia.20261013c.js"],
     ["encyclopedia.css", "encyclopedia.20261013b.css"],
     ["encyclopedia-records.js", "encyclopedia-records.20261013b.js"],
     ["composition-engine.js", "composition-engine.20261013a.js"],
-    ["encyclopedia-catalog.js", "encyclopedia-catalog.20261013a.js"],
+    ["encyclopedia-catalog.js", "encyclopedia-catalog.20261013b.js"],
     ["encyclopedia-spatial.js", "encyclopedia-spatial.20261013a.js"],
     ["world-geometry.js", "world-geometry.20261013a.js"]
   ];

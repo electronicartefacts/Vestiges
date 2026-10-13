@@ -262,10 +262,23 @@ for (const [route, page] of pages) {
   const data = blocks[0];
   if (data["@context"] !== "https://schema.org") fail(`${route} doit déclarer le contexte Schema.org.`);
   const entities = Array.isArray(data["@graph"]) ? data["@graph"] : [data];
-  const allowedTypes = new Set(["WebSite", "WebPage", "AboutPage"]);
+  const allowedTypes = new Set(["WebSite", "WebPage", "AboutPage", "BreadcrumbList"]);
   if (entities.some((entity) => !allowedTypes.has(entity["@type"]))) fail(`${route} contient un type JSON-LD non qualifié.`);
   if (entities.some((entity) => entity["@type"] === "Organization" || (Array.isArray(entity["@type"]) && entity["@type"].includes("Organization")))) {
     fail(`${route} ne peut pas déclarer Organization avant vérification de l’entité porteuse.`);
+  }
+  const breadcrumbs = entities.filter(entity => entity["@type"] === "BreadcrumbList");
+  if (breadcrumbs.length !== (route === "/" ? 0 : 1)) fail(`${route} doit décrire son fil d’Ariane visible.`);
+  if (breadcrumbs.length) {
+    const visible = page.html.match(/<nav class="breadcrumbs"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || "";
+    const names = [...visible.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map(match => textContent(match[1]));
+    const items = breadcrumbs[0].itemListElement;
+    if (!Array.isArray(items) || items.length < 2 || items.length !== names.length) fail(`${route} a un fil d’Ariane incomplet.`);
+    items.forEach((item, index) => {
+      if (item["@type"] !== "ListItem" || item.position !== index + 1 || item.name !== names[index]) fail(`${route} désaligne le fil d’Ariane visible et structuré.`);
+      if (!pages.has(new URL(item.item).pathname) || !item.item.startsWith(`${origin}/`)) fail(`${route} référence une page absente dans son fil d’Ariane.`);
+    });
+    if (items[0].item !== `${origin}/` || items.at(-1).item !== page.canonical) fail(`${route} a un fil d’Ariane non canonique.`);
   }
   const websites = entities.filter((entity) => entity["@type"] === "WebSite");
   const webPages = entities.filter((entity) => entity["@type"] === "WebPage" || entity["@type"] === "AboutPage");

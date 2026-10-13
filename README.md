@@ -21,7 +21,7 @@ Mini-site statique de [Vestiges](https://vestiges.world), projet culturel et éd
 
 Les pages historiques restent accessibles en liens secondaires dans le pied de page : `/programme-fondateur/`, `/pour-qui/`, `/comment-ca-marche/`, `/transmission/`, `/organisations/`, `/artistes/`, `/methode/`, `/participer/`, `/a-propos/`, `/laboratoire/`, `/explorer/` et `/explorer/specimen/`. Aucune route historique n’a été supprimée ou redirigée dans cette première version.
 
-L’accueil commence par une présentation visuelle et quatre portes de découverte, puis propose une **constellation éditoriale** de douze exemples de démonstration. Son jeu de données est isolé dans `exploration-data.js` ; il ne décrit aucun dossier réel et pourra être remplacé par une projection de VAST sans réécrire la couche d’interaction.
+L’accueil commence par une présentation visuelle et quatre portes de découverte, puis propose une **constellation éditoriale** de douze exemples de démonstration. Son jeu de données est isolé dans `exploration-data.js` ; il ne décrit aucun dossier réel et pourra être remplacé par une projection de VAST sans réécrire la couche d’interaction. Un aperçu photo utilise la recherche et les médias de l’encyclopédie, avec un mot-clé conservé vers la grille. Sur mobile, les quatre portes se parcourent dans un carrousel horizontal natif.
 
 Le site correspond à l’état de maturité **premier prototype public**. Les premiers portraits et dossiers sont à construire avec des artisan·es. La marketplace n’est pas encore ouverte. Bois flotté 01 est un sujet naturel sans praticien attribué. La capture, la reconstruction et les médias numériques sont attribués à Electronic Artefacts et ne sont pas déclarés dans le domaine public.
 
@@ -66,7 +66,7 @@ La page `Comment ça marche` contient une anatomie de dossier explicitement pré
 ## Technique
 
 - HTML, CSS et JavaScript natifs ;
-- polices Inter et Newsreader locales, sous SIL Open Font License ;
+- polices Inter et Newsreader locales, sous SIL Open Font License, avec sous-ensembles et fichiers originaux complémentaires ; voir [`assets/fonts/README.md`](assets/fonts/README.md) ;
 - aucune dépendance distante, aucun analytics ;
 - Three.js est archivé localement sous licence MIT pour la vue 3D à la demande ;
 - modèle GLB FORGE et manifeste de provenance conservés dans `assets/works/bois-flotte-01/` ;
@@ -114,3 +114,7 @@ Ces fonctions ne sont pas encore actives. Elles doivent prolonger l’encyclopé
 - aucun ambassadeur, partenaire institutionnel ou dossier d’artisan n’est affiché ;
 - la collecte chiffrée publique reste fermée ;
 - les mentions juridiques complètes devront être validées avant son ouverture.
+
+## Lecture et navigation
+
+Les pages secondaires proposent un fil d’Ariane visible, repris en `BreadcrumbList` pour les treize pages secondaires canoniques indexables. Le validateur contrôle leur concordance avec le HTML et les URL canoniques. L’encyclopédie garde trois références de collection lisibles en HTML, avec images, dates et sources ; ses commandes interactives s’affichent après initialisation. Le formulaire conserve les réponses pendant la visite, donne accès au texte exact à copier avant ouverture de la messagerie et réserve cette ouverture à la quatrième étape.
